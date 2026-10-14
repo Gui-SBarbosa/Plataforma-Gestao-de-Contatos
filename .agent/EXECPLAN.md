@@ -30,7 +30,7 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | Estado      | Etapa                    | Saída verificável                                                 |
 | ----------- | ------------------------ | ----------------------------------------------------------------- |
 | completed   | Fundação do repositório  | Workspaces, scripts, lint, TypeScript e app mínima compilando     |
-| in_progress | Banco e seed             | Schema, migrations, sessão, admin e 20+ contatos de demonstração  |
+| in_progress | Banco e seed             | Schema, migrations, sessão e administrador de demonstração         |
 | pending     | Autenticação             | Registro, login, logout, `me`, cookies e rate limiter persistente |
 | pending     | Aprovação em tempo real  | Painel admin, tracking token e eventos de aprovação/rejeição      |
 | pending     | Contatos                 | Cadastro, RBAC, ownership e paginação backend                     |
@@ -68,6 +68,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — Prisma 6.16 foi fixado por compatibilidade com Node 20; o seed usa `@node-rs/argon2` com algoritmo Argon2id e exige senhas fornecidas pelo ambiente.
 - 14/10/2026 — o backlog P0 passou a ser sequencial: somente o primeiro item pendente pode ser trabalhado. A etapa de banco permanece em andamento até a validação em PostgreSQL real.
 - 14/10/2026 — os scripts Prisma da API passaram a carregar explicitamente o `.env` da raiz, evitando divergência entre o diretório do workspace e a configuração local do banco.
+- 14/10/2026 — por decisão do solicitante, o seed de demonstração passou a criar somente um administrador ativo; operadores e contatos serão criados manualmente pela plataforma nas etapas posteriores.
 
 ## Validações executadas
 
@@ -90,8 +91,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 
 ## Pendências e próximos passos
 
-- Item atual do backlog: aplicar a migration e executar o seed contra um PostgreSQL disponível.
-- Definir `SEED_ADMIN_PASSWORD` e `SEED_OPERATOR_PASSWORD` no `.env` local para executar `npm run db:seed`.
-- Validar contagem dos usuários e dos 24 contatos após o seed.
-- A migration foi aplicada em PostgreSQL local; o seed permanece bloqueado pela ausência das senhas locais de demonstração.
+- Item atual do backlog: executar e validar o seed do administrador contra o PostgreSQL disponível.
+- Definir `SEED_ADMIN_PASSWORD` no `.env` local para executar `npm run db:seed`.
+- Validar a presença de um administrador ativo após o seed.
+- A migration foi aplicada em PostgreSQL local; o seed permanece bloqueado pela ausência da senha local do administrador.
 - Não iniciar autenticação ou qualquer item posterior até concluir e registrar a validação deste item.

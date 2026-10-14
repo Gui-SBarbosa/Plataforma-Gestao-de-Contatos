@@ -24,7 +24,6 @@ push na main
 NODE_ENV=production
 DATABASE_URL=<fornecida pelo ambiente>
 SEED_ADMIN_PASSWORD=<fornecida apenas no ambiente de demo>
-SEED_OPERATOR_PASSWORD=<fornecida apenas no ambiente de demo>
 SESSION_SECRET=<segredo forte>
 CSRF_SECRET=<segredo forte>
 RATE_LIMIT_SECRET=<segredo forte e independente>

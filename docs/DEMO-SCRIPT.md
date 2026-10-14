@@ -60,6 +60,6 @@ Reforçar que a solução prioriza requisitos obrigatórios, segurança, rastrea
 ## Plano de contingência
 
 - Manter GIF ou vídeo curto dos dois fluxos em tempo real.
-- Ter massa de dados pronta pelo seed.
+- Preparar operadores e contatos pela própria plataforma antes da apresentação.
 - Manter ambiente local pronto caso o deploy fique indisponível.
 - Não editar dados manualmente durante a apresentação.
