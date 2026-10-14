@@ -39,14 +39,20 @@ Entregar uma aplicação com dois perfis:
 
 ## Execução
 
-Os comandos definitivos serão preenchidos após a fundação do código. A interface esperada será:
+Pré-requisitos: Node.js 20+ e npm 10+. Copie o arquivo de ambiente e instale as dependências:
 
 ```bash
 npm install
-cp .env.example .env
-npm run db:migrate
-npm run db:seed
+npm install
+Copy-Item .env.example .env
 npm run dev
+```
+
+Para iniciar somente um serviço durante o desenvolvimento:
+
+```bash
+npm run dev:api
+npm run dev:web
 ```
 
 Validação esperada:
@@ -57,6 +63,8 @@ npm run typecheck
 npm test
 npm run build
 ```
+
+Com a base em execução, a API responde em `GET /api/health`. Migrations, seed e endpoints de domínio serão adicionados nas próximas etapas do ExecPlan.
 
 ## Credenciais de demonstração
 

@@ -8,7 +8,7 @@ Priorizar testes de integração do backend com Jest e Supertest. As regras crí
 
 - Jest.
 - Supertest.
-- `@swc/jest` para TypeScript.
+- `tsc` compila a API antes dos testes de integração; o Jest executa o artefato JavaScript resultante.
 - React Testing Library apenas para fluxos essenciais, se houver tempo.
 - Banco PostgreSQL isolado por ambiente.
 

@@ -29,7 +29,7 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 
 | Estado      | Etapa                    | Saída verificável                                                 |
 | ----------- | ------------------------ | ----------------------------------------------------------------- |
-| in_progress | Fundação do repositório  | Workspaces, scripts, lint, TypeScript e app mínima compilando     |
+| completed   | Fundação do repositório  | Workspaces, scripts, lint, TypeScript e app mínima compilando     |
 | pending     | Banco e seed             | Schema, migrations, sessão, admin e 20+ contatos de demonstração  |
 | pending     | Autenticação             | Registro, login, logout, `me`, cookies e rate limiter persistente |
 | pending     | Aprovação em tempo real  | Painel admin, tracking token e eventos de aprovação/rejeição      |
@@ -62,14 +62,22 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 13/10/2026 — Jest + Supertest escolhidos para testes do backend.
 - 13/10/2026 — PlantUML escolhido como fonte dos diagramas UML.
 - 13/10/2026 — Rate limiter persistente no PostgreSQL tornou-se obrigatório para endpoints sensíveis.
+- 14/10/2026 — fundação entregue como monorepo npm com `apps/api` e `apps/web`; os comandos `dev:api` e `dev:web` permitem iniciar cada aplicação separadamente.
+- 14/10/2026 — testes de integração executam o artefato TypeScript compilado pelo Jest e Supertest. A mudança evita dependência de binding nativo na fundação e preserva os testes HTTP reais definidos no ADR 0005.
+- 14/10/2026 — a referência visual fornecida no Open Design será a base de tokens e componentes do frontend nas etapas de interface correspondentes.
 
 ## Validações executadas
 
-- Ainda não executadas; implementação não iniciada.
+- 14/10/2026 — `npm run lint`: aprovado.
+- 14/10/2026 — `npm run typecheck`: aprovado para API e web.
+- 14/10/2026 — `npm run test:integration --workspace=@gestcon/api`: 1 teste aprovado para `GET /api/health`.
+- 14/10/2026 — `npm run build --workspace=@gestcon/api`: aprovado.
+- 14/10/2026 — `npm run build --workspace=@gestcon/web`: aprovado.
+- 14/10/2026 — `npm audit --omit=dev --json`: nenhuma vulnerabilidade em dependências de produção.
 
 ## Pendências e próximos passos
 
-- Criar fundação do monorepo.
+- Iniciar a etapa Banco e seed, atualizando seu estado para `in_progress` antes de alterar o schema.
 - Confirmar com avaliador a visibilidade de contatos entre operadores.
 - Confirmar interpretação de “duas páginas de contatos”.
 - Substituir placeholders de comandos e URLs após o primeiro deploy.
