@@ -1,25 +1,31 @@
 # Backlog de entrega
 
+## Forma de execução
+
+Os itens P0 abaixo são executados estritamente na ordem apresentada. Um item só
+avança para concluído quando suas validações forem registradas no ExecPlan; itens
+posteriores não são iniciados enquanto o item corrente estiver pendente ou bloqueado.
+
 ## P0 — Obrigatório
 
-- [ ] Fundação TypeScript, lint, build e configuração.
-- [ ] Schema e migrations.
-- [ ] Seed com admin, operador e pelo menos 20 contatos.
-- [ ] Login, logout e sessão atual.
-- [ ] Rate limiter persistente para autenticação, registro e tracking.
-- [ ] Job de limpeza de buckets expirados.
-- [ ] Registro público de operador.
-- [ ] Acompanhamento em tempo real da aprovação.
-- [ ] Cadastro direto de usuário pelo admin.
-- [ ] Aprovação e rejeição.
-- [ ] Cadastro de contato.
-- [ ] Notificação em tempo real para admin.
-- [ ] Lista paginada de contatos.
-- [ ] RBAC e ownership.
-- [ ] Testes críticos.
-- [ ] Testes de persistência, concorrência e resposta `429` do rate limiter.
-- [ ] README executável.
-- [ ] Deploy e smoke test.
+- [x] 01. Fundação TypeScript, lint, build e configuração.
+- [ ] 02. Banco local: aplicar migrations e executar o seed em um PostgreSQL disponível.
+  - Schema, migration e seed idempotente já foram implementados.
+  - Falta validar a execução real, incluindo 2 usuários e 24 contatos de demonstração.
+- [ ] 03. Login, logout e sessão atual.
+- [ ] 04. Rate limiter persistente para autenticação, registro e tracking.
+- [ ] 05. Job idempotente de limpeza de buckets expirados.
+- [ ] 06. Registro público de operador.
+- [ ] 07. Cadastro direto de usuário pelo administrador.
+- [ ] 08. Aprovação e rejeição de solicitações.
+- [ ] 09. Acompanhamento da aprovação em tempo real.
+- [ ] 10. Cadastro de contato.
+- [ ] 11. RBAC e ownership de contatos.
+- [ ] 12. Lista paginada de contatos.
+- [ ] 13. Notificação em tempo real para administrador.
+- [ ] 14. Testes críticos, de persistência, concorrência e resposta `429`.
+- [ ] 15. README executável e documentação de ambiente revisada.
+- [ ] 16. Deploy e smoke test.
 
 ## P1 — Diferenciais viáveis
 

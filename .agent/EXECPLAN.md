@@ -66,6 +66,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — testes de integração executam o artefato TypeScript compilado pelo Jest e Supertest. A mudança evita dependência de binding nativo na fundação e preserva os testes HTTP reais definidos no ADR 0005.
 - 14/10/2026 — a referência visual fornecida no Open Design será a base de tokens e componentes do frontend nas etapas de interface correspondentes.
 - 14/10/2026 — Prisma 6.16 foi fixado por compatibilidade com Node 20; o seed usa `@node-rs/argon2` com algoritmo Argon2id e exige senhas fornecidas pelo ambiente.
+- 14/10/2026 — o backlog P0 passou a ser sequencial: somente o primeiro item pendente pode ser trabalhado. A etapa de banco permanece em andamento até a validação em PostgreSQL real.
 
 ## Validações executadas
 
@@ -85,11 +86,9 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 
 ## Pendências e próximos passos
 
-- Implementar schema, migration e seed idempotente do PostgreSQL.
+- Item atual do backlog: aplicar a migration e executar o seed contra um PostgreSQL disponível.
 - Executar `npm run db:deploy` e `npm run db:seed` contra um PostgreSQL disponível.
 - Validar contagem dos usuários e dos 24 contatos após o seed.
 - PostgreSQL local e daemon Docker não estavam disponíveis durante esta etapa; migration e seed ainda não foram executados contra um banco real.
 - Após iniciar o Docker Desktop, executar `npm run db:up`, atualizar o `.env` com a senha local e executar `npm run db:deploy` e `npm run db:seed`.
-- Confirmar com avaliador a visibilidade de contatos entre operadores.
-- Confirmar interpretação de “duas páginas de contatos”.
-- Substituir placeholders de comandos e URLs após o primeiro deploy.
+- Não iniciar autenticação ou qualquer item posterior até concluir e registrar a validação deste item.
