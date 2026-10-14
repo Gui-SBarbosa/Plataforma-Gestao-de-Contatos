@@ -43,13 +43,15 @@ Pré-requisitos: Node.js 20+ e npm 10+. Copie o arquivo de ambiente e instale as
 
 ```bash
 npm install
-npm install
 Copy-Item .env.example .env
+npm run db:up
 npm run db:generate
 npm run db:migrate
 npm run db:seed
 npm run dev
 ```
+
+O PostgreSQL local Ã© fornecido pelo `compose.yaml`. O Docker Desktop precisa estar iniciado antes de `npm run db:up`.
 
 Antes de executar o seed, preencha `SEED_ADMIN_PASSWORD` e `SEED_OPERATOR_PASSWORD` no `.env` local. Esses valores não devem ser commitados.
 

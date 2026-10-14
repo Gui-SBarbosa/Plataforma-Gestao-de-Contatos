@@ -80,6 +80,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — teste isolado do Argon2id: aprovado sem persistir credenciais.
 - 14/10/2026 — migration SQL inicial gerada por `prisma migrate diff --from-empty` e adicionada ao repositório.
 - 14/10/2026 — validação final de lint, typecheck, typecheck da seed, build da API, build web e teste de integração: aprovada.
+- 14/10/2026 — ambiente local documentado com `compose.yaml`, PostgreSQL 16, senha obrigatória e bind restrito a `127.0.0.1`.
+- 14/10/2026 — `docker compose config --quiet`, lint, typecheck, typecheck da seed e builds: aprovados.
 
 ## Pendências e próximos passos
 
@@ -87,6 +89,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - Executar `npm run db:deploy` e `npm run db:seed` contra um PostgreSQL disponível.
 - Validar contagem dos usuários e dos 24 contatos após o seed.
 - PostgreSQL local e daemon Docker não estavam disponíveis durante esta etapa; migration e seed ainda não foram executados contra um banco real.
+- Após iniciar o Docker Desktop, executar `npm run db:up`, atualizar o `.env` com a senha local e executar `npm run db:deploy` e `npm run db:seed`.
 - Confirmar com avaliador a visibilidade de contatos entre operadores.
 - Confirmar interpretação de “duas páginas de contatos”.
 - Substituir placeholders de comandos e URLs após o primeiro deploy.

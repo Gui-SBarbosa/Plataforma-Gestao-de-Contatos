@@ -34,8 +34,6 @@ PORT=<fornecida pelo ambiente>
 
 ## Comandos previstos
 
-Devem ser ajustados ao scaffolding real:
-
 ```text
 Build: npm ci && npm run build
 Start: npm run start
