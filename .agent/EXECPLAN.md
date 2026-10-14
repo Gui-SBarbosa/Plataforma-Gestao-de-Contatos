@@ -31,7 +31,7 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | ----------- | ------------------------ | ----------------------------------------------------------------- |
 | completed   | Fundação do repositório  | Workspaces, scripts, lint, TypeScript e app mínima compilando     |
 | completed   | Banco e seed             | Schema, migrations, sessão e administrador de demonstração         |
-| in_progress | Autenticação             | Registro, login, logout, `me`, cookies e rate limiter persistente |
+| in_progress | Autenticação             | Login, logout, `me`, sessão server-side, cookies e CSRF           |
 | pending     | Aprovação em tempo real  | Painel admin, tracking token e eventos de aprovação/rejeição      |
 | pending     | Contatos                 | Cadastro, RBAC, ownership e paginação backend                     |
 | pending     | Notificações e auditoria | Persistência, leitura e eventos pós-commit                        |
@@ -71,6 +71,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — por decisão do solicitante, o seed de demonstração passou a criar somente um administrador ativo; operadores e contatos serão criados manualmente pela plataforma nas etapas posteriores.
 - 14/10/2026 — o e-mail do administrador seedado passou a ser obrigatório no ambiente, normalizado antes do upsert e validado sem registrá-lo em logs.
 - 14/10/2026 — banco `gestcon` migrado e seed administrativo validado em PostgreSQL local; a etapa de autenticação tornou-se a única etapa em andamento.
+- 14/10/2026 — autenticação foi implementada no módulo isolado `auth`, com sessão opaca persistida no PostgreSQL, cookie `HttpOnly`, CORS de origem configurada, CSRF ligado à sessão e headers Helmet.
 
 ## Validações executadas
 
@@ -91,9 +92,12 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — `npm run db:generate` e `npm run typecheck:db`: aprovados após o ajuste de carregamento do `.env` raiz.
 - 14/10/2026 — `npm audit --omit=dev --json` identificou 4 alertas altos encadeados pelo Prisma CLI; a correção sugerida altera a versão fixada por compatibilidade e deve ser avaliada na etapa de qualidade.
 - 14/10/2026 — `npm run db:seed`: aprovado em PostgreSQL local; administrador configurado pelo ambiente confirmado como `ADMIN` e `ACTIVE`, sem expor seu e-mail.
+- 14/10/2026 — migration aplicada no banco isolado `gestcon_test`; 7 testes de integração aprovados para CSRF, login de usuário ativo, rejeição de usuário pendente/rejeitado/desativado, `me` e logout.
+- 14/10/2026 — lint, typecheck, testes de integração e build da API e web: aprovados após a implementação de autenticação.
 
 ## Pendências e próximos passos
 
 - Item atual do backlog: implementar autenticação por sessão server-side, incluindo login, logout e consulta de sessão atual.
-- Ler e aplicar os ADRs de autenticação e rate limiting antes de criar endpoints.
+- Definir `SESSION_SECRET` e `CSRF_SECRET` com pelo menos 32 caracteres no `.env` local e executar o smoke test de desenvolvimento.
+- Verificar manualmente o fluxo de `GET /api/auth/csrf`, login, `me` e logout com o administrador seedado.
 - Não iniciar aprovação, contatos ou qualquer item posterior até concluir e registrar a validação desta etapa.

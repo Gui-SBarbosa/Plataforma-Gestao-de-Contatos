@@ -40,6 +40,7 @@ Paginação:
 
 | Método | Rota | Acesso | Descrição |
 |---|---|---|---|
+| GET | `/auth/csrf` | Público | Cria ou retorna o token CSRF da sessão atual |
 | POST | `/auth/register` | Público | Solicita cadastro de operador |
 | POST | `/auth/login` | Público | Cria sessão |
 | POST | `/auth/logout` | Autenticado | Encerra sessão |
@@ -55,6 +56,8 @@ Paginação:
   "password": "senha-forte"
 }
 ```
+
+Antes de operações de escrita, o cliente obtém `GET /auth/csrf` com credenciais e envia o token retornado no header `X-CSRF-Token`.
 
 Os endpoints de autenticação podem responder:
 
