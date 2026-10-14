@@ -1,0 +1,37 @@
+@startuml
+skinparam componentStyle rectangle
+actor Usuario
+component "React + Vite" as Web
+node "GestCon — Express" {
+  component "REST API" as API
+  component "Socket.IO" as Socket
+  component "Auth" as Auth
+  component "Users" as Users
+  component "Contacts" as Contacts
+  component "Notifications" as Notifications
+  component "Dashboard" as Dashboard
+  component "Audit" as Audit
+  component "Prisma repositories" as Repos
+}
+database PostgreSQL
+
+Usuario --> Web
+Web --> API : HTTPS/JSON
+Web <--> Socket : WSS
+API --> Auth
+API --> Users
+API --> Contacts
+API --> Notifications
+API --> Dashboard
+Auth --> Repos
+Users --> Repos
+Contacts --> Repos
+Notifications --> Repos
+Dashboard --> Repos
+Audit --> Repos
+Contacts --> Notifications : evento de aplicação
+Users --> Socket : pós-commit
+Notifications --> Socket : pós-commit
+Repos --> PostgreSQL
+@enduml
+

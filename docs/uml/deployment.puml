@@ -1,0 +1,17 @@
+@startuml
+node "Navegador" as Browser {
+  artifact "React SPA" as SPA
+}
+cloud "Railway" {
+  node "GestCon App — 1 réplica" as App {
+    artifact "Express + Socket.IO" as Server
+    artifact "React build" as Build
+  }
+  database "PostgreSQL" as DB
+}
+
+Browser --> App : HTTPS / WSS
+Server --> DB : TLS / SQL
+Server --> Build : arquivos estáticos
+@enduml
+

@@ -1,0 +1,25 @@
+@startuml
+actor Operador
+participant "React" as Web
+participant "Express API" as API
+database PostgreSQL as DB
+participant "Socket.IO" as Socket
+actor Administrador as Admin
+
+Operador -> Web : preenche solicitação
+Web -> API : POST /auth/register
+API -> DB : cria User(PENDING) + token hash
+DB --> API : commit
+API --> Web : 202 + trackingToken
+Web -> Socket : registration:watch(token)
+Socket -> DB : valida token hash e status
+Socket --> Web : acompanhamento ativo
+Socket --> Admin : registration:requested
+Admin -> API : PATCH /admin/users/:id/approve
+API -> DB : User=ACTIVE + audit log
+DB --> API : commit
+API -> Socket : registration:approved
+Socket --> Web : status ACTIVE
+Web --> Operador : aprovado; ir para login
+@enduml
+

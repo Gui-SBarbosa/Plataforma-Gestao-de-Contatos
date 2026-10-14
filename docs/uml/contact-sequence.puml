@@ -1,0 +1,19 @@
+@startuml
+actor Operador
+participant "React" as Web
+participant "Express API" as API
+database PostgreSQL as DB
+participant "Socket.IO" as Socket
+actor Administrador as Admin
+
+Operador -> Web : envia contato
+Web -> API : POST /contacts
+API -> API : sessão + RBAC + Zod
+API -> DB : transação: Contact + Notification + AuditLog
+DB --> API : commit
+API -> Socket : contact:created
+Socket --> Admin : notificação em tempo real
+API --> Web : 201 Contact
+Web --> Operador : confirma cadastro
+@enduml
+

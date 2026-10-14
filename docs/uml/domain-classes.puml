@@ -1,0 +1,65 @@
+@startuml
+hide methods
+class User {
+  +UUID id
+  +String name
+  +String email
+  -String passwordHash
+  +Role role
+  +UserStatus status
+  +UUID approvedById
+  +DateTime approvedAt
+  +DateTime createdAt
+}
+class Contact {
+  +UUID id
+  +String name
+  +String email
+  +String phone
+  +String company
+  +String city
+  +ContactSource source
+  +UUID createdById
+  +DateTime createdAt
+}
+class Notification {
+  +UUID id
+  +UUID recipientId
+  +NotificationType type
+  +String title
+  +Json payload
+  +DateTime readAt
+  +DateTime createdAt
+}
+class AuditLog {
+  +UUID id
+  +UUID actorId
+  +String action
+  +String entityType
+  +UUID entityId
+  +Json metadata
+  +DateTime createdAt
+}
+class Session {
+  +String sid
+  +Json sess
+  +DateTime expire
+}
+class RateLimitBucket {
+  +UUID id
+  +String scope
+  +String keyHash
+  +DateTime windowStart
+  +Int count
+  +DateTime expiresAt
+}
+
+User "1" -- "0..*" Contact : creates
+User "1" -- "0..*" Notification : receives
+User "0..1" -- "0..*" AuditLog : performs
+User "0..1" -- "0..*" User : approves
+Session ..> User : contains identity
+RateLimitBucket ..> User : protects authentication
+@enduml
+
+
