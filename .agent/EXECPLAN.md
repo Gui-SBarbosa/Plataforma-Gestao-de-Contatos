@@ -30,8 +30,8 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | Estado      | Etapa                    | Saída verificável                                                 |
 | ----------- | ------------------------ | ----------------------------------------------------------------- |
 | completed   | Fundação do repositório  | Workspaces, scripts, lint, TypeScript e app mínima compilando     |
-| in_progress | Banco e seed             | Schema, migrations, sessão e administrador de demonstração         |
-| pending     | Autenticação             | Registro, login, logout, `me`, cookies e rate limiter persistente |
+| completed   | Banco e seed             | Schema, migrations, sessão e administrador de demonstração         |
+| in_progress | Autenticação             | Registro, login, logout, `me`, cookies e rate limiter persistente |
 | pending     | Aprovação em tempo real  | Painel admin, tracking token e eventos de aprovação/rejeição      |
 | pending     | Contatos                 | Cadastro, RBAC, ownership e paginação backend                     |
 | pending     | Notificações e auditoria | Persistência, leitura e eventos pós-commit                        |
@@ -70,6 +70,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — os scripts Prisma da API passaram a carregar explicitamente o `.env` da raiz, evitando divergência entre o diretório do workspace e a configuração local do banco.
 - 14/10/2026 — por decisão do solicitante, o seed de demonstração passou a criar somente um administrador ativo; operadores e contatos serão criados manualmente pela plataforma nas etapas posteriores.
 - 14/10/2026 — o e-mail do administrador seedado passou a ser obrigatório no ambiente, normalizado antes do upsert e validado sem registrá-lo em logs.
+- 14/10/2026 — banco `gestcon` migrado e seed administrativo validado em PostgreSQL local; a etapa de autenticação tornou-se a única etapa em andamento.
 
 ## Validações executadas
 
@@ -89,11 +90,10 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — `npm run db:deploy`: aprovado contra o PostgreSQL local; a migration `20261014023000_init` foi aplicada ao banco `gestcon`.
 - 14/10/2026 — `npm run db:generate` e `npm run typecheck:db`: aprovados após o ajuste de carregamento do `.env` raiz.
 - 14/10/2026 — `npm audit --omit=dev --json` identificou 4 alertas altos encadeados pelo Prisma CLI; a correção sugerida altera a versão fixada por compatibilidade e deve ser avaliada na etapa de qualidade.
+- 14/10/2026 — `npm run db:seed`: aprovado em PostgreSQL local; administrador configurado pelo ambiente confirmado como `ADMIN` e `ACTIVE`, sem expor seu e-mail.
 
 ## Pendências e próximos passos
 
-- Item atual do backlog: executar e validar o seed do administrador contra o PostgreSQL disponível.
-- Definir `SEED_ADMIN_EMAIL` e `SEED_ADMIN_PASSWORD` no `.env` local para executar `npm run db:seed`.
-- Validar a presença de um administrador ativo após o seed.
-- A migration foi aplicada em PostgreSQL local; o seed permanece bloqueado pela ausência da senha local do administrador.
-- Não iniciar autenticação ou qualquer item posterior até concluir e registrar a validação deste item.
+- Item atual do backlog: implementar autenticação por sessão server-side, incluindo login, logout e consulta de sessão atual.
+- Ler e aplicar os ADRs de autenticação e rate limiting antes de criar endpoints.
+- Não iniciar aprovação, contatos ou qualquer item posterior até concluir e registrar a validação desta etapa.

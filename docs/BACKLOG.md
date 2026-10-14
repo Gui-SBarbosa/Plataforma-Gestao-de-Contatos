@@ -9,9 +9,8 @@ posteriores não são iniciados enquanto o item corrente estiver pendente ou blo
 ## P0 — Obrigatório
 
 - [x] 01. Fundação TypeScript, lint, build e configuração.
-- [ ] 02. Banco local: aplicar migrations e executar o seed em um PostgreSQL disponível.
-  - Schema, migration e seed idempotente do administrador já foram implementados.
-  - Falta validar a execução real com um administrador ativo.
+- [x] 02. Banco local: aplicar migrations e executar o seed em um PostgreSQL disponível.
+  - Schema, migration e seed idempotente do administrador foram validados em PostgreSQL local.
 - [ ] 03. Login, logout e sessão atual.
 - [ ] 04. Rate limiter persistente para autenticação, registro e tracking.
 - [ ] 05. Job idempotente de limpeza de buckets expirados.
