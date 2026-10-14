@@ -45,8 +45,13 @@ Pré-requisitos: Node.js 20+ e npm 10+. Copie o arquivo de ambiente e instale as
 npm install
 npm install
 Copy-Item .env.example .env
+npm run db:generate
+npm run db:migrate
+npm run db:seed
 npm run dev
 ```
+
+Antes de executar o seed, preencha `SEED_ADMIN_PASSWORD` e `SEED_OPERATOR_PASSWORD` no `.env` local. Esses valores não devem ser commitados.
 
 Para iniciar somente um serviço durante o desenvolvimento:
 
@@ -64,7 +69,7 @@ npm test
 npm run build
 ```
 
-Com a base em execução, a API responde em `GET /api/health`. Migrations, seed e endpoints de domínio serão adicionados nas próximas etapas do ExecPlan.
+Com a base em execução, a API responde em `GET /api/health`. Os endpoints de domínio serão adicionados nas próximas etapas do ExecPlan.
 
 ## Credenciais de demonstração
 

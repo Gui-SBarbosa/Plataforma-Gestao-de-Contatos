@@ -23,6 +23,8 @@ push na main
 ```text
 NODE_ENV=production
 DATABASE_URL=<fornecida pelo ambiente>
+SEED_ADMIN_PASSWORD=<fornecida apenas no ambiente de demo>
+SEED_OPERATOR_PASSWORD=<fornecida apenas no ambiente de demo>
 SESSION_SECRET=<segredo forte>
 CSRF_SECRET=<segredo forte>
 RATE_LIMIT_SECRET=<segredo forte e independente>
@@ -38,6 +40,7 @@ Devem ser ajustados ao scaffolding real:
 Build: npm ci && npm run build
 Start: npm run start
 Migration: npm run db:deploy
+Seed demo local: npm run db:seed
 ```
 
 ## Health checks

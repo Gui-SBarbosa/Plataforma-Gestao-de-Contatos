@@ -30,7 +30,7 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | Estado      | Etapa                    | Saída verificável                                                 |
 | ----------- | ------------------------ | ----------------------------------------------------------------- |
 | completed   | Fundação do repositório  | Workspaces, scripts, lint, TypeScript e app mínima compilando     |
-| pending     | Banco e seed             | Schema, migrations, sessão, admin e 20+ contatos de demonstração  |
+| in_progress | Banco e seed             | Schema, migrations, sessão, admin e 20+ contatos de demonstração  |
 | pending     | Autenticação             | Registro, login, logout, `me`, cookies e rate limiter persistente |
 | pending     | Aprovação em tempo real  | Painel admin, tracking token e eventos de aprovação/rejeição      |
 | pending     | Contatos                 | Cadastro, RBAC, ownership e paginação backend                     |
@@ -65,6 +65,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — fundação entregue como monorepo npm com `apps/api` e `apps/web`; os comandos `dev:api` e `dev:web` permitem iniciar cada aplicação separadamente.
 - 14/10/2026 — testes de integração executam o artefato TypeScript compilado pelo Jest e Supertest. A mudança evita dependência de binding nativo na fundação e preserva os testes HTTP reais definidos no ADR 0005.
 - 14/10/2026 — a referência visual fornecida no Open Design será a base de tokens e componentes do frontend nas etapas de interface correspondentes.
+- 14/10/2026 — Prisma 6.16 foi fixado por compatibilidade com Node 20; o seed usa `@node-rs/argon2` com algoritmo Argon2id e exige senhas fornecidas pelo ambiente.
 
 ## Validações executadas
 
@@ -74,10 +75,18 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — `npm run build --workspace=@gestcon/api`: aprovado.
 - 14/10/2026 — `npm run build --workspace=@gestcon/web`: aprovado.
 - 14/10/2026 — `npm audit --omit=dev --json`: nenhuma vulnerabilidade em dependências de produção.
+- 14/10/2026 — `npm run typecheck:db`: aprovado para a seed Prisma.
+- 14/10/2026 — `prisma format --check` e `prisma validate`: aprovados.
+- 14/10/2026 — teste isolado do Argon2id: aprovado sem persistir credenciais.
+- 14/10/2026 — migration SQL inicial gerada por `prisma migrate diff --from-empty` e adicionada ao repositório.
+- 14/10/2026 — validação final de lint, typecheck, typecheck da seed, build da API, build web e teste de integração: aprovada.
 
 ## Pendências e próximos passos
 
-- Iniciar a etapa Banco e seed, atualizando seu estado para `in_progress` antes de alterar o schema.
+- Implementar schema, migration e seed idempotente do PostgreSQL.
+- Executar `npm run db:deploy` e `npm run db:seed` contra um PostgreSQL disponível.
+- Validar contagem dos usuários e dos 24 contatos após o seed.
+- PostgreSQL local e daemon Docker não estavam disponíveis durante esta etapa; migration e seed ainda não foram executados contra um banco real.
 - Confirmar com avaliador a visibilidade de contatos entre operadores.
 - Confirmar interpretação de “duas páginas de contatos”.
 - Substituir placeholders de comandos e URLs após o primeiro deploy.
