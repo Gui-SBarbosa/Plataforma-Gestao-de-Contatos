@@ -40,3 +40,9 @@ export const registerOperator = async ({ email, name, password }: RegistrationIn
 
   return { status: UserStatus.PENDING, trackingToken };
 };
+
+export const findRegistrationByTrackingToken = (trackingToken: string) =>
+  prisma.user.findUnique({
+    select: { approvedAt: true, id: true, status: true, updatedAt: true },
+    where: { registrationTokenHash: hashTrackingToken(trackingToken) },
+  });

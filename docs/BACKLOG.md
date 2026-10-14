@@ -17,7 +17,7 @@ posteriores não são iniciados enquanto o item corrente estiver pendente ou blo
 - [x] 06. Registro público de operador.
 - [x] 07. Cadastro direto de usuário pelo administrador.
 - [x] 08. Aprovação e rejeição de solicitações.
-- [ ] 09. Acompanhamento da aprovação em tempo real.
+- [x] 09. Acompanhamento da aprovação em tempo real.
 - [ ] 10. Cadastro de contato.
 - [ ] 11. RBAC e ownership de contatos.
 - [ ] 12. Lista paginada de contatos.

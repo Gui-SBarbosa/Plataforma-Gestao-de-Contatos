@@ -65,6 +65,8 @@ Paginação:
 
 Retorna `202 Accepted` com `status: PENDING` e um `trackingToken` opaco, exibido somente nessa resposta. O cadastro não cria sessão; o operador só pode autenticar após aprovação.
 
+`GET /auth/registration-status?trackingToken=...` retorna apenas `status` e `decidedAt`, sem dados de usuário, e possui o limite próprio de 60 consultas por minuto. O cliente usa o mesmo token opaco para acompanhar a solicitação no Socket.IO.
+
 Antes de operações de escrita, o cliente obtém `GET /auth/csrf` com credenciais e envia o token retornado no header `X-CSRF-Token`.
 
 Os endpoints de autenticação podem responder:
@@ -150,7 +152,7 @@ Cadastro:
 | Evento | Payload | Autorização |
 |---|---|---|
 | `registration:watch` | `{ trackingToken }` | Token válido |
-| `registration:unwatch` | `{ trackingToken }` | Token válido |
+| `registration:unwatch` | sem payload | Socket já autorizado |
 
 ### Servidor para cliente
 
@@ -164,6 +166,8 @@ Cadastro:
 | `dashboard:updated` | `admins` | métricas ou sinal para revalidar |
 
 O servidor ignora qualquer sala ou papel declarado diretamente pelo cliente.
+
+O cliente emite `registration:watch` com o tracking token e recebe o estado atual no acknowledgement. Depois de uma decisão persistida, a sala autorizada recebe `registration:approved` ou `registration:rejected`; em reconexões, a consulta HTTP continua sendo a fonte de verdade.
 
 ## Status HTTP principais
 

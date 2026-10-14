@@ -23,8 +23,9 @@ export const createApp = () => {
   app.use(requestId);
   app.use(
     pinoHttp({
+      customProps: (request) => ({ route: request.url?.split("?")[0] }),
       genReqId: (request) => request.id,
-      redact: ["req.headers.cookie", "req.headers.x-csrf-token", "res.headers.set-cookie"],
+      redact: ["req.headers.cookie", "req.headers.x-csrf-token", "req.query.trackingToken", "req.url", "res.headers.set-cookie"],
     }),
   );
   app.use(helmet());

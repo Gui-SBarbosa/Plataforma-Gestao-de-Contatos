@@ -72,7 +72,19 @@ const decide =
     }
 
     try {
-      const user = await decision(input.data.id, request.authUser!.id);
+      const decisionResult = await decision(input.data.id, request.authUser!.id);
+      const { approvedAt, updatedAt, ...user } = decisionResult;
+      const publishRegistrationDecision = request.app.locals.publishRegistrationDecision as
+        | ((decision: { decidedAt: Date; registrationId: string; status: "ACTIVE" | "REJECTED" }) => void)
+        | undefined;
+
+      if (user.status === "ACTIVE" || user.status === "REJECTED") {
+        publishRegistrationDecision?.({
+          decidedAt: approvedAt ?? updatedAt,
+          registrationId: user.id,
+          status: user.status,
+        });
+      }
 
       response.status(200).json({ data: { user } });
     } catch (error) {

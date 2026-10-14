@@ -86,6 +86,8 @@ Salas previstas:
 
 Eventos e payloads estão descritos em [API.md](API.md).
 
+O recurso web de solicitação e acompanhamento fica em `apps/web/src/features/registration`. Ele consome os contratos HTTP e Socket.IO públicos, mantém o tracking token somente em memória e sempre recupera o estado pelo endpoint HTTP antes de acompanhar eventos.
+
 ## Escalabilidade
 
 Fase atual:

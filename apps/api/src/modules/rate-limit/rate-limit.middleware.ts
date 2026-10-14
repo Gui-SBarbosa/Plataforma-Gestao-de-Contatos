@@ -64,3 +64,23 @@ export const rateLimitLogin: RequestHandler = async (request, response, next) =>
 };
 
 export const rateLimitRegistration = rateLimitByIp("AUTH_REGISTER_IP");
+
+export const rateLimitRegistrationStatus: RequestHandler = async (request, response, next) => {
+  const trackingToken = typeof request.query.trackingToken === "string" ? request.query.trackingToken : "invalid-tracking-token";
+
+  try {
+    const result = await consumeRateLimit("REGISTRATION_STATUS", trackingToken);
+
+    if (result.exceeded) {
+      rejectRequest(response, String(request.id), result);
+      return;
+    }
+
+    setRateLimitHeaders(response, result);
+    next();
+  } catch {
+    response.status(503).json({
+      error: { code: "RATE_LIMIT_UNAVAILABLE", message: "Unable to process the request.", requestId: String(request.id) },
+    });
+  }
+};

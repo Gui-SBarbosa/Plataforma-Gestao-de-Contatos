@@ -18,6 +18,12 @@ const adminUserSelect = {
   status: true,
 } as const;
 
+const decisionUserSelect = {
+  ...adminUserSelect,
+  approvedAt: true,
+  updatedAt: true,
+} as const;
+
 export const createActiveOperator = async ({ email, name, password }: CreateAdminOperatorInput) => {
   const passwordHash = await hash(password, { algorithm: 2 });
 
@@ -75,7 +81,7 @@ const decidePendingUser = async (
     throw new UserDecisionConflictError();
   }
 
-  return prisma.user.findUniqueOrThrow({ where: { id: userId }, select: adminUserSelect });
+  return prisma.user.findUniqueOrThrow({ where: { id: userId }, select: decisionUserSelect });
 };
 
 export const approvePendingUser = (userId: string, administratorId: string) =>

@@ -6,4 +6,8 @@ export const registrationSchema = z.object({
   password: z.string().min(12).max(128),
 });
 
+export const registrationTrackingSchema = z.object({
+  trackingToken: z.string().min(43).max(128),
+});
+
 export type RegistrationInput = z.infer<typeof registrationSchema>;

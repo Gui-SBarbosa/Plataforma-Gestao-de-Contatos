@@ -75,6 +75,31 @@ export const openApiDocument = {
         tags: ["Registration"],
       },
     },
+    "/api/auth/registration-status": {
+      get: {
+        parameters: [
+          {
+            description: "Opaque tracking token returned once by POST /api/auth/register.",
+            in: "query",
+            name: "trackingToken",
+            required: true,
+            schema: { minLength: 43, type: "string" },
+          },
+        ],
+        responses: {
+          "200": {
+            content: { "application/json": { schema: { $ref: "#/components/schemas/RegistrationStatusResponse" } } },
+            description: "Current status of the registration request.",
+          },
+          "400": { ...errorResponse, description: "Invalid tracking token input." },
+          "404": { ...errorResponse, description: "Registration request not found." },
+          "429": { ...errorResponse, description: "Rate limit exceeded." },
+          "503": { ...errorResponse, description: "Rate limit storage unavailable." },
+        },
+        summary: "Get registration status",
+        tags: ["Registration"],
+      },
+    },
     "/api/auth/logout": {
       post: {
         parameters: [{ $ref: "#/components/parameters/CsrfToken" }],
@@ -300,6 +325,20 @@ export const openApiDocument = {
           data: {
             properties: { status: { enum: ["PENDING"], type: "string" }, trackingToken: { type: "string" } },
             required: ["status", "trackingToken"],
+            type: "object",
+          },
+        },
+        required: ["data"],
+        type: "object",
+      },
+      RegistrationStatusResponse: {
+        properties: {
+          data: {
+            properties: {
+              decidedAt: { format: "date-time", nullable: true, type: "string" },
+              status: { enum: ["PENDING", "ACTIVE", "REJECTED"], type: "string" },
+            },
+            required: ["status", "decidedAt"],
             type: "object",
           },
         },

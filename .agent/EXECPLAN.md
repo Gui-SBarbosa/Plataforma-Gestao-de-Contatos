@@ -38,7 +38,7 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | completed   | Registro público          | Solicitação de acesso de operador e tracking token                 |
 | completed   | Cadastro administrativo   | Criação direta de operador ativo pelo administrador                |
 | completed   | Aprovação de solicitações | Listagem administrativa, aprovação e rejeição                      |
-| pending     | Acompanhamento em tempo real | Tracking token, estado e eventos de aprovação/rejeição           |
+| completed   | Acompanhamento em tempo real | Tracking token, estado e eventos de aprovação/rejeição           |
 | pending     | Contatos                 | Cadastro, RBAC, ownership e paginação backend                     |
 | pending     | Notificações e auditoria | Persistência, leitura e eventos pós-commit                        |
 | pending     | Dashboard                | Métricas essenciais e atualização por evento                      |
@@ -91,6 +91,10 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — cadastro administrativo concluído no módulo `admin-users`: `POST /api/admin/users` cria exclusivamente operadores `ACTIVE`, com senha Argon2id, validação, e-mail normalizado, resposta sem hash e proteção por sessão, CSRF e RBAC de administrador. A criação de administradores adicionais permanece fora do escopo.
 - 14/10/2026 — iniciada a etapa de aprovação de solicitações: administradores poderão listar solicitações pendentes e aplicar exclusivamente as transições `PENDING` para `ACTIVE` ou `REJECTED`, protegidas por sessão, CSRF e RBAC. Sessão automática, tracking HTTP e eventos em tempo real permanecem fora desta etapa.
 - 14/10/2026 — aprovação de solicitações concluída no módulo `admin-users`: a listagem administrativa paginada expõe somente operadores pendentes e as decisões usam atualização condicional para aplicar uma única transição. Aprovação registra administrador e data; rejeição impede autenticação. Tracking HTTP, Socket.IO e frontend permanecem fora do escopo.
+- 14/10/2026 — iniciada a etapa de acompanhamento: será disponibilizada consulta de status com tracking token opaco e limite persistente próprio, além de Socket.IO no mesmo processo HTTP. O servidor validará o token antes de autorizar a sala da solicitação e emitirá eventos somente após a decisão persistida; nenhuma interface React será alterada nesta etapa.
+- 14/10/2026 — acompanhamento em tempo real concluído no backend: `GET /api/auth/registration-status` retorna somente estado e data da decisão, com rate limit persistente por token. Socket.IO valida a origem, autoriza a sala somente após validar o token opaco e recebe eventos de aprovação ou rejeição somente após a atualização persistida. Logs redigem token e URL bruta.
+- 14/10/2026 — o frontend da etapa de acompanhamento foi iniciado após comunicação prévia ao solicitante, pois a atualização visual sem recarregar é necessária para concluir o AC-03. O escopo visual limita-se ao recurso modular de tracking; contatos e telas administrativas permanecem fora desta etapa.
+- 14/10/2026 — acompanhamento concluído no frontend em `features/registration`: a tela cria solicitações, apresenta o tracking token uma única vez e acompanha o estado com consulta HTTP seguida de Socket.IO. O token não é persistido no navegador; o estilo segue tokens da referência Open Design fornecida.
 
 ## Validações executadas
 
@@ -121,9 +125,11 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — lint, typecheck, build e 16 testes de integração aprovados após o registro público, incluindo criação pendente, proteção de senha e token, ausência de sessão, conflito e resposta `429`.
 - 14/10/2026 — lint, typecheck, build e 21 testes de integração aprovados após o cadastro administrativo, cobrindo criação de operador ativo, login do operador criado, autenticação, RBAC, CSRF e presença da rota na especificação OpenAPI.
 - 14/10/2026 — lint, typecheck, build e 27 testes de integração aprovados após a aprovação de solicitações, cobrindo listagem paginada, aprovação, rejeição, administrador e data da aprovação, login bloqueado ou permitido conforme o status, RBAC, CSRF, transição inválida e OpenAPI.
+- 14/10/2026 — lint, typecheck, build e 32 testes de integração aprovados após o backend de acompanhamento, cobrindo consulta segura de status, `429` por token, origem Socket.IO, autorização da sala e evento de aprovação após persistência.
+- 14/10/2026 — lint, typecheck, 32 testes de integração da API e build completo aprovados após o frontend de acompanhamento. A inspeção visual por navegador não pôde ser executada porque nenhum navegador estava disponível na sessão.
 
 ## Pendências e próximos passos
 
-- Item atual do backlog: acompanhamento da aprovação em tempo real.
-- A aprovação e rejeição persistem o estado no PostgreSQL; a próxima etapa entregará a consulta de tracking e os eventos de atualização, sem tornar Socket.IO fonte de verdade.
-- Não iniciar contatos ou qualquer item posterior até concluir e registrar o acompanhamento em tempo real.
+- Item atual do backlog: cadastro de contato.
+- O acompanhamento de aprovação está concluído no backend e frontend; o frontend de contatos será iniciado apenas quando sua etapa estiver em andamento.
+- Não iniciar RBAC/ownership de contatos, paginação ou qualquer item posterior até concluir e registrar o cadastro de contato.
