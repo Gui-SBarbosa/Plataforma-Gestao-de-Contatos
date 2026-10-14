@@ -67,6 +67,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — a referência visual fornecida no Open Design será a base de tokens e componentes do frontend nas etapas de interface correspondentes.
 - 14/10/2026 — Prisma 6.16 foi fixado por compatibilidade com Node 20; o seed usa `@node-rs/argon2` com algoritmo Argon2id e exige senhas fornecidas pelo ambiente.
 - 14/10/2026 — o backlog P0 passou a ser sequencial: somente o primeiro item pendente pode ser trabalhado. A etapa de banco permanece em andamento até a validação em PostgreSQL real.
+- 14/10/2026 — os scripts Prisma da API passaram a carregar explicitamente o `.env` da raiz, evitando divergência entre o diretório do workspace e a configuração local do banco.
 
 ## Validações executadas
 
@@ -83,12 +84,14 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — validação final de lint, typecheck, typecheck da seed, build da API, build web e teste de integração: aprovada.
 - 14/10/2026 — ambiente local documentado com `compose.yaml`, PostgreSQL 16, senha obrigatória e bind restrito a `127.0.0.1`.
 - 14/10/2026 — `docker compose config --quiet`, lint, typecheck, typecheck da seed e builds: aprovados.
+- 14/10/2026 — `npm run db:deploy`: aprovado contra o PostgreSQL local; a migration `20261014023000_init` foi aplicada ao banco `gestcon`.
+- 14/10/2026 — `npm run db:generate` e `npm run typecheck:db`: aprovados após o ajuste de carregamento do `.env` raiz.
+- 14/10/2026 — `npm audit --omit=dev --json` identificou 4 alertas altos encadeados pelo Prisma CLI; a correção sugerida altera a versão fixada por compatibilidade e deve ser avaliada na etapa de qualidade.
 
 ## Pendências e próximos passos
 
 - Item atual do backlog: aplicar a migration e executar o seed contra um PostgreSQL disponível.
-- Executar `npm run db:deploy` e `npm run db:seed` contra um PostgreSQL disponível.
+- Definir `SEED_ADMIN_PASSWORD` e `SEED_OPERATOR_PASSWORD` no `.env` local para executar `npm run db:seed`.
 - Validar contagem dos usuários e dos 24 contatos após o seed.
-- PostgreSQL local e daemon Docker não estavam disponíveis durante esta etapa; migration e seed ainda não foram executados contra um banco real.
-- Após iniciar o Docker Desktop, executar `npm run db:up`, atualizar o `.env` com a senha local e executar `npm run db:deploy` e `npm run db:seed`.
+- A migration foi aplicada em PostgreSQL local; o seed permanece bloqueado pela ausência das senhas locais de demonstração.
 - Não iniciar autenticação ou qualquer item posterior até concluir e registrar a validação deste item.

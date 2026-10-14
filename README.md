@@ -51,7 +51,7 @@ npm run db:seed
 npm run dev
 ```
 
-O PostgreSQL local Ã© fornecido pelo `compose.yaml`. O Docker Desktop precisa estar iniciado antes de `npm run db:up`.
+O PostgreSQL local Ã© fornecido pelo `compose.yaml`. O Docker Desktop precisa estar iniciado antes de `npm run db:up`. Os comandos Prisma carregam o `.env` da raiz do repositÃ³rio.
 
 Antes de executar o seed, preencha `SEED_ADMIN_PASSWORD` e `SEED_OPERATOR_PASSWORD` no `.env` local. Esses valores não devem ser commitados.
 
