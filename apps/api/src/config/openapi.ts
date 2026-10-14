@@ -102,6 +102,28 @@ export const openApiDocument = {
         tags: ["Authentication"],
       },
     },
+    "/api/admin/users": {
+      post: {
+        parameters: [{ $ref: "#/components/parameters/CsrfToken" }],
+        requestBody: {
+          content: { "application/json": { schema: { $ref: "#/components/schemas/AdminUserInput" } } },
+          required: true,
+        },
+        responses: {
+          "201": {
+            content: { "application/json": { schema: { $ref: "#/components/schemas/AdminUserResponse" } } },
+            description: "Active operator created.",
+          },
+          "400": { ...errorResponse, description: "Invalid input." },
+          "401": { ...errorResponse, description: "Unauthenticated or inactive user." },
+          "403": { ...errorResponse, description: "Administrator role or valid CSRF token required." },
+          "409": { ...errorResponse, description: "User cannot be created." },
+        },
+        security: [{ sessionCookie: [] }],
+        summary: "Create an active operator",
+        tags: ["Administration"],
+      },
+    },
     "/api/health": {
       get: {
         responses: {
@@ -126,6 +148,20 @@ export const openApiDocument = {
       },
     },
     schemas: {
+      AdminUserInput: {
+        properties: {
+          email: { format: "email", type: "string" },
+          name: { maxLength: 120, minLength: 2, type: "string" },
+          password: { format: "password", maxLength: 128, minLength: 12, type: "string" },
+        },
+        required: ["name", "email", "password"],
+        type: "object",
+      },
+      AdminUserResponse: {
+        properties: { data: { properties: { user: { $ref: "#/components/schemas/User" } }, required: ["user"], type: "object" } },
+        required: ["data"],
+        type: "object",
+      },
       CsrfResponse: {
         properties: { data: { properties: { csrfToken: { type: "string" } }, required: ["csrfToken"], type: "object" } },
         required: ["data"],

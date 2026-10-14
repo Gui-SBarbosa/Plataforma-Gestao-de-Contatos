@@ -3,9 +3,15 @@ const request = require("supertest");
 
 describe("OpenAPI documentation", () => {
   let registerOpenApiDocs;
+  let openApiDocument;
 
   beforeAll(async () => {
-    ({ registerOpenApiDocs } = await import("../dist/config/openapi.js"));
+    ({ openApiDocument, registerOpenApiDocs } = await import("../dist/config/openapi.js"));
+  });
+
+  it("documents the implemented administrative user creation route", () => {
+    expect(openApiDocument.paths["/api/admin/users"].post.responses["201"]).toBeDefined();
+    expect(openApiDocument.paths["/api/admin/users"].post.security).toEqual([{ sessionCookie: [] }]);
   });
 
   it("serves Swagger UI only in development", async () => {

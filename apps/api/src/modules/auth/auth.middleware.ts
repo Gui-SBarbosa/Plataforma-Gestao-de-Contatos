@@ -1,6 +1,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 import type { RequestHandler } from "express";
+import type { UserRole } from "@prisma/client";
 
 import { env } from "../../config/env.js";
 
@@ -79,6 +80,17 @@ export const requireCsrf: RequestHandler = (request, response, next) => {
         message: "The request could not be processed.",
         requestId: request.id,
       },
+    });
+    return;
+  }
+
+  next();
+};
+
+export const requireRole = (...roles: UserRole[]): RequestHandler => (request, response, next) => {
+  if (!request.authUser || !roles.includes(request.authUser.role)) {
+    response.status(403).json({
+      error: { code: "FORBIDDEN", message: "You do not have permission to perform this action.", requestId: request.id },
     });
     return;
   }

@@ -15,7 +15,7 @@ posteriores não são iniciados enquanto o item corrente estiver pendente ou blo
 - [x] 04. Rate limiter persistente para autenticação, registro e tracking.
 - [x] 05. Job idempotente de limpeza de buckets expirados.
 - [x] 06. Registro público de operador.
-- [ ] 07. Cadastro direto de usuário pelo administrador.
+- [x] 07. Cadastro direto de usuário pelo administrador.
 - [ ] 08. Aprovação e rejeição de solicitações.
 - [ ] 09. Acompanhamento da aprovação em tempo real.
 - [ ] 10. Cadastro de contato.

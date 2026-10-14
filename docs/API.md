@@ -103,6 +103,8 @@ Resposta `202 Accepted`:
 
 Transições inválidas retornam `409 Conflict`.
 
+Nesta etapa, `POST /admin/users` cria somente um operador `ACTIVE` e exige `name`, `email` e `password`; a rota requer sessão de administrador e `X-CSRF-Token`.
+
 ## Contatos
 
 | Método | Rota | Acesso |

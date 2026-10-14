@@ -36,8 +36,9 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | completed   | Documentação OpenAPI       | Especificação Swagger das rotas existentes em `/docs` no desenvolvimento |
 | completed   | Limpeza de buckets        | Job idempotente para registros expirados                           |
 | completed   | Registro público          | Solicitação de acesso de operador e tracking token                 |
-| pending     | Cadastro administrativo   | Criação direta de usuário ativo pelo administrador                 |
-| pending     | Aprovação em tempo real  | Painel admin, tracking token e eventos de aprovação/rejeição      |
+| completed   | Cadastro administrativo   | Criação direta de operador ativo pelo administrador                |
+| pending     | Aprovação de solicitações | Listagem administrativa, aprovação e rejeição                      |
+| pending     | Acompanhamento em tempo real | Tracking token, estado e eventos de aprovação/rejeição           |
 | pending     | Contatos                 | Cadastro, RBAC, ownership e paginação backend                     |
 | pending     | Notificações e auditoria | Persistência, leitura e eventos pós-commit                        |
 | pending     | Dashboard                | Métricas essenciais e atualização por evento                      |
@@ -86,6 +87,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — limpeza de buckets concluída: exclusão idempotente filtrada por `expiresAt`, execução isolada por script e agendamento no processo da API ao iniciar e a cada 15 minutos.
 - 14/10/2026 — iniciada a etapa de registro público: será criado um módulo independente que persiste operador pendente, hash Argon2id, hash de token opaco e aplica o limite de registro por IP, sem sessão automática.
 - 14/10/2026 — registro público concluído no módulo `registration`: operador `PENDING`, papel `OPERATOR`, Argon2id, tracking token opaco com hash SHA-256, CSRF e rate limit por IP; o cadastro não cria sessão.
+- 14/10/2026 — iniciada a etapa de cadastro administrativo: o endpoint criará exclusivamente operadores `ACTIVE`, protegido por sessão, CSRF e RBAC de administrador; criação de novos administradores não faz parte desta etapa.
+- 14/10/2026 — cadastro administrativo concluído no módulo `admin-users`: `POST /api/admin/users` cria exclusivamente operadores `ACTIVE`, com senha Argon2id, validação, e-mail normalizado, resposta sem hash e proteção por sessão, CSRF e RBAC de administrador. A criação de administradores adicionais permanece fora do escopo.
 
 ## Validações executadas
 
@@ -114,9 +117,10 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — OpenAPI/Swagger validado: 12 testes de integração confirmam documentação disponível em desenvolvimento e `404` fora dele; smoke test local em `/docs/` aprovado.
 - 14/10/2026 — job de limpeza validado por teste de idempotência e execução local de `npm run rate-limit:cleanup`, sem buckets expirados a remover.
 - 14/10/2026 — lint, typecheck, build e 16 testes de integração aprovados após o registro público, incluindo criação pendente, proteção de senha e token, ausência de sessão, conflito e resposta `429`.
+- 14/10/2026 — lint, typecheck, build e 21 testes de integração aprovados após o cadastro administrativo, cobrindo criação de operador ativo, login do operador criado, autenticação, RBAC, CSRF e presença da rota na especificação OpenAPI.
 
 ## Pendências e próximos passos
 
-- Item atual do backlog: implementar o cadastro direto de usuário ativo pelo administrador.
-- O registro público foi concluído sem sessão automática; acompanhamento de status e aprovação permanecem em etapas posteriores.
-- Não iniciar aprovação, contatos ou qualquer item posterior até concluir e registrar o cadastro administrativo.
+- Item atual do backlog: aprovação e rejeição de solicitações pelo administrador.
+- O cadastro administrativo cria apenas operadores ativos; administradores adicionais não podem ser criados por essa rota.
+- Não iniciar o acompanhamento em tempo real, contatos ou qualquer item posterior até concluir e registrar a aprovação e rejeição.
