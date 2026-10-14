@@ -63,6 +63,8 @@ Paginação:
 }
 ```
 
+Retorna `202 Accepted` com `status: PENDING` e um `trackingToken` opaco, exibido somente nessa resposta. O cadastro não cria sessão; o operador só pode autenticar após aprovação.
+
 Antes de operações de escrita, o cliente obtém `GET /auth/csrf` com credenciais e envia o token retornado no header `X-CSRF-Token`.
 
 Os endpoints de autenticação podem responder:

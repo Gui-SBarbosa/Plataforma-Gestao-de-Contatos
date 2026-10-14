@@ -53,6 +53,28 @@ export const openApiDocument = {
         tags: ["Authentication"],
       },
     },
+    "/api/auth/register": {
+      post: {
+        parameters: [{ $ref: "#/components/parameters/CsrfToken" }],
+        requestBody: {
+          content: { "application/json": { schema: { $ref: "#/components/schemas/RegistrationInput" } } },
+          required: true,
+        },
+        responses: {
+          "202": {
+            content: { "application/json": { schema: { $ref: "#/components/schemas/RegistrationResponse" } } },
+            description: "Pending operator request created. The tracking token is returned only once.",
+          },
+          "400": { ...errorResponse, description: "Invalid input." },
+          "403": { ...errorResponse, description: "Invalid CSRF token." },
+          "409": { ...errorResponse, description: "Registration cannot be created." },
+          "429": { ...errorResponse, description: "Rate limit exceeded." },
+          "503": { ...errorResponse, description: "Rate limit storage unavailable." },
+        },
+        summary: "Request operator access",
+        tags: ["Registration"],
+      },
+    },
     "/api/auth/logout": {
       post: {
         parameters: [{ $ref: "#/components/parameters/CsrfToken" }],
@@ -140,6 +162,26 @@ export const openApiDocument = {
           data: {
             properties: { csrfToken: { type: "string" }, user: { $ref: "#/components/schemas/User" } },
             required: ["csrfToken", "user"],
+            type: "object",
+          },
+        },
+        required: ["data"],
+        type: "object",
+      },
+      RegistrationInput: {
+        properties: {
+          email: { format: "email", type: "string" },
+          name: { type: "string" },
+          password: { format: "password", minLength: 12, type: "string" },
+        },
+        required: ["name", "email", "password"],
+        type: "object",
+      },
+      RegistrationResponse: {
+        properties: {
+          data: {
+            properties: { status: { enum: ["PENDING"], type: "string" }, trackingToken: { type: "string" } },
+            required: ["status", "trackingToken"],
             type: "object",
           },
         },

@@ -35,7 +35,8 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | completed   | Rate limiting             | Buckets persistentes, chaves HMAC e limites por escopo            |
 | completed   | Documentação OpenAPI       | Especificação Swagger das rotas existentes em `/docs` no desenvolvimento |
 | completed   | Limpeza de buckets        | Job idempotente para registros expirados                           |
-| pending     | Registro público          | Solicitação de acesso de operador e tracking token                 |
+| completed   | Registro público          | Solicitação de acesso de operador e tracking token                 |
+| pending     | Cadastro administrativo   | Criação direta de usuário ativo pelo administrador                 |
 | pending     | Aprovação em tempo real  | Painel admin, tracking token e eventos de aprovação/rejeição      |
 | pending     | Contatos                 | Cadastro, RBAC, ownership e paginação backend                     |
 | pending     | Notificações e auditoria | Persistência, leitura e eventos pós-commit                        |
@@ -83,6 +84,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — documentação OpenAPI concluída com Swagger UI local em `/docs`, registrada somente em `NODE_ENV=development`; as rotas de saúde e autenticação implementadas são a fonte da especificação inicial.
 - 14/10/2026 — iniciada a etapa de limpeza de buckets: o job poderá ser executado isoladamente e será agendado a cada 15 minutos no único processo da API, mantendo a decisão atual de uma réplica.
 - 14/10/2026 — limpeza de buckets concluída: exclusão idempotente filtrada por `expiresAt`, execução isolada por script e agendamento no processo da API ao iniciar e a cada 15 minutos.
+- 14/10/2026 — iniciada a etapa de registro público: será criado um módulo independente que persiste operador pendente, hash Argon2id, hash de token opaco e aplica o limite de registro por IP, sem sessão automática.
+- 14/10/2026 — registro público concluído no módulo `registration`: operador `PENDING`, papel `OPERATOR`, Argon2id, tracking token opaco com hash SHA-256, CSRF e rate limit por IP; o cadastro não cria sessão.
 
 ## Validações executadas
 
@@ -110,9 +113,10 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — smoke test local de rate limiting aprovado com `.env` raiz: saúde, CSRF, login administrativo, headers de limite, `me` e logout.
 - 14/10/2026 — OpenAPI/Swagger validado: 12 testes de integração confirmam documentação disponível em desenvolvimento e `404` fora dele; smoke test local em `/docs/` aprovado.
 - 14/10/2026 — job de limpeza validado por teste de idempotência e execução local de `npm run rate-limit:cleanup`, sem buckets expirados a remover.
+- 14/10/2026 — lint, typecheck, build e 16 testes de integração aprovados após o registro público, incluindo criação pendente, proteção de senha e token, ausência de sessão, conflito e resposta `429`.
 
 ## Pendências e próximos passos
 
-- Item atual do backlog: implementar o registro público de operador.
-- A limpeza idempotente de buckets foi concluída e executa a cada 15 minutos na instância única da API.
-- Não iniciar cadastro administrativo, aprovação ou qualquer item posterior até concluir e registrar o registro público.
+- Item atual do backlog: implementar o cadastro direto de usuário ativo pelo administrador.
+- O registro público foi concluído sem sessão automática; acompanhamento de status e aprovação permanecem em etapas posteriores.
+- Não iniciar aprovação, contatos ou qualquer item posterior até concluir e registrar o cadastro administrativo.

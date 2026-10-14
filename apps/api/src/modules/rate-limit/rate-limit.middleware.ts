@@ -20,6 +20,24 @@ const rejectRequest = (response: Parameters<RequestHandler>[1], requestId: strin
   });
 };
 
+const rateLimitByIp = (scope: "AUTH_REGISTER_IP"): RequestHandler => async (request, response, next) => {
+  try {
+    const result = await consumeRateLimit(scope, request.ip ?? "unknown-ip");
+
+    if (result.exceeded) {
+      rejectRequest(response, String(request.id), result);
+      return;
+    }
+
+    setRateLimitHeaders(response, result);
+    next();
+  } catch {
+    response.status(503).json({
+      error: { code: "RATE_LIMIT_UNAVAILABLE", message: "Unable to process the request.", requestId: String(request.id) },
+    });
+  }
+};
+
 export const rateLimitLogin: RequestHandler = async (request, response, next) => {
   const input = loginSchema.safeParse(request.body);
   const identity = input.success ? input.data.email : "invalid-identity";
@@ -44,3 +62,5 @@ export const rateLimitLogin: RequestHandler = async (request, response, next) =>
     });
   }
 };
+
+export const rateLimitRegistration = rateLimitByIp("AUTH_REGISTER_IP");
