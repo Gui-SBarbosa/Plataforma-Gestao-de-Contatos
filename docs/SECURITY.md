@@ -141,6 +141,7 @@ Variáveis previstas:
 DATABASE_URL
 SESSION_SECRET
 CSRF_SECRET
+RATE_LIMIT_SECRET
 APP_ORIGIN
 NODE_ENV
 PORT
@@ -173,4 +174,3 @@ PORT
 - Sem recuperação de senha por e-mail.
 - Uma réplica evita inconsistência do adapter Socket.IO em memória.
 - Auditoria não substitui uma plataforma SIEM.
-

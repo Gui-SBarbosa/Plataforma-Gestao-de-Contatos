@@ -10,6 +10,7 @@ const environmentSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   APP_ORIGIN: z.string().url().default("http://localhost:5173"),
   CSRF_SECRET: z.string().min(32),
+  RATE_LIMIT_SECRET: z.string().min(32),
   SESSION_SECRET: z.string().min(32),
 });
 

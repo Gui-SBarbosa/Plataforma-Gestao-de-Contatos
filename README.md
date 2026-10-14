@@ -55,7 +55,7 @@ O PostgreSQL local Ã© fornecido pelo `compose.yaml`. O Docker Desktop precisa 
 
 Antes de executar o seed, preencha `SEED_ADMIN_EMAIL` e `SEED_ADMIN_PASSWORD` no `.env` local. Esses valores não devem ser commitados.
 
-Para iniciar a API, também defina `SESSION_SECRET` e `CSRF_SECRET` com pelo menos 32 caracteres. Use valores locais diferentes dos usados em produção.
+Para iniciar a API, também defina `SESSION_SECRET`, `CSRF_SECRET` e `RATE_LIMIT_SECRET` com pelo menos 32 caracteres. Use valores locais diferentes dos usados em produção.
 
 Para iniciar somente um serviço durante o desenvolvimento:
 

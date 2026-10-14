@@ -2,6 +2,7 @@ const request = require("supertest");
 
 process.env.APP_ORIGIN = "http://localhost:5173";
 process.env.CSRF_SECRET = "test-csrf-secret-with-at-least-thirty-two-characters";
+process.env.RATE_LIMIT_SECRET = "test-rate-limit-secret-with-at-least-thirty-two-characters";
 process.env.SESSION_SECRET = "test-session-secret-with-at-least-thirty-two-characters";
 
 describe("GET /api/health", () => {

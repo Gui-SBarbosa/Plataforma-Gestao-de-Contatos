@@ -32,7 +32,7 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | completed   | Fundação do repositório  | Workspaces, scripts, lint, TypeScript e app mínima compilando     |
 | completed   | Banco e seed             | Schema, migrations, sessão e administrador de demonstração         |
 | completed   | Autenticação             | Login, logout, `me`, sessão server-side, cookies e CSRF           |
-| pending     | Rate limiting             | Buckets persistentes, chaves HMAC e limites por escopo            |
+| in_progress | Rate limiting             | Buckets persistentes, chaves HMAC e limites por escopo            |
 | pending     | Aprovação em tempo real  | Painel admin, tracking token e eventos de aprovação/rejeição      |
 | pending     | Contatos                 | Cadastro, RBAC, ownership e paginação backend                     |
 | pending     | Notificações e auditoria | Persistência, leitura e eventos pós-commit                        |
@@ -74,6 +74,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — banco `gestcon` migrado e seed administrativo validado em PostgreSQL local; a etapa de autenticação tornou-se a única etapa em andamento.
 - 14/10/2026 — autenticação foi implementada no módulo isolado `auth`, com sessão opaca persistida no PostgreSQL, cookie `HttpOnly`, CORS de origem configurada, CSRF ligado à sessão e headers Helmet.
 - 14/10/2026 — etapa de autenticação concluída após smoke test de saúde, CSRF, login do administrador, `me`, logout e confirmação de sessão invalidada.
+- 14/10/2026 — iniciada a etapa de rate limiting persistente, limitada nesta entrega aos mecanismos compartilhados e à proteção do login já existente; registro e tracking serão conectados apenas quando suas rotas forem iniciadas no backlog.
 
 ## Validações executadas
 
@@ -102,4 +103,5 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 
 - Item atual do backlog: implementar o rate limiter persistente para autenticação, registro e tracking.
 - A etapa de autenticação foi concluída com sessão server-side, CSRF e smoke test local aprovados.
+- `RATE_LIMIT_SECRET` ainda precisa ser definido no `.env` local com pelo menos 32 caracteres antes do smoke test da API.
 - Não iniciar job de limpeza, registro ou qualquer item posterior até concluir e registrar o rate limiter.

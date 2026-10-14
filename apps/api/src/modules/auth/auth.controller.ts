@@ -3,6 +3,7 @@ import { createHmac, randomBytes } from "node:crypto";
 import type { RequestHandler } from "express";
 
 import { env } from "../../config/env.js";
+import { clearRateLimit } from "../rate-limit/rate-limit.service.js";
 
 import { loginSchema } from "./auth.schema.js";
 import { authenticateUser } from "./auth.service.js";
@@ -58,6 +59,14 @@ export const login: RequestHandler = async (request, response, next) => {
       return;
     }
 
+    try {
+      await clearRateLimit("AUTH_LOGIN_IDENTITY", input.data.email);
+    } catch {
+      response.status(503).json({
+        error: { code: "RATE_LIMIT_UNAVAILABLE", message: "Unable to process the request.", requestId: request.id },
+      });
+      return;
+    }
     await regenerateSession(request);
     request.session.userId = user.id;
     request.session.csrfToken = createCsrfToken(request.sessionID);

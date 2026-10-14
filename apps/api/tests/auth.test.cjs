@@ -8,6 +8,7 @@ process.env.APP_ORIGIN = "http://localhost:5173";
 process.env.CSRF_SECRET = "test-csrf-secret-with-at-least-thirty-two-characters";
 process.env.DATABASE_URL = process.env.DATABASE_URL_TEST;
 process.env.NODE_ENV = "test";
+process.env.RATE_LIMIT_SECRET = "test-rate-limit-secret-with-at-least-thirty-two-characters";
 process.env.SESSION_SECRET = "test-session-secret-with-at-least-thirty-two-characters";
 
 const activeUserEmail = "auth-active-test@example.com";
@@ -18,6 +19,7 @@ const rejectedUserEmail = "auth-rejected-test@example.com";
 
 describe("authentication endpoints", () => {
   let app;
+  let createApp;
   let prisma;
 
   beforeAll(async () => {
@@ -27,9 +29,11 @@ describe("authentication endpoints", () => {
       import("../dist/app.js"),
     ]);
     prisma = new PrismaClient();
-    app = appModule.createApp();
+    ({ createApp } = appModule);
+    app = createApp();
 
     const passwordHash = await hash(password, { algorithm: 2 });
+    await prisma.rateLimitBucket.deleteMany();
     await prisma.session.deleteMany();
     await prisma.user.deleteMany({
       where: { email: { in: [activeUserEmail, disabledUserEmail, pendingUserEmail, rejectedUserEmail] } },
@@ -45,11 +49,16 @@ describe("authentication endpoints", () => {
   });
 
   afterAll(async () => {
+    await prisma.rateLimitBucket.deleteMany();
     await prisma.session.deleteMany();
     await prisma.user.deleteMany({
       where: { email: { in: [activeUserEmail, disabledUserEmail, pendingUserEmail, rejectedUserEmail] } },
     });
     await prisma.$disconnect();
+  });
+
+  beforeEach(async () => {
+    await prisma.rateLimitBucket.deleteMany();
   });
 
   const getCsrfToken = async (agent) => {
@@ -116,5 +125,59 @@ describe("authentication endpoints", () => {
     const currentUserResponse = await agent.get("/api/auth/me");
 
     expect(currentUserResponse.status).toBe(401);
+  });
+
+  it("keeps the identity limit after a new application instance starts", async () => {
+    const agent = request.agent(app);
+    const csrfToken = await getCsrfToken(agent);
+
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const response = await agent
+        .post("/api/auth/login")
+        .set("X-CSRF-Token", csrfToken)
+        .send({ email: activeUserEmail, password: "invalid-password" });
+
+      expect(response.status).toBe(401);
+    }
+
+    const restartedAgent = request.agent(createApp());
+    const restartedCsrfToken = await getCsrfToken(restartedAgent);
+    const blockedResponse = await restartedAgent
+      .post("/api/auth/login")
+      .set("X-CSRF-Token", restartedCsrfToken)
+      .send({ email: activeUserEmail, password: "invalid-password" });
+
+    expect(blockedResponse.status).toBe(429);
+    expect(blockedResponse.headers["retry-after"]).toEqual(expect.any(String));
+    expect(blockedResponse.body.error).toMatchObject({ code: "RATE_LIMITED", message: "Unable to process the request." });
+  });
+
+  it("atomically enforces the shared IP limit across concurrent application instances", async () => {
+    const firstAgent = request.agent(app);
+    const secondAgent = request.agent(createApp());
+    const [firstCsrfToken, secondCsrfToken] = await Promise.all([getCsrfToken(firstAgent), getCsrfToken(secondAgent)]);
+    const requests = Array.from({ length: 20 }, (_, index) => {
+      const agent = index % 2 === 0 ? firstAgent : secondAgent;
+      const csrfToken = index % 2 === 0 ? firstCsrfToken : secondCsrfToken;
+
+      return agent
+        .post("/api/auth/login")
+        .set("X-CSRF-Token", csrfToken)
+        .send({ email: `rate-limit-${index}@example.com`, password: "invalid-password" });
+    });
+    const responses = await Promise.all(requests);
+
+    expect(responses).toHaveLength(20);
+    expect(responses.every((response) => response.status === 401)).toBe(true);
+
+    const blockedResponse = await firstAgent
+      .post("/api/auth/login")
+      .set("X-CSRF-Token", firstCsrfToken)
+      .send({ email: "rate-limit-overflow@example.com", password: "invalid-password" });
+
+    expect(blockedResponse.status).toBe(429);
+    expect(blockedResponse.headers["ratelimit-limit"]).toBe("20");
+    expect(blockedResponse.headers["ratelimit-remaining"]).toBe("0");
+    expect(blockedResponse.headers["retry-after"]).toEqual(expect.any(String));
   });
 });
