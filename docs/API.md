@@ -2,6 +2,12 @@
 
 Prefixo: `/api`
 
+## OpenAPI
+
+A documentação interativa Swagger está disponível em `/docs` somente quando
+`NODE_ENV=development`. A rota não é registrada em teste ou produção e documenta
+apenas os endpoints já implementados.
+
 ## Convenções
 
 Resposta de sucesso:
@@ -168,4 +174,3 @@ O servidor ignora qualquer sala ou papel declarado diretamente pelo cliente.
 | 409 | Duplicidade ou transição inválida |
 | 429 | Rate limit |
 | 503 | Dependência de segurança indisponível; tentativa não processada |
-

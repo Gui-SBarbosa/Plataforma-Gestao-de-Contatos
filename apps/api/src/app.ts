@@ -5,6 +5,7 @@ import helmet from "helmet";
 import { pinoHttp } from "pino-http";
 
 import { env } from "./config/env.js";
+import { registerOpenApiDocs } from "./config/openapi.js";
 import { PrismaSessionStore } from "./config/session-store.js";
 import { errorHandler } from "./middlewares/error-handler.js";
 import { notFoundHandler } from "./middlewares/not-found.js";
@@ -58,6 +59,7 @@ export const createApp = () => {
   });
 
   app.use("/api/auth", authRouter);
+  registerOpenApiDocs(app, env.NODE_ENV);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

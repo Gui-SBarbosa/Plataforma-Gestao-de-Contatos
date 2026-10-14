@@ -2,6 +2,7 @@ const request = require("supertest");
 
 process.env.APP_ORIGIN = "http://localhost:5173";
 process.env.CSRF_SECRET = "test-csrf-secret-with-at-least-thirty-two-characters";
+process.env.NODE_ENV = "test";
 process.env.RATE_LIMIT_SECRET = "test-rate-limit-secret-with-at-least-thirty-two-characters";
 process.env.SESSION_SECRET = "test-session-secret-with-at-least-thirty-two-characters";
 
@@ -20,5 +21,12 @@ describe("GET /api/health", () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ data: { status: "ok" } });
     expect(response.headers["x-request-id"]).toEqual(expect.any(String));
+  });
+
+  it("does not expose Swagger UI outside development", async () => {
+    const response = await request(app).get("/docs/");
+
+    expect(response.status).toBe(404);
+    expect(response.body.error.code).toBe("NOT_FOUND");
   });
 });

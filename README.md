@@ -75,6 +75,8 @@ npm run build
 
 Com a base em execução, a API responde em `GET /api/health`. Os endpoints de domínio serão adicionados nas próximas etapas do ExecPlan.
 
+Com `NODE_ENV=development`, a documentação interativa das rotas implementadas está disponível em `/docs`. Ela não é registrada em teste ou produção.
+
 ## Credenciais de demonstração
 
 Devem ser criadas pelo seed e documentadas apenas com valores seguros para demonstração. Nunca colocar credenciais reais ou secrets no repositório.

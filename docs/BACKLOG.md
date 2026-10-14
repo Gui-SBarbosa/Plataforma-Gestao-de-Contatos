@@ -32,7 +32,7 @@ posteriores não são iniciados enquanto o item corrente estiver pendente ou blo
 - [ ] Auditoria administrativa.
 - [ ] Dashboard com métricas essenciais.
 - [ ] Atualização do dashboard em tempo real.
-- [ ] OpenAPI/Swagger.
+- [x] OpenAPI/Swagger.
 - [ ] CI no GitHub Actions.
 
 ## P2 — Evolução, não implementar antes do P0
