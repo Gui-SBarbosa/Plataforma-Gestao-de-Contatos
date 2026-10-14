@@ -10,6 +10,7 @@
     "db:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
     "db:seed": "dotenv -e ../../.env -- prisma db seed",
     "build": "tsc -p tsconfig.json",
+    "rate-limit:cleanup": "npm run build && node dist/jobs/rate-limit-cleanup.js",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "typecheck:db": "tsc --noEmit -p tsconfig.prisma.json",

@@ -62,6 +62,7 @@ Para iniciar somente um serviço durante o desenvolvimento:
 ```bash
 npm run dev:api
 npm run dev:web
+npm run rate-limit:cleanup
 ```
 
 Validação esperada:

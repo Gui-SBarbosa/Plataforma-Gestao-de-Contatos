@@ -39,6 +39,7 @@ Build: npm ci && npm run build
 Start: npm run start
 Migration: npm run db:deploy
 Seed demo local: npm run db:seed
+Rate limit cleanup: npm run rate-limit:cleanup
 ```
 
 ## Health checks
@@ -70,7 +71,7 @@ Seed demo local: npm run db:seed
 
 ## Manutenção do rate limiter
 
-- Executar limpeza idempotente de buckets expirados a cada 15 minutos.
+- A API executa a limpeza idempotente ao iniciar e a cada 15 minutos; `npm run rate-limit:cleanup` permite execução isolada por agendador externo.
 - Manter índice em `expiresAt`.
 - Monitorar quantidade de respostas `429`, latência do upsert e crescimento da tabela.
 - Nunca executar limpeza sem filtro explícito por expiração.

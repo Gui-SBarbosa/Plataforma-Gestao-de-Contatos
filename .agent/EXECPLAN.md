@@ -34,7 +34,8 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | completed   | Autenticação             | Login, logout, `me`, sessão server-side, cookies e CSRF           |
 | completed   | Rate limiting             | Buckets persistentes, chaves HMAC e limites por escopo            |
 | completed   | Documentação OpenAPI       | Especificação Swagger das rotas existentes em `/docs` no desenvolvimento |
-| pending     | Limpeza de buckets        | Job idempotente para registros expirados                           |
+| completed   | Limpeza de buckets        | Job idempotente para registros expirados                           |
+| pending     | Registro público          | Solicitação de acesso de operador e tracking token                 |
 | pending     | Aprovação em tempo real  | Painel admin, tracking token e eventos de aprovação/rejeição      |
 | pending     | Contatos                 | Cadastro, RBAC, ownership e paginação backend                     |
 | pending     | Notificações e auditoria | Persistência, leitura e eventos pós-commit                        |
@@ -80,6 +81,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — rate limiting persistente concluído com segredo exclusivo para HMAC, incrementos atômicos via upsert no PostgreSQL, políticas centralizadas e proteção do login já existente. As políticas de registro e tracking serão reutilizadas quando essas rotas forem implementadas.
 - 14/10/2026 — por solicitação do usuário, a documentação OpenAPI/Swagger será antecipada como etapa complementar antes do job de limpeza; `/docs` ficará disponível exclusivamente com `NODE_ENV=development` e documentará apenas rotas já implementadas.
 - 14/10/2026 — documentação OpenAPI concluída com Swagger UI local em `/docs`, registrada somente em `NODE_ENV=development`; as rotas de saúde e autenticação implementadas são a fonte da especificação inicial.
+- 14/10/2026 — iniciada a etapa de limpeza de buckets: o job poderá ser executado isoladamente e será agendado a cada 15 minutos no único processo da API, mantendo a decisão atual de uma réplica.
+- 14/10/2026 — limpeza de buckets concluída: exclusão idempotente filtrada por `expiresAt`, execução isolada por script e agendamento no processo da API ao iniciar e a cada 15 minutos.
 
 ## Validações executadas
 
@@ -106,9 +109,10 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — lint, typecheck, build e 9 testes de integração aprovados após o rate limiter, incluindo persistência após nova instância e concorrência de 20 tentativas entre instâncias.
 - 14/10/2026 — smoke test local de rate limiting aprovado com `.env` raiz: saúde, CSRF, login administrativo, headers de limite, `me` e logout.
 - 14/10/2026 — OpenAPI/Swagger validado: 12 testes de integração confirmam documentação disponível em desenvolvimento e `404` fora dele; smoke test local em `/docs/` aprovado.
+- 14/10/2026 — job de limpeza validado por teste de idempotência e execução local de `npm run rate-limit:cleanup`, sem buckets expirados a remover.
 
 ## Pendências e próximos passos
 
-- Item atual do backlog: implementar o job idempotente de limpeza de buckets expirados.
-- A documentação OpenAPI foi concluída e permanece acessível apenas em `NODE_ENV=development`.
-- Não iniciar registro ou qualquer item posterior até concluir e registrar o job de limpeza.
+- Item atual do backlog: implementar o registro público de operador.
+- A limpeza idempotente de buckets foi concluída e executa a cada 15 minutos na instância única da API.
+- Não iniciar cadastro administrativo, aprovação ou qualquer item posterior até concluir e registrar o registro público.
