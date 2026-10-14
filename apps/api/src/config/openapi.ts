@@ -103,6 +103,25 @@ export const openApiDocument = {
       },
     },
     "/api/admin/users": {
+      get: {
+        parameters: [
+          { in: "query", name: "status", schema: { enum: ["PENDING"], type: "string" } },
+          { in: "query", name: "page", schema: { default: 1, minimum: 1, type: "integer" } },
+          { in: "query", name: "pageSize", schema: { default: 10, maximum: 50, minimum: 1, type: "integer" } },
+        ],
+        responses: {
+          "200": {
+            content: { "application/json": { schema: { $ref: "#/components/schemas/PendingUserListResponse" } } },
+            description: "Pending operator requests.",
+          },
+          "400": { ...errorResponse, description: "Invalid pagination input." },
+          "401": { ...errorResponse, description: "Unauthenticated or inactive user." },
+          "403": { ...errorResponse, description: "Administrator role required." },
+        },
+        security: [{ sessionCookie: [] }],
+        summary: "List pending operator requests",
+        tags: ["Administration"],
+      },
       post: {
         parameters: [{ $ref: "#/components/parameters/CsrfToken" }],
         requestBody: {
@@ -121,6 +140,44 @@ export const openApiDocument = {
         },
         security: [{ sessionCookie: [] }],
         summary: "Create an active operator",
+        tags: ["Administration"],
+      },
+    },
+    "/api/admin/users/{id}/approve": {
+      patch: {
+        parameters: [{ $ref: "#/components/parameters/UserId" }, { $ref: "#/components/parameters/CsrfToken" }],
+        responses: {
+          "200": {
+            content: { "application/json": { schema: { $ref: "#/components/schemas/AdminUserResponse" } } },
+            description: "Operator request approved.",
+          },
+          "400": { ...errorResponse, description: "Invalid user identifier." },
+          "401": { ...errorResponse, description: "Unauthenticated or inactive user." },
+          "403": { ...errorResponse, description: "Administrator role or valid CSRF token required." },
+          "404": { ...errorResponse, description: "User not found." },
+          "409": { ...errorResponse, description: "User is no longer pending." },
+        },
+        security: [{ sessionCookie: [] }],
+        summary: "Approve a pending operator request",
+        tags: ["Administration"],
+      },
+    },
+    "/api/admin/users/{id}/reject": {
+      patch: {
+        parameters: [{ $ref: "#/components/parameters/UserId" }, { $ref: "#/components/parameters/CsrfToken" }],
+        responses: {
+          "200": {
+            content: { "application/json": { schema: { $ref: "#/components/schemas/AdminUserResponse" } } },
+            description: "Operator request rejected.",
+          },
+          "400": { ...errorResponse, description: "Invalid user identifier." },
+          "401": { ...errorResponse, description: "Unauthenticated or inactive user." },
+          "403": { ...errorResponse, description: "Administrator role or valid CSRF token required." },
+          "404": { ...errorResponse, description: "User not found." },
+          "409": { ...errorResponse, description: "User is no longer pending." },
+        },
+        security: [{ sessionCookie: [] }],
+        summary: "Reject a pending operator request",
         tags: ["Administration"],
       },
     },
@@ -145,6 +202,13 @@ export const openApiDocument = {
         name: "X-CSRF-Token",
         required: true,
         schema: { type: "string" },
+      },
+      UserId: {
+        description: "User UUID.",
+        in: "path",
+        name: "id",
+        required: true,
+        schema: { format: "uuid", type: "string" },
       },
     },
     schemas: {
@@ -204,6 +268,24 @@ export const openApiDocument = {
         required: ["data"],
         type: "object",
       },
+      PendingUserListResponse: {
+        properties: {
+          data: { items: { $ref: "#/components/schemas/User" }, type: "array" },
+          meta: { $ref: "#/components/schemas/PaginationMeta" },
+        },
+        required: ["data", "meta"],
+        type: "object",
+      },
+      PaginationMeta: {
+        properties: {
+          page: { type: "integer" },
+          pageSize: { type: "integer" },
+          total: { type: "integer" },
+          totalPages: { type: "integer" },
+        },
+        required: ["page", "pageSize", "total", "totalPages"],
+        type: "object",
+      },
       RegistrationInput: {
         properties: {
           email: { format: "email", type: "string" },
@@ -230,7 +312,7 @@ export const openApiDocument = {
           id: { format: "uuid", type: "string" },
           name: { type: "string" },
           role: { enum: ["ADMIN", "OPERATOR"], type: "string" },
-          status: { enum: ["ACTIVE"], type: "string" },
+          status: { enum: ["PENDING", "ACTIVE", "REJECTED", "DISABLED"], type: "string" },
         },
         required: ["id", "name", "email", "role", "status"],
         type: "object",

@@ -37,7 +37,7 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | completed   | Limpeza de buckets        | Job idempotente para registros expirados                           |
 | completed   | Registro público          | Solicitação de acesso de operador e tracking token                 |
 | completed   | Cadastro administrativo   | Criação direta de operador ativo pelo administrador                |
-| pending     | Aprovação de solicitações | Listagem administrativa, aprovação e rejeição                      |
+| completed   | Aprovação de solicitações | Listagem administrativa, aprovação e rejeição                      |
 | pending     | Acompanhamento em tempo real | Tracking token, estado e eventos de aprovação/rejeição           |
 | pending     | Contatos                 | Cadastro, RBAC, ownership e paginação backend                     |
 | pending     | Notificações e auditoria | Persistência, leitura e eventos pós-commit                        |
@@ -89,6 +89,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — registro público concluído no módulo `registration`: operador `PENDING`, papel `OPERATOR`, Argon2id, tracking token opaco com hash SHA-256, CSRF e rate limit por IP; o cadastro não cria sessão.
 - 14/10/2026 — iniciada a etapa de cadastro administrativo: o endpoint criará exclusivamente operadores `ACTIVE`, protegido por sessão, CSRF e RBAC de administrador; criação de novos administradores não faz parte desta etapa.
 - 14/10/2026 — cadastro administrativo concluído no módulo `admin-users`: `POST /api/admin/users` cria exclusivamente operadores `ACTIVE`, com senha Argon2id, validação, e-mail normalizado, resposta sem hash e proteção por sessão, CSRF e RBAC de administrador. A criação de administradores adicionais permanece fora do escopo.
+- 14/10/2026 — iniciada a etapa de aprovação de solicitações: administradores poderão listar solicitações pendentes e aplicar exclusivamente as transições `PENDING` para `ACTIVE` ou `REJECTED`, protegidas por sessão, CSRF e RBAC. Sessão automática, tracking HTTP e eventos em tempo real permanecem fora desta etapa.
+- 14/10/2026 — aprovação de solicitações concluída no módulo `admin-users`: a listagem administrativa paginada expõe somente operadores pendentes e as decisões usam atualização condicional para aplicar uma única transição. Aprovação registra administrador e data; rejeição impede autenticação. Tracking HTTP, Socket.IO e frontend permanecem fora do escopo.
 
 ## Validações executadas
 
@@ -118,9 +120,10 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — job de limpeza validado por teste de idempotência e execução local de `npm run rate-limit:cleanup`, sem buckets expirados a remover.
 - 14/10/2026 — lint, typecheck, build e 16 testes de integração aprovados após o registro público, incluindo criação pendente, proteção de senha e token, ausência de sessão, conflito e resposta `429`.
 - 14/10/2026 — lint, typecheck, build e 21 testes de integração aprovados após o cadastro administrativo, cobrindo criação de operador ativo, login do operador criado, autenticação, RBAC, CSRF e presença da rota na especificação OpenAPI.
+- 14/10/2026 — lint, typecheck, build e 27 testes de integração aprovados após a aprovação de solicitações, cobrindo listagem paginada, aprovação, rejeição, administrador e data da aprovação, login bloqueado ou permitido conforme o status, RBAC, CSRF, transição inválida e OpenAPI.
 
 ## Pendências e próximos passos
 
-- Item atual do backlog: aprovação e rejeição de solicitações pelo administrador.
-- O cadastro administrativo cria apenas operadores ativos; administradores adicionais não podem ser criados por essa rota.
-- Não iniciar o acompanhamento em tempo real, contatos ou qualquer item posterior até concluir e registrar a aprovação e rejeição.
+- Item atual do backlog: acompanhamento da aprovação em tempo real.
+- A aprovação e rejeição persistem o estado no PostgreSQL; a próxima etapa entregará a consulta de tracking e os eventos de atualização, sem tornar Socket.IO fonte de verdade.
+- Não iniciar contatos ou qualquer item posterior até concluir e registrar o acompanhamento em tempo real.

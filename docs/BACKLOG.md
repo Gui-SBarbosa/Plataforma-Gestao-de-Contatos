@@ -16,7 +16,7 @@ posteriores não são iniciados enquanto o item corrente estiver pendente ou blo
 - [x] 05. Job idempotente de limpeza de buckets expirados.
 - [x] 06. Registro público de operador.
 - [x] 07. Cadastro direto de usuário pelo administrador.
-- [ ] 08. Aprovação e rejeição de solicitações.
+- [x] 08. Aprovação e rejeição de solicitações.
 - [ ] 09. Acompanhamento da aprovação em tempo real.
 - [ ] 10. Cadastro de contato.
 - [ ] 11. RBAC e ownership de contatos.

@@ -105,6 +105,8 @@ Transições inválidas retornam `409 Conflict`.
 
 Nesta etapa, `POST /admin/users` cria somente um operador `ACTIVE` e exige `name`, `email` e `password`; a rota requer sessão de administrador e `X-CSRF-Token`.
 
+`GET /admin/users` retorna apenas solicitações `PENDING`, com paginação e sem hashes ou tracking tokens. `PATCH /admin/users/:id/approve` muda uma solicitação pendente para `ACTIVE`, registra o administrador e a data da aprovação; `PATCH /admin/users/:id/reject` muda-a para `REJECTED`. As duas rotas exigem sessão administrativa e `X-CSRF-Token`, retornam `409 Conflict` para estados diferentes de `PENDING` e não iniciam sessão para o operador.
+
 ## Contatos
 
 | Método | Rota | Acesso |

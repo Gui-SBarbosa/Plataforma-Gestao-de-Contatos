@@ -14,6 +14,12 @@ describe("OpenAPI documentation", () => {
     expect(openApiDocument.paths["/api/admin/users"].post.security).toEqual([{ sessionCookie: [] }]);
   });
 
+  it("documents implemented pending request decisions", () => {
+    expect(openApiDocument.paths["/api/admin/users"].get.responses["200"]).toBeDefined();
+    expect(openApiDocument.paths["/api/admin/users/{id}/approve"].patch.responses["409"]).toBeDefined();
+    expect(openApiDocument.paths["/api/admin/users/{id}/reject"].patch.responses["409"]).toBeDefined();
+  });
+
   it("serves Swagger UI only in development", async () => {
     const app = express();
     registerOpenApiDocs(app, "development");
