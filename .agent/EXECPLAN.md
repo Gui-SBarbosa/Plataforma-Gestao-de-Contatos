@@ -32,7 +32,8 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | completed   | Fundação do repositório  | Workspaces, scripts, lint, TypeScript e app mínima compilando     |
 | completed   | Banco e seed             | Schema, migrations, sessão e administrador de demonstração         |
 | completed   | Autenticação             | Login, logout, `me`, sessão server-side, cookies e CSRF           |
-| in_progress | Rate limiting             | Buckets persistentes, chaves HMAC e limites por escopo            |
+| completed   | Rate limiting             | Buckets persistentes, chaves HMAC e limites por escopo            |
+| pending     | Limpeza de buckets        | Job idempotente para registros expirados                           |
 | pending     | Aprovação em tempo real  | Painel admin, tracking token e eventos de aprovação/rejeição      |
 | pending     | Contatos                 | Cadastro, RBAC, ownership e paginação backend                     |
 | pending     | Notificações e auditoria | Persistência, leitura e eventos pós-commit                        |
@@ -75,6 +76,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — autenticação foi implementada no módulo isolado `auth`, com sessão opaca persistida no PostgreSQL, cookie `HttpOnly`, CORS de origem configurada, CSRF ligado à sessão e headers Helmet.
 - 14/10/2026 — etapa de autenticação concluída após smoke test de saúde, CSRF, login do administrador, `me`, logout e confirmação de sessão invalidada.
 - 14/10/2026 — iniciada a etapa de rate limiting persistente, limitada nesta entrega aos mecanismos compartilhados e à proteção do login já existente; registro e tracking serão conectados apenas quando suas rotas forem iniciadas no backlog.
+- 14/10/2026 — rate limiting persistente concluído com segredo exclusivo para HMAC, incrementos atômicos via upsert no PostgreSQL, políticas centralizadas e proteção do login já existente. As políticas de registro e tracking serão reutilizadas quando essas rotas forem implementadas.
 
 ## Validações executadas
 
@@ -98,10 +100,11 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — migration aplicada no banco isolado `gestcon_test`; 7 testes de integração aprovados para CSRF, login de usuário ativo, rejeição de usuário pendente/rejeitado/desativado, `me` e logout.
 - 14/10/2026 — lint, typecheck, testes de integração e build da API e web: aprovados após a implementação de autenticação.
 - 14/10/2026 — smoke test local de autenticação aprovado: CSRF, login, `me`, logout e resposta `401` após logout.
+- 14/10/2026 — lint, typecheck, build e 9 testes de integração aprovados após o rate limiter, incluindo persistência após nova instância e concorrência de 20 tentativas entre instâncias.
+- 14/10/2026 — smoke test local de rate limiting aprovado com `.env` raiz: saúde, CSRF, login administrativo, headers de limite, `me` e logout.
 
 ## Pendências e próximos passos
 
-- Item atual do backlog: implementar o rate limiter persistente para autenticação, registro e tracking.
-- A etapa de autenticação foi concluída com sessão server-side, CSRF e smoke test local aprovados.
-- `RATE_LIMIT_SECRET` ainda precisa ser definido no `.env` local com pelo menos 32 caracteres antes do smoke test da API.
-- Não iniciar job de limpeza, registro ou qualquer item posterior até concluir e registrar o rate limiter.
+- Item atual do backlog: implementar o job idempotente de limpeza de buckets expirados.
+- A etapa de rate limiting foi concluída com políticas persistentes e testes de reinício, concorrência e resposta `429`.
+- Não iniciar registro ou qualquer item posterior até concluir e registrar o job de limpeza.

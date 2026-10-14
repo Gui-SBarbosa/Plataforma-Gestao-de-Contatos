@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 
 import { z } from "zod";
 
-config({ path: fileURLToPath(new URL("../../../.env", import.meta.url)), quiet: true });
+config({ path: fileURLToPath(new URL("../../../../.env", import.meta.url)), quiet: true });
 
 const environmentSchema = z.object({
   API_PORT: z.coerce.number().int().positive().default(3001),
