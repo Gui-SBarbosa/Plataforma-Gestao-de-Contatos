@@ -69,6 +69,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — o backlog P0 passou a ser sequencial: somente o primeiro item pendente pode ser trabalhado. A etapa de banco permanece em andamento até a validação em PostgreSQL real.
 - 14/10/2026 — os scripts Prisma da API passaram a carregar explicitamente o `.env` da raiz, evitando divergência entre o diretório do workspace e a configuração local do banco.
 - 14/10/2026 — por decisão do solicitante, o seed de demonstração passou a criar somente um administrador ativo; operadores e contatos serão criados manualmente pela plataforma nas etapas posteriores.
+- 14/10/2026 — o e-mail do administrador seedado passou a ser obrigatório no ambiente, normalizado antes do upsert e validado sem registrá-lo em logs.
 
 ## Validações executadas
 
@@ -92,7 +93,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 ## Pendências e próximos passos
 
 - Item atual do backlog: executar e validar o seed do administrador contra o PostgreSQL disponível.
-- Definir `SEED_ADMIN_PASSWORD` no `.env` local para executar `npm run db:seed`.
+- Definir `SEED_ADMIN_EMAIL` e `SEED_ADMIN_PASSWORD` no `.env` local para executar `npm run db:seed`.
 - Validar a presença de um administrador ativo após o seed.
 - A migration foi aplicada em PostgreSQL local; o seed permanece bloqueado pela ausência da senha local do administrador.
 - Não iniciar autenticação ou qualquer item posterior até concluir e registrar a validação deste item.

@@ -23,6 +23,7 @@ push na main
 ```text
 NODE_ENV=production
 DATABASE_URL=<fornecida pelo ambiente>
+SEED_ADMIN_EMAIL=<e-mail do administrador de demonstração>
 SEED_ADMIN_PASSWORD=<fornecida apenas no ambiente de demo>
 SESSION_SECRET=<segredo forte>
 CSRF_SECRET=<segredo forte>
