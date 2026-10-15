@@ -54,6 +54,7 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | completed   | Conditional user email uniqueness | Active/pending emails required and unique; disabled/rejected emails nullable and reusable |
 | completed   | Frontend de requests | Admin list and approve/reject actions for pending operators |
 | completed   | Frontend de registro público | Formulário de solicitação e acompanhamento em tempo real para visitantes |
+| completed   | Frontend architecture refactor | Shared layout/UI components and feature boundaries without behavior changes |
 
 ## Critérios de aceite
 
@@ -128,6 +129,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 15/10/2026 — migration local e de teste aplicadas; lint, typecheck, builds e 48 testes de integração aprovados após a regra de e-mail condicional.
 - 15/10/2026 — tela `#requests` validada com typecheck, ESLint e build Vite; ações usam CSRF e continuam protegidas por sessão/RBAC no backend.
 - 15/10/2026 — registro público exposto em `#register`; login, formulário, tracking HTTP e eventos Socket.IO validados com typecheck, ESLint e build Vite.
+- 15/10/2026 — arquitetura frontend refatorada com `components`, `features`, `routes` e `services`; typecheck, ESLint e build Vite aprovados sem alterar contratos HTTP.
 
 - 14/10/2026 — `npm run lint`: aprovado.
 - 14/10/2026 — `npm run typecheck`: aprovado para API e web.
