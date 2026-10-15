@@ -105,6 +105,8 @@ describe("public operator registration", () => {
       } else {
         expect(response.status).toBe(429);
         expect(response.headers["retry-after"]).toEqual(expect.any(String));
+        expect(response.headers["ratelimit-limit"]).toBe("5");
+        expect(response.headers["ratelimit-remaining"]).toBe("0");
         expect(response.body.error.code).toBe("RATE_LIMITED");
       }
     }

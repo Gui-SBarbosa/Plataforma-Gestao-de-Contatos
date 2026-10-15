@@ -45,7 +45,7 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | completed   | Notificação em tempo real | Sala administrativa e evento pós-persistência de contato          |
 | pending     | Notificações e auditoria | Persistência, leitura e auditoria administrativa                   |
 | pending     | Dashboard                | Métricas essenciais e atualização por evento                      |
-| pending     | Qualidade                | Jest/Supertest, lint, typecheck, build e revisão de segurança     |
+| completed   | Qualidade                | Jest/Supertest, lint, typecheck, build e revisão de segurança     |
 | pending     | Deploy                   | Railway, migrations, seed de demo e smoke test                    |
 | pending     | Entrega                  | README final, UML, apresentação e roteiro de demonstração         |
 
@@ -106,6 +106,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — lista paginada concluída: `GET /api/contacts` retorna `data` e `meta` com `page`, `pageSize`, `total` e `totalPages`, padrão de 10 itens e máximo de 50. A consulta aplica ownership para operador e visão global para administrador; filtros, notificações e frontend permanecem em etapas posteriores.
 - 14/10/2026 — iniciada a etapa de notificação em tempo real: Socket.IO reutilizará a sessão server-side para autorizar exclusivamente administradores na sala `admins`. A criação de contato emitirá evento mínimo somente após a persistência; notificações persistentes, auditoria e frontend permanecem fora do escopo.
 - 14/10/2026 — notificação em tempo real concluída: o Socket.IO aplica a sessão server-side no handshake e inclui somente administradores ativos na sala `admins`. `POST /api/contacts` publica `contact:created` após persistência, com `contactId`, `creatorName` e `createdAt`; notificações persistentes, auditoria e frontend permanecem fora do escopo.
+- 14/10/2026 — iniciada a etapa de qualidade: serão revisados e ampliados os testes críticos de persistência, concorrência e respostas `429`, preservando os contratos e módulos existentes. Frontend, notificações persistentes e auditoria permanecem fora do escopo.
+- 14/10/2026 — etapa de qualidade concluída: a suíte cobre sessão persistente após nova instância, limites persistentes, concorrência entre instâncias, `429` genérico para conta conhecida ou desconhecida e headers de limite para login, registro e tracking. Nenhuma funcionalidade de produto foi adicionada.
 
 ## Validações executadas
 
@@ -142,8 +144,9 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — lint, typecheck, 39 testes de integração da API e build completo aprovados após RBAC e ownership, cobrindo consulta própria, bloqueio de acesso a contato alheio e acesso administrativo.
 - 14/10/2026 — lint, typecheck, 42 testes de integração da API e build completo aprovados após a lista paginada, cobrindo paginação, escopo do operador, visão administrativa e limite máximo de página.
 - 14/10/2026 — lint, typecheck, 43 testes de integração da API e build completo aprovados após a notificação em tempo real, incluindo handshake de sessão Socket.IO e emissão de evento após persistência de contato.
+- 14/10/2026 — lint, typecheck, 45 testes de integração da API e build completo aprovados na etapa de qualidade; o recorte isolado de autenticação aprovou 10 testes.
 
 ## Pendências e próximos passos
 
-- Próximo item do backlog: testes críticos, persistência, concorrência e resposta `429`.
-- Não iniciar notificações persistentes, auditoria ou frontend sem etapa explícita no backlog.
+- Próximo item do backlog: README executável e documentação de ambiente revisada.
+- O frontend de contatos requer etapa explícita após os itens P0 pendentes ou alteração aprovada do backlog.

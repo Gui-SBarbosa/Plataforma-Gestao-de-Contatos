@@ -95,6 +95,20 @@ describe("authentication endpoints", () => {
     expect(currentUserResponse.body.data.user.email).toBe(activeUserEmail);
   });
 
+  it("keeps an authenticated session after a new application instance starts", async () => {
+    const agent = request.agent(app);
+    const csrfToken = await getCsrfToken(agent);
+    const loginResponse = await agent
+      .post("/api/auth/login")
+      .set("X-CSRF-Token", csrfToken)
+      .send({ email: activeUserEmail, password });
+    const sessionCookie = loginResponse.headers["set-cookie"][0].split(";")[0];
+    const restartedResponse = await request(createApp()).get("/api/auth/me").set("Cookie", sessionCookie);
+
+    expect(restartedResponse.status).toBe(200);
+    expect(restartedResponse.body.data.user).toMatchObject({ email: activeUserEmail, status: "ACTIVE" });
+  });
+
   it.each([disabledUserEmail, pendingUserEmail, rejectedUserEmail])(
     "rejects a non-active user without creating a session",
     async (email) => {
@@ -179,5 +193,29 @@ describe("authentication endpoints", () => {
     expect(blockedResponse.headers["ratelimit-limit"]).toBe("20");
     expect(blockedResponse.headers["ratelimit-remaining"]).toBe("0");
     expect(blockedResponse.headers["retry-after"]).toEqual(expect.any(String));
+  });
+
+  it("returns the same generic 429 response for known and unknown accounts", async () => {
+    const agent = request.agent(app);
+    const csrfToken = await getCsrfToken(agent);
+    const requests = Array.from({ length: 20 }, (_, index) =>
+      agent
+        .post("/api/auth/login")
+        .set("X-CSRF-Token", csrfToken)
+        .send({ email: `limit-generic-${index}@example.com`, password: "invalid-password" }),
+    );
+
+    await Promise.all(requests);
+    const [knownResponse, unknownResponse] = await Promise.all([
+      agent.post("/api/auth/login").set("X-CSRF-Token", csrfToken).send({ email: activeUserEmail, password: "invalid-password" }),
+      agent.post("/api/auth/login").set("X-CSRF-Token", csrfToken).send({ email: "unknown@example.com", password: "invalid-password" }),
+    ]);
+
+    for (const response of [knownResponse, unknownResponse]) {
+      expect(response.status).toBe(429);
+      expect(response.headers["retry-after"]).toEqual(expect.any(String));
+      expect(response.body.error).toMatchObject({ code: "RATE_LIMITED", message: "Unable to process the request." });
+      expect(response.body.data).toBeUndefined();
+    }
   });
 });

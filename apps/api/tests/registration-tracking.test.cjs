@@ -141,6 +141,9 @@ describe("registration tracking", () => {
       } else {
         expect(response.status).toBe(429);
         expect(response.headers["retry-after"]).toEqual(expect.any(String));
+        expect(response.headers["ratelimit-limit"]).toBe("60");
+        expect(response.headers["ratelimit-remaining"]).toBe("0");
+        expect(response.body.error).toMatchObject({ code: "RATE_LIMITED", message: "Unable to process the request." });
       }
     }
   });
