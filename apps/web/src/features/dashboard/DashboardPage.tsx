@@ -76,7 +76,8 @@ const DashboardCardHead = ({ actionHref, actionLabel, subtitle, title }: { actio
 const LineChart = ({ data }: { data: DashboardData["series"] }) => {
   const values = data.length ? data : [{ period: "—", total: 0 }];
   const max = Math.max(...values.map((item) => item.total), 1);
-  const points = values.map((item, index) => `${index * (100 / Math.max(values.length - 1, 1))},${92 - (item.total / max) * 72}`).join(" ");
+  const y = (total: number) => 92 - (total / max) * 72;
+  const points = values.length === 1 ? `0,${y(values[0].total)} 100,${y(values[0].total)}` : values.map((item, index) => `${index * (100 / (values.length - 1))},${y(item.total)}`).join(" ");
   return <div className="dashboard-line-chart"><svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="Contatos por período"><line x1="0" y1="20" x2="100" y2="20" /><line x1="0" y1="56" x2="100" y2="56" /><line x1="0" y1="92" x2="100" y2="92" /><polyline points={points} /></svg><div className="dashboard-chart-labels">{values.map((item) => <span key={item.period}>{item.period.slice(5)}</span>)}</div></div>;
 };
 
