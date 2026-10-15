@@ -106,4 +106,30 @@ describe("admin user creation", () => {
     expect(response.status).toBe(403);
     expect(response.body.error.code).toBe("CSRF_INVALID");
   });
+
+  it("lists, updates, deactivates and reactivates operators", async () => {
+    const { agent, csrfToken } = await login(adminEmail);
+    const created = await agent.post("/api/admin/users").set("X-CSRF-Token", csrfToken).send(input);
+    expect(created.status).toBe(201);
+
+    const listed = await agent.get("/api/admin/users/operators");
+    expect(listed.status).toBe(200);
+    expect(listed.body.data).toEqual(expect.arrayContaining([expect.objectContaining({ id: created.body.data.user.id, status: "ACTIVE" })]));
+    expect(listed.body.data[0].passwordHash).toBeUndefined();
+
+    const updateCsrf = await agent.get("/api/auth/csrf");
+    const updated = await agent.patch(`/api/admin/users/${created.body.data.user.id}`).set("X-CSRF-Token", updateCsrf.body.data.csrfToken).send({ email: createdOperatorEmail, name: "Updated Operator" });
+    expect(updated.status).toBe(200);
+    expect(updated.body.data.user.name).toBe("Updated Operator");
+
+    const disableCsrf = await agent.get("/api/auth/csrf");
+    const disabled = await agent.delete(`/api/admin/users/${created.body.data.user.id}`).set("X-CSRF-Token", disableCsrf.body.data.csrfToken);
+    expect(disabled.status).toBe(200);
+    expect(disabled.body.data.user.status).toBe("DISABLED");
+
+    const activateCsrf = await agent.get("/api/auth/csrf");
+    const activated = await agent.patch(`/api/admin/users/${created.body.data.user.id}/activate`).set("X-CSRF-Token", activateCsrf.body.data.csrfToken);
+    expect(activated.status).toBe(200);
+    expect(activated.body.data.user.status).toBe("ACTIVE");
+  });
 });

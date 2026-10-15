@@ -3,12 +3,13 @@ import { Prisma, UserRole, UserStatus } from "@prisma/client";
 
 import { prisma } from "../../config/prisma.js";
 
-import type { CreateAdminOperatorInput } from "./admin-users.schema.js";
-import type { ListPendingUsersInput } from "./admin-users.schema.js";
+import type { CreateAdminOperatorInput, ListOperatorsInput, ListPendingUsersInput, UpdateOperatorInput } from "./admin-users.schema.js";
 
 export class AdminUserConflictError extends Error {}
 export class PendingUserNotFoundError extends Error {}
 export class UserDecisionConflictError extends Error {}
+export class OperatorNotFoundError extends Error {}
+export class OperatorConflictError extends Error {}
 
 const adminUserSelect = {
   email: true,
@@ -55,6 +56,39 @@ export const listPendingUsers = async ({ page, pageSize }: ListPendingUsersInput
   ]);
 
   return { page, pageSize, total, totalPages: Math.ceil(total / pageSize), users };
+};
+
+export const listOperators = async ({ page, pageSize, status }: ListOperatorsInput) => {
+  const where = { role: UserRole.OPERATOR, ...(status ? { status } : { status: { in: [UserStatus.ACTIVE, UserStatus.DISABLED] } }) };
+  const [total, users] = await prisma.$transaction([
+    prisma.user.count({ where }),
+    prisma.user.findMany({ orderBy: [{ status: "asc" }, { name: "asc" }], select: { ...adminUserSelect, createdAt: true, updatedAt: true }, skip: (page - 1) * pageSize, take: pageSize, where }),
+  ]);
+  return { page, pageSize, total, totalPages: Math.ceil(total / pageSize), users };
+};
+
+export const updateOperator = async (userId: string, input: UpdateOperatorInput) => {
+  try {
+    return await prisma.user.update({
+      data: input,
+      where: { id: userId, role: UserRole.OPERATOR },
+      select: { ...adminUserSelect, createdAt: true, updatedAt: true },
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") throw new OperatorNotFoundError();
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") throw new OperatorConflictError();
+    throw error;
+  }
+};
+
+export const setOperatorStatus = async (userId: string, status: "ACTIVE" | "DISABLED") => {
+  const result = await prisma.user.updateMany({ data: { status }, where: { id: userId, role: UserRole.OPERATOR, status: { in: [UserStatus.ACTIVE, UserStatus.DISABLED] } } });
+  if (result.count === 0) {
+    const user = await prisma.user.findFirst({ where: { id: userId, role: UserRole.OPERATOR }, select: { id: true } });
+    if (!user) throw new OperatorNotFoundError();
+    throw new OperatorConflictError();
+  }
+  return prisma.user.findUniqueOrThrow({ where: { id: userId }, select: { ...adminUserSelect, createdAt: true, updatedAt: true } });
 };
 
 const decidePendingUser = async (

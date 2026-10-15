@@ -1,14 +1,19 @@
 import type { RequestHandler } from "express";
 
-import { createAdminOperatorSchema, listPendingUsersSchema, userIdSchema } from "./admin-users.schema.js";
+import { createAdminOperatorSchema, listOperatorsSchema, listPendingUsersSchema, updateOperatorSchema, userIdSchema } from "./admin-users.schema.js";
 import {
   AdminUserConflictError,
   PendingUserNotFoundError,
   UserDecisionConflictError,
+  OperatorConflictError,
+  OperatorNotFoundError,
   approvePendingUser,
   createActiveOperator,
   listPendingUsers,
   rejectPendingUser,
+  listOperators,
+  setOperatorStatus,
+  updateOperator,
 } from "./admin-users.service.js";
 
 export const createUser: RequestHandler = async (request, response, next) => {
@@ -55,6 +60,35 @@ export const listPending: RequestHandler = async (request, response, next) => {
       meta: { page: result.page, pageSize: result.pageSize, total: result.total, totalPages: result.totalPages },
     });
   } catch (error) {
+    next(error);
+  }
+};
+
+export const listAllOperators: RequestHandler = async (request, response, next) => {
+  const input = listOperatorsSchema.safeParse(request.query);
+  if (!input.success) { response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Unable to process the request.", requestId: request.id } }); return; }
+  try { const result = await listOperators(input.data); response.status(200).json({ data: result.users, meta: { page: result.page, pageSize: result.pageSize, total: result.total, totalPages: result.totalPages } }); } catch (error) { next(error); }
+};
+
+export const update: RequestHandler = async (request, response, next) => {
+  const params = userIdSchema.safeParse(request.params); const input = updateOperatorSchema.safeParse(request.body);
+  if (!params.success || !input.success) { response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Unable to process the request.", requestId: request.id } }); return; }
+  try { response.status(200).json({ data: { user: await updateOperator(params.data.id, input.data) } }); } catch (error) {
+    if (error instanceof OperatorNotFoundError) { response.status(404).json({ error: { code: "USER_NOT_FOUND", message: "Unable to process the request.", requestId: request.id } }); return; }
+    if (error instanceof OperatorConflictError) { response.status(409).json({ error: { code: "USER_CONFLICT", message: "Unable to process the request.", requestId: request.id } }); return; }
+    next(error);
+  }
+};
+
+export const deactivate: RequestHandler = async (request, response, next) => changeStatus(request, response, next, "DISABLED");
+export const activate: RequestHandler = async (request, response, next) => changeStatus(request, response, next, "ACTIVE");
+
+const changeStatus = async (request: Parameters<RequestHandler>[0], response: Parameters<RequestHandler>[1], next: Parameters<RequestHandler>[2], status: "ACTIVE" | "DISABLED") => {
+  const params = userIdSchema.safeParse(request.params);
+  if (!params.success) { response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Unable to process the request.", requestId: request.id } }); return; }
+  try { response.status(200).json({ data: { user: await setOperatorStatus(params.data.id, status) } }); } catch (error) {
+    if (error instanceof OperatorNotFoundError) { response.status(404).json({ error: { code: "USER_NOT_FOUND", message: "Unable to process the request.", requestId: request.id } }); return; }
+    if (error instanceof OperatorConflictError) { response.status(409).json({ error: { code: "INVALID_USER_TRANSITION", message: "Unable to process the request.", requestId: request.id } }); return; }
     next(error);
   }
 };

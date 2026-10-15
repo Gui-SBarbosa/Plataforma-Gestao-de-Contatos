@@ -206,6 +206,37 @@ export const openApiDocument = {
         tags: ["Administration"],
       },
     },
+    "/api/admin/users/operators": {
+      get: {
+        parameters: [
+          { in: "query", name: "status", schema: { enum: ["ACTIVE", "DISABLED"], type: "string" } },
+          { in: "query", name: "page", schema: { default: 1, minimum: 1, type: "integer" } },
+          { in: "query", name: "pageSize", schema: { default: 10, maximum: 50, minimum: 1, type: "integer" } },
+        ],
+        responses: { "200": { content: { "application/json": { schema: { $ref: "#/components/schemas/PendingUserListResponse" } } }, description: "Operator accounts." }, "401": { ...errorResponse, description: "Unauthenticated." }, "403": { ...errorResponse, description: "Administrator role required." } },
+        security: [{ sessionCookie: [] }], summary: "List operator accounts", tags: ["Administration"],
+      },
+    },
+    "/api/admin/users/{id}": {
+      patch: {
+        parameters: [{ $ref: "#/components/parameters/UserId" }, { $ref: "#/components/parameters/CsrfToken" }],
+        requestBody: { content: { "application/json": { schema: { $ref: "#/components/schemas/OperatorUpdateInput" } } }, required: true },
+        responses: { "200": { content: { "application/json": { schema: { $ref: "#/components/schemas/AdminUserResponse" } } }, description: "Operator updated." }, "400": { ...errorResponse, description: "Invalid input." }, "401": { ...errorResponse, description: "Unauthenticated." }, "403": { ...errorResponse, description: "Administrator role or valid CSRF token required." }, "404": { ...errorResponse, description: "Operator not found." }, "409": { ...errorResponse, description: "E-mail already in use." } },
+        security: [{ sessionCookie: [] }], summary: "Update an operator", tags: ["Administration"],
+      },
+      delete: {
+        parameters: [{ $ref: "#/components/parameters/UserId" }, { $ref: "#/components/parameters/CsrfToken" }],
+        responses: { "200": { content: { "application/json": { schema: { $ref: "#/components/schemas/AdminUserResponse" } } }, description: "Operator deactivated." }, "401": { ...errorResponse, description: "Unauthenticated." }, "403": { ...errorResponse, description: "Administrator role or valid CSRF token required." }, "404": { ...errorResponse, description: "Operator not found." } },
+        security: [{ sessionCookie: [] }], summary: "Deactivate an operator", tags: ["Administration"],
+      },
+    },
+    "/api/admin/users/{id}/activate": {
+      patch: {
+        parameters: [{ $ref: "#/components/parameters/UserId" }, { $ref: "#/components/parameters/CsrfToken" }],
+        responses: { "200": { content: { "application/json": { schema: { $ref: "#/components/schemas/AdminUserResponse" } } }, description: "Operator reactivated." }, "401": { ...errorResponse, description: "Unauthenticated." }, "403": { ...errorResponse, description: "Administrator role or valid CSRF token required." }, "404": { ...errorResponse, description: "Operator not found." }, "409": { ...errorResponse, description: "Invalid status transition." } },
+        security: [{ sessionCookie: [] }], summary: "Reactivate an operator", tags: ["Administration"],
+      },
+    },
     "/api/contacts": {
       get: {
         parameters: [
@@ -306,6 +337,11 @@ export const openApiDocument = {
           password: { format: "password", maxLength: 128, minLength: 12, type: "string" },
         },
         required: ["name", "email", "password"],
+        type: "object",
+      },
+      OperatorUpdateInput: {
+        properties: { email: { format: "email", type: "string" }, name: { maxLength: 120, minLength: 2, type: "string" } },
+        required: ["name", "email"],
         type: "object",
       },
       AdminUserResponse: {
