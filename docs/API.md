@@ -181,6 +181,8 @@ O servidor ignora qualquer sala ou papel declarado diretamente pelo cliente.
 
 O cliente emite `registration:watch` com o tracking token e recebe o estado atual no acknowledgement. Depois de uma decisão persistida, a sala autorizada recebe `registration:approved` ou `registration:rejected`; em reconexões, a consulta HTTP continua sendo a fonte de verdade.
 
+`contact:created` é emitido somente após `POST /contacts` persistir o contato. O evento é entregue apenas à sala `admins`, cujo acesso é definido pelo backend a partir de uma sessão ativa de administrador.
+
 ## Status HTTP principais
 
 | Status | Uso |

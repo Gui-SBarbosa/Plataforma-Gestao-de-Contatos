@@ -7,9 +7,10 @@ import { createRegistrationRealtime } from "./realtime/registration-realtime.js"
 
 const app = createApp();
 const httpServer = createServer(app);
-const realtime = createRegistrationRealtime(httpServer);
+const realtime = createRegistrationRealtime(httpServer, app.locals.sessionMiddleware);
 
 app.locals.publishRegistrationDecision = realtime.publishRegistrationDecision;
+app.locals.publishContactCreated = realtime.publishContactCreated;
 
 httpServer.listen(env.API_PORT, () => {
   console.info(`API listening on port ${env.API_PORT}`);

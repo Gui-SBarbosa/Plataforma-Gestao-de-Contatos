@@ -86,7 +86,7 @@ Salas previstas:
 
 Eventos e payloads estão descritos em [API.md](API.md).
 
-O recurso web de solicitação e acompanhamento fica em `apps/web/src/features/registration`. Ele consome os contratos HTTP e Socket.IO públicos, mantém o tracking token somente em memória e sempre recupera o estado pelo endpoint HTTP antes de acompanhar eventos.
+O recurso web de solicitação e acompanhamento fica em `apps/web/src/features/registration`. Ele consome os contratos HTTP e Socket.IO públicos, mantém o tracking token somente em memória e sempre recupera o estado pelo endpoint HTTP antes de acompanhar eventos. O handshake Socket.IO também aplica a sessão server-side: somente administradores ativos entram na sala `admins`.
 
 ## Escalabilidade
 

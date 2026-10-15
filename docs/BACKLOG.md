@@ -21,7 +21,7 @@ posteriores não são iniciados enquanto o item corrente estiver pendente ou blo
 - [x] 10. Cadastro de contato.
 - [x] 11. RBAC e ownership de contatos.
 - [x] 12. Lista paginada de contatos.
-- [ ] 13. Notificação em tempo real para administrador.
+- [x] 13. Notificação em tempo real para administrador.
 - [ ] 14. Testes críticos, de persistência, concorrência e resposta `429`.
 - [ ] 15. README executável e documentação de ambiente revisada.
 - [ ] 16. Deploy e smoke test.

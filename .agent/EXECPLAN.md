@@ -42,7 +42,8 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | completed   | Cadastro de contato      | Criação autenticada e atribuição do criador                        |
 | completed   | RBAC e ownership         | Consulta direta do próprio contato ou por administrador            |
 | completed   | Lista paginada           | Listagem de contatos com paginação backend                         |
-| pending     | Notificações e auditoria | Persistência, leitura e eventos pós-commit                        |
+| completed   | Notificação em tempo real | Sala administrativa e evento pós-persistência de contato          |
+| pending     | Notificações e auditoria | Persistência, leitura e auditoria administrativa                   |
 | pending     | Dashboard                | Métricas essenciais e atualização por evento                      |
 | pending     | Qualidade                | Jest/Supertest, lint, typecheck, build e revisão de segurança     |
 | pending     | Deploy                   | Railway, migrations, seed de demo e smoke test                    |
@@ -103,6 +104,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — RBAC e ownership de contatos concluídos: `GET /api/contacts/:id` permite consulta direta apenas ao criador autenticado ou a administrador. Contatos inexistentes ou não visíveis retornam `404`; a resposta não expõe `createdById`. Listagem, paginação, notificações e frontend permanecem em etapas posteriores.
 - 14/10/2026 — iniciada a etapa de lista paginada: `GET /api/contacts` retornará dados e metadados de paginação. Operadores receberão somente os próprios contatos e administradores todos os contatos; filtros, notificações e frontend permanecem fora do escopo.
 - 14/10/2026 — lista paginada concluída: `GET /api/contacts` retorna `data` e `meta` com `page`, `pageSize`, `total` e `totalPages`, padrão de 10 itens e máximo de 50. A consulta aplica ownership para operador e visão global para administrador; filtros, notificações e frontend permanecem em etapas posteriores.
+- 14/10/2026 — iniciada a etapa de notificação em tempo real: Socket.IO reutilizará a sessão server-side para autorizar exclusivamente administradores na sala `admins`. A criação de contato emitirá evento mínimo somente após a persistência; notificações persistentes, auditoria e frontend permanecem fora do escopo.
+- 14/10/2026 — notificação em tempo real concluída: o Socket.IO aplica a sessão server-side no handshake e inclui somente administradores ativos na sala `admins`. `POST /api/contacts` publica `contact:created` após persistência, com `contactId`, `creatorName` e `createdAt`; notificações persistentes, auditoria e frontend permanecem fora do escopo.
 
 ## Validações executadas
 
@@ -138,9 +141,9 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — lint, typecheck, 36 testes de integração da API e build completo aprovados após o cadastro de contato, cobrindo criação autenticada, atribuição do criador, validação e CSRF.
 - 14/10/2026 — lint, typecheck, 39 testes de integração da API e build completo aprovados após RBAC e ownership, cobrindo consulta própria, bloqueio de acesso a contato alheio e acesso administrativo.
 - 14/10/2026 — lint, typecheck, 42 testes de integração da API e build completo aprovados após a lista paginada, cobrindo paginação, escopo do operador, visão administrativa e limite máximo de página.
+- 14/10/2026 — lint, typecheck, 43 testes de integração da API e build completo aprovados após a notificação em tempo real, incluindo handshake de sessão Socket.IO e emissão de evento após persistência de contato.
 
 ## Pendências e próximos passos
 
-- Próximo item do backlog: notificação em tempo real para administrador.
-- O frontend de contatos será iniciado apenas quando sua etapa estiver em andamento.
-- Não iniciar frontend de contatos até concluir e registrar a notificação em tempo real.
+- Próximo item do backlog: testes críticos, persistência, concorrência e resposta `429`.
+- Não iniciar notificações persistentes, auditoria ou frontend sem etapa explícita no backlog.

@@ -15,6 +15,15 @@ export const create: RequestHandler = async (request, response, next) => {
 
   try {
     const contact = await createContact(input.data, request.authUser!.id);
+    const publishContactCreated = request.app.locals.publishContactCreated as
+      | ((event: { contactId: string; createdAt: Date; creatorName: string }) => void)
+      | undefined;
+
+    publishContactCreated?.({
+      contactId: contact.id,
+      createdAt: contact.createdAt,
+      creatorName: request.authUser!.name,
+    });
 
     response.status(201).json({ data: { contact } });
   } catch (error) {
