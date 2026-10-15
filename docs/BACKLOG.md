@@ -23,8 +23,9 @@ posteriores não são iniciados enquanto o item corrente estiver pendente ou blo
 - [x] 12. Lista paginada de contatos.
 - [x] 13. Notificação em tempo real para administrador.
 - [x] 14. Testes críticos, de persistência, concorrência e resposta `429`.
-- [ ] 15. README executável e documentação de ambiente revisada.
-- [ ] 16. Deploy e smoke test.
+- [ ] 15. Frontend modular de contatos baseado no Open Design.
+- [ ] 16. README executável e documentação de ambiente revisada.
+- [ ] 17. Deploy e smoke test.
 
 ## P1 — Diferenciais viáveis
 

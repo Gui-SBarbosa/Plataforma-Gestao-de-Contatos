@@ -43,6 +43,7 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | completed   | RBAC e ownership         | Consulta direta do próprio contato ou por administrador            |
 | completed   | Lista paginada           | Listagem de contatos com paginação backend                         |
 | completed   | Notificação em tempo real | Sala administrativa e evento pós-persistência de contato          |
+| completed   | Frontend de contatos | Interface modular baseada no Open Design e contratos HTTP existentes |
 | pending     | Notificações e auditoria | Persistência, leitura e auditoria administrativa                   |
 | pending     | Dashboard                | Métricas essenciais e atualização por evento                      |
 | completed   | Qualidade                | Jest/Supertest, lint, typecheck, build e revisão de segurança     |
@@ -108,6 +109,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — notificação em tempo real concluída: o Socket.IO aplica a sessão server-side no handshake e inclui somente administradores ativos na sala `admins`. `POST /api/contacts` publica `contact:created` após persistência, com `contactId`, `creatorName` e `createdAt`; notificações persistentes, auditoria e frontend permanecem fora do escopo.
 - 14/10/2026 — iniciada a etapa de qualidade: serão revisados e ampliados os testes críticos de persistência, concorrência e respostas `429`, preservando os contratos e módulos existentes. Frontend, notificações persistentes e auditoria permanecem fora do escopo.
 - 14/10/2026 — etapa de qualidade concluída: a suíte cobre sessão persistente após nova instância, limites persistentes, concorrência entre instâncias, `429` genérico para conta conhecida ou desconhecida e headers de limite para login, registro e tracking. Nenhuma funcionalidade de produto foi adicionada.
+- 14/10/2026 — por solicitação do usuário, o frontend de contatos foi antecipado para a etapa 15, após qualidade. A implementação seguirá a referência Open Design fornecida, com composição em `app`, módulos de domínio em `features`, componentes reutilizáveis em `shared` e acesso HTTP isolado em `services`. O backend permanece fonte de verdade para autenticação, autorização e contratos.
+- 14/10/2026 — frontend da etapa 15 concluído: login por sessão, listagem paginada, criação de contato, estados de carregamento/erro/vazio, modal e layout responsivo baseado no Open Design. O proxy de desenvolvimento usa `VITE_API_PROXY_TARGET`; nenhum token é persistido no navegador.
 
 ## Validações executadas
 
@@ -145,8 +148,9 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — lint, typecheck, 42 testes de integração da API e build completo aprovados após a lista paginada, cobrindo paginação, escopo do operador, visão administrativa e limite máximo de página.
 - 14/10/2026 — lint, typecheck, 43 testes de integração da API e build completo aprovados após a notificação em tempo real, incluindo handshake de sessão Socket.IO e emissão de evento após persistência de contato.
 - 14/10/2026 — lint, typecheck, 45 testes de integração da API e build completo aprovados na etapa de qualidade; o recorte isolado de autenticação aprovou 10 testes.
+- 14/10/2026 — frontend validado com TypeScript, ESLint, build Vite e `git diff --check`. O wrapper `npm` falhou neste ambiente ao resolver `C:\Users\guiso`; os binários locais equivalentes executaram as validações sem erro.
 
 ## Pendências e próximos passos
 
-- Próximo item do backlog: README executável e documentação de ambiente revisada.
-- O frontend de contatos requer etapa explícita após os itens P0 pendentes ou alteração aprovada do backlog.
+- Próximo item do plano: README executável e documentação de ambiente revisada.
+- Frontend modular de contatos concluído; a integração de notificações persistentes, auditoria e dashboard permanece pendente conforme backlog.
