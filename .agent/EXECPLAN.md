@@ -41,7 +41,7 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | completed   | Acompanhamento em tempo real | Tracking token, estado e eventos de aprovação/rejeição           |
 | completed   | Cadastro de contato      | Criação autenticada e atribuição do criador                        |
 | completed   | RBAC e ownership         | Consulta direta do próprio contato ou por administrador            |
-| pending     | Lista paginada           | Listagem de contatos com paginação backend                         |
+| completed   | Lista paginada           | Listagem de contatos com paginação backend                         |
 | pending     | Notificações e auditoria | Persistência, leitura e eventos pós-commit                        |
 | pending     | Dashboard                | Métricas essenciais e atualização por evento                      |
 | pending     | Qualidade                | Jest/Supertest, lint, typecheck, build e revisão de segurança     |
@@ -101,6 +101,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — cadastro de contato concluído no módulo `contacts`: `POST /api/contacts` exige sessão ativa e CSRF, valida os dados mínimos, normaliza e-mail e persiste `createdById` a partir da sessão. Consulta, ownership de leitura, paginação, notificações e frontend permanecem em etapas posteriores.
 - 14/10/2026 — iniciada a etapa de RBAC e ownership de contatos: a consulta direta retornará somente o contato do operador autenticado ou qualquer contato para administrador. Contatos não visíveis retornarão `404`; listagem, paginação, notificações e frontend permanecem fora do escopo.
 - 14/10/2026 — RBAC e ownership de contatos concluídos: `GET /api/contacts/:id` permite consulta direta apenas ao criador autenticado ou a administrador. Contatos inexistentes ou não visíveis retornam `404`; a resposta não expõe `createdById`. Listagem, paginação, notificações e frontend permanecem em etapas posteriores.
+- 14/10/2026 — iniciada a etapa de lista paginada: `GET /api/contacts` retornará dados e metadados de paginação. Operadores receberão somente os próprios contatos e administradores todos os contatos; filtros, notificações e frontend permanecem fora do escopo.
+- 14/10/2026 — lista paginada concluída: `GET /api/contacts` retorna `data` e `meta` com `page`, `pageSize`, `total` e `totalPages`, padrão de 10 itens e máximo de 50. A consulta aplica ownership para operador e visão global para administrador; filtros, notificações e frontend permanecem em etapas posteriores.
 
 ## Validações executadas
 
@@ -135,9 +137,10 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — lint, typecheck, 32 testes de integração da API e build completo aprovados após o frontend de acompanhamento. A inspeção visual por navegador não pôde ser executada porque nenhum navegador estava disponível na sessão.
 - 14/10/2026 — lint, typecheck, 36 testes de integração da API e build completo aprovados após o cadastro de contato, cobrindo criação autenticada, atribuição do criador, validação e CSRF.
 - 14/10/2026 — lint, typecheck, 39 testes de integração da API e build completo aprovados após RBAC e ownership, cobrindo consulta própria, bloqueio de acesso a contato alheio e acesso administrativo.
+- 14/10/2026 — lint, typecheck, 42 testes de integração da API e build completo aprovados após a lista paginada, cobrindo paginação, escopo do operador, visão administrativa e limite máximo de página.
 
 ## Pendências e próximos passos
 
-- Próximo item do backlog: lista paginada de contatos.
+- Próximo item do backlog: notificação em tempo real para administrador.
 - O frontend de contatos será iniciado apenas quando sua etapa estiver em andamento.
-- Não iniciar notificações, eventos ou frontend de contatos até concluir e registrar a lista paginada.
+- Não iniciar frontend de contatos até concluir e registrar a notificação em tempo real.

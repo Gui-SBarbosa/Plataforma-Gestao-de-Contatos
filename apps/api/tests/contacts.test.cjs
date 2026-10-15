@@ -136,4 +136,51 @@ describe("contact creation", () => {
     expect(adminResponse.status).toBe(200);
     expect(adminResponse.body.data.contact).toMatchObject({ id: contact.id, email: "other@example.com" });
   });
+
+  it("paginates only contacts visible to the authenticated operator", async () => {
+    await prisma.contact.createMany({
+      data: Array.from({ length: 12 }, (_value, index) => ({
+        ...input,
+        createdById: operator.id,
+        email: `operator-page-${index}@example.com`,
+      })),
+    });
+    await prisma.contact.createMany({
+      data: Array.from({ length: 3 }, (_value, index) => ({
+        ...input,
+        createdById: otherOperator.id,
+        email: `other-page-${index}@example.com`,
+      })),
+    });
+
+    const { agent } = await login();
+    const response = await agent.get("/api/contacts?page=2&pageSize=10");
+
+    expect(response.status).toBe(200);
+    expect(response.body.meta).toEqual({ page: 2, pageSize: 10, total: 12, totalPages: 2 });
+    expect(response.body.data).toHaveLength(2);
+    expect(response.body.data.every((contact) => contact.email.startsWith("operator-page-"))).toBe(true);
+  });
+
+  it("lists all contacts for administrators and rejects invalid pagination", async () => {
+    await prisma.contact.createMany({
+      data: [
+        { ...input, createdById: operator.id, email: "operator-list@example.com" },
+        { ...input, createdById: otherOperator.id, email: "other-list@example.com" },
+      ],
+    });
+    const { agent } = await login(adminEmail);
+    const response = await agent.get("/api/contacts");
+
+    expect(response.status).toBe(200);
+    expect(response.body.meta).toEqual({ page: 1, pageSize: 10, total: 2, totalPages: 1 });
+    expect(response.body.data.map((contact) => contact.email)).toEqual(
+      expect.arrayContaining(["operator-list@example.com", "other-list@example.com"]),
+    );
+
+    const invalidResponse = await agent.get("/api/contacts?pageSize=51");
+
+    expect(invalidResponse.status).toBe(400);
+    expect(invalidResponse.body.error.code).toBe("VALIDATION_ERROR");
+  });
 });

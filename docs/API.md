@@ -114,6 +114,7 @@ Nesta etapa, `POST /admin/users` cria somente um operador `ACTIVE` e exige `name
 | Método | Rota | Acesso |
 |---|---|---|
 | POST | `/contacts` | OPERATOR ou ADMIN |
+| GET | `/contacts?page=1&pageSize=10` | OPERATOR ou ADMIN |
 | GET | `/contacts/:id` | Dono ou ADMIN |
 
 Cadastro:
@@ -131,7 +132,11 @@ Cadastro:
 
 `POST /contacts` exige sessão autenticada e `X-CSRF-Token`. A resposta `201` retorna
 o contato criado sem dados internos do criador. O backend atribui `createdById` ao usuário
-da sessão; a listagem paginada será disponibilizada em etapa posterior.
+da sessão.
+
+`GET /contacts` exige sessão autenticada e retorna `{ data, meta }`, onde `meta` possui
+`page`, `pageSize`, `total` e `totalPages`. O tamanho padrão é `10` e o máximo é `50`.
+Operadores recebem somente os próprios contatos; administradores recebem todos.
 
 `GET /contacts/:id` exige sessão autenticada. Operadores recebem somente contatos cujo
 `createdById` pertence à própria sessão. Administradores acessam qualquer contato. Um contato

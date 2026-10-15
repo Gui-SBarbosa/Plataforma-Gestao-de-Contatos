@@ -14,4 +14,10 @@ export const contactIdSchema = z.object({
   id: z.uuid(),
 });
 
+export const listContactsSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(50).default(10),
+});
+
 export type CreateContactInput = z.infer<typeof createContactSchema>;
+export type ListContactsInput = z.infer<typeof listContactsSchema>;

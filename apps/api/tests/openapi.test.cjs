@@ -35,6 +35,11 @@ describe("OpenAPI documentation", () => {
     expect(openApiDocument.paths["/api/contacts/{id}"].get.security).toEqual([{ sessionCookie: [] }]);
   });
 
+  it("documents the paginated contacts route", () => {
+    expect(openApiDocument.paths["/api/contacts"].get.responses["200"]).toBeDefined();
+    expect(openApiDocument.paths["/api/contacts"].get.security).toEqual([{ sessionCookie: [] }]);
+  });
+
   it("serves Swagger UI only in development", async () => {
     const app = express();
     registerOpenApiDocs(app, "development");

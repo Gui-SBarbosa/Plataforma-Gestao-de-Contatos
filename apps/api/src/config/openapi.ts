@@ -207,6 +207,23 @@ export const openApiDocument = {
       },
     },
     "/api/contacts": {
+      get: {
+        parameters: [
+          { in: "query", name: "page", schema: { default: 1, minimum: 1, type: "integer" } },
+          { in: "query", name: "pageSize", schema: { default: 10, maximum: 50, minimum: 1, type: "integer" } },
+        ],
+        responses: {
+          "200": {
+            content: { "application/json": { schema: { $ref: "#/components/schemas/ContactListResponse" } } },
+            description: "Visible contacts page.",
+          },
+          "400": { ...errorResponse, description: "Invalid pagination input." },
+          "401": { ...errorResponse, description: "Unauthenticated or inactive user." },
+        },
+        security: [{ sessionCookie: [] }],
+        summary: "List visible contacts",
+        tags: ["Contacts"],
+      },
       post: {
         parameters: [{ $ref: "#/components/parameters/CsrfToken" }],
         requestBody: {
@@ -325,6 +342,14 @@ export const openApiDocument = {
           source: { enum: ["WEBSITE", "REFERRAL", "SOCIAL_MEDIA", "PHONE", "OTHER"], type: "string" },
         },
         required: ["name", "email", "phone", "source"],
+        type: "object",
+      },
+      ContactListResponse: {
+        properties: {
+          data: { items: { $ref: "#/components/schemas/Contact" }, type: "array" },
+          meta: { $ref: "#/components/schemas/PaginationMeta" },
+        },
+        required: ["data", "meta"],
         type: "object",
       },
       ContactResponse: {

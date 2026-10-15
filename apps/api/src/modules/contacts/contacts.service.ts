@@ -2,7 +2,7 @@ import { UserRole } from "@prisma/client";
 
 import { prisma } from "../../config/prisma.js";
 
-import type { CreateContactInput } from "./contacts.schema.js";
+import type { CreateContactInput, ListContactsInput } from "./contacts.schema.js";
 
 const contactSelect = {
   city: true,
@@ -26,3 +26,19 @@ export const findVisibleContact = (contactId: string, user: { id: string; role: 
     select: contactSelect,
     where: user.role === UserRole.ADMIN ? { id: contactId } : { createdById: user.id, id: contactId },
   });
+
+export const listVisibleContacts = async ({ page, pageSize }: ListContactsInput, user: { id: string; role: UserRole }) => {
+  const where = user.role === UserRole.ADMIN ? {} : { createdById: user.id };
+  const [total, contacts] = await prisma.$transaction([
+    prisma.contact.count({ where }),
+    prisma.contact.findMany({
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      select: contactSelect,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      where,
+    }),
+  ]);
+
+  return { contacts, page, pageSize, total, totalPages: Math.ceil(total / pageSize) };
+};
