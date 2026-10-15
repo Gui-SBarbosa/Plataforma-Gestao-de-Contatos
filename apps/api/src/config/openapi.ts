@@ -206,6 +206,27 @@ export const openApiDocument = {
         tags: ["Administration"],
       },
     },
+    "/api/contacts": {
+      post: {
+        parameters: [{ $ref: "#/components/parameters/CsrfToken" }],
+        requestBody: {
+          content: { "application/json": { schema: { $ref: "#/components/schemas/ContactInput" } } },
+          required: true,
+        },
+        responses: {
+          "201": {
+            content: { "application/json": { schema: { $ref: "#/components/schemas/ContactResponse" } } },
+            description: "Contact created.",
+          },
+          "400": { ...errorResponse, description: "Invalid input." },
+          "401": { ...errorResponse, description: "Unauthenticated or inactive user." },
+          "403": { ...errorResponse, description: "Invalid CSRF token." },
+        },
+        security: [{ sessionCookie: [] }],
+        summary: "Create a contact",
+        tags: ["Contacts"],
+      },
+    },
     "/api/health": {
       get: {
         responses: {
@@ -253,6 +274,37 @@ export const openApiDocument = {
       },
       CsrfResponse: {
         properties: { data: { properties: { csrfToken: { type: "string" } }, required: ["csrfToken"], type: "object" } },
+        required: ["data"],
+        type: "object",
+      },
+      Contact: {
+        properties: {
+          city: { nullable: true, type: "string" },
+          company: { nullable: true, type: "string" },
+          createdAt: { format: "date-time", type: "string" },
+          email: { format: "email", type: "string" },
+          id: { format: "uuid", type: "string" },
+          name: { type: "string" },
+          phone: { type: "string" },
+          source: { enum: ["WEBSITE", "REFERRAL", "SOCIAL_MEDIA", "PHONE", "OTHER"], type: "string" },
+        },
+        required: ["id", "name", "email", "phone", "source", "createdAt"],
+        type: "object",
+      },
+      ContactInput: {
+        properties: {
+          city: { maxLength: 120, type: "string" },
+          company: { maxLength: 160, type: "string" },
+          email: { format: "email", maxLength: 320, type: "string" },
+          name: { maxLength: 120, minLength: 2, type: "string" },
+          phone: { maxLength: 32, minLength: 6, type: "string" },
+          source: { enum: ["WEBSITE", "REFERRAL", "SOCIAL_MEDIA", "PHONE", "OTHER"], type: "string" },
+        },
+        required: ["name", "email", "phone", "source"],
+        type: "object",
+      },
+      ContactResponse: {
+        properties: { data: { properties: { contact: { $ref: "#/components/schemas/Contact" } }, required: ["contact"], type: "object" } },
         required: ["data"],
         type: "object",
       },

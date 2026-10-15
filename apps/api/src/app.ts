@@ -12,6 +12,7 @@ import { notFoundHandler } from "./middlewares/not-found.js";
 import { requestId } from "./middlewares/request-id.js";
 import { authRouter } from "./modules/auth/auth.routes.js";
 import { adminUsersRouter } from "./modules/admin-users/admin-users.routes.js";
+import { contactsRouter } from "./modules/contacts/contacts.routes.js";
 
 export const createApp = () => {
   const app = express();
@@ -62,6 +63,7 @@ export const createApp = () => {
 
   app.use("/api/auth", authRouter);
   app.use("/api/admin/users", adminUsersRouter);
+  app.use("/api/contacts", contactsRouter);
   registerOpenApiDocs(app, env.NODE_ENV);
 
   app.use(notFoundHandler);

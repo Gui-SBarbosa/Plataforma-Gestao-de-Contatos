@@ -25,6 +25,11 @@ describe("OpenAPI documentation", () => {
     expect(openApiDocument.paths["/api/auth/registration-status"].get.responses["429"]).toBeDefined();
   });
 
+  it("documents the implemented contact creation route", () => {
+    expect(openApiDocument.paths["/api/contacts"].post.responses["201"]).toBeDefined();
+    expect(openApiDocument.paths["/api/contacts"].post.security).toEqual([{ sessionCookie: [] }]);
+  });
+
   it("serves Swagger UI only in development", async () => {
     const app = express();
     registerOpenApiDocs(app, "development");

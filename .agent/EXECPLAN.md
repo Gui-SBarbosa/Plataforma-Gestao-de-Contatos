@@ -39,7 +39,7 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | completed   | Cadastro administrativo   | Criação direta de operador ativo pelo administrador                |
 | completed   | Aprovação de solicitações | Listagem administrativa, aprovação e rejeição                      |
 | completed   | Acompanhamento em tempo real | Tracking token, estado e eventos de aprovação/rejeição           |
-| pending     | Contatos                 | Cadastro, RBAC, ownership e paginação backend                     |
+| completed   | Contatos                 | Cadastro, RBAC, ownership e paginação backend                     |
 | pending     | Notificações e auditoria | Persistência, leitura e eventos pós-commit                        |
 | pending     | Dashboard                | Métricas essenciais e atualização por evento                      |
 | pending     | Qualidade                | Jest/Supertest, lint, typecheck, build e revisão de segurança     |
@@ -95,6 +95,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — acompanhamento em tempo real concluído no backend: `GET /api/auth/registration-status` retorna somente estado e data da decisão, com rate limit persistente por token. Socket.IO valida a origem, autoriza a sala somente após validar o token opaco e recebe eventos de aprovação ou rejeição somente após a atualização persistida. Logs redigem token e URL bruta.
 - 14/10/2026 — o frontend da etapa de acompanhamento foi iniciado após comunicação prévia ao solicitante, pois a atualização visual sem recarregar é necessária para concluir o AC-03. O escopo visual limita-se ao recurso modular de tracking; contatos e telas administrativas permanecem fora desta etapa.
 - 14/10/2026 — acompanhamento concluído no frontend em `features/registration`: a tela cria solicitações, apresenta o tracking token uma única vez e acompanha o estado com consulta HTTP seguida de Socket.IO. O token não é persistido no navegador; o estilo segue tokens da referência Open Design fornecida.
+- 14/10/2026 — iniciada a etapa de cadastro de contato: será criado o módulo isolado `contacts` para `POST /api/contacts`, protegido por sessão e CSRF. Esta entrega valida os dados mínimos e persiste o criador autenticado; RBAC/ownership de consulta, paginação, notificações e frontend permanecem fora do escopo.
+- 14/10/2026 — cadastro de contato concluído no módulo `contacts`: `POST /api/contacts` exige sessão ativa e CSRF, valida os dados mínimos, normaliza e-mail e persiste `createdById` a partir da sessão. Consulta, ownership de leitura, paginação, notificações e frontend permanecem em etapas posteriores.
 
 ## Validações executadas
 
@@ -127,9 +129,10 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — lint, typecheck, build e 27 testes de integração aprovados após a aprovação de solicitações, cobrindo listagem paginada, aprovação, rejeição, administrador e data da aprovação, login bloqueado ou permitido conforme o status, RBAC, CSRF, transição inválida e OpenAPI.
 - 14/10/2026 — lint, typecheck, build e 32 testes de integração aprovados após o backend de acompanhamento, cobrindo consulta segura de status, `429` por token, origem Socket.IO, autorização da sala e evento de aprovação após persistência.
 - 14/10/2026 — lint, typecheck, 32 testes de integração da API e build completo aprovados após o frontend de acompanhamento. A inspeção visual por navegador não pôde ser executada porque nenhum navegador estava disponível na sessão.
+- 14/10/2026 — lint, typecheck, 36 testes de integração da API e build completo aprovados após o cadastro de contato, cobrindo criação autenticada, atribuição do criador, validação e CSRF.
 
 ## Pendências e próximos passos
 
-- Item atual do backlog: cadastro de contato.
-- O acompanhamento de aprovação está concluído no backend e frontend; o frontend de contatos será iniciado apenas quando sua etapa estiver em andamento.
-- Não iniciar RBAC/ownership de contatos, paginação ou qualquer item posterior até concluir e registrar o cadastro de contato.
+- Próximo item do backlog: RBAC e ownership de contatos.
+- O cadastro autenticado de contatos está concluído; o frontend de contatos será iniciado apenas quando sua etapa estiver em andamento.
+- Não iniciar paginação, notificações, eventos ou frontend de contatos até concluir e registrar RBAC e ownership.
