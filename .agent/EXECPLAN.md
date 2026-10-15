@@ -52,6 +52,7 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | pending     | Entrega                  | README final, UML, apresentação e roteiro de demonstração         |
 
 | completed   | Conditional user email uniqueness | Active/pending emails required and unique; disabled/rejected emails nullable and reusable |
+| completed   | Frontend de requests | Admin list and approve/reject actions for pending operators |
 
 ## Critérios de aceite
 
@@ -124,6 +125,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 
 - 15/10/2026 — unicidade condicional de e-mail implementada com `CHECK`, índice único parcial e limpeza de e-mail em rejeição/desativação; reativação exige novo e-mail válido.
 - 15/10/2026 — migration local e de teste aplicadas; lint, typecheck, builds e 48 testes de integração aprovados após a regra de e-mail condicional.
+- 15/10/2026 — tela `#requests` validada com typecheck, ESLint e build Vite; ações usam CSRF e continuam protegidas por sessão/RBAC no backend.
 
 - 14/10/2026 — `npm run lint`: aprovado.
 - 14/10/2026 — `npm run typecheck`: aprovado para API e web.
