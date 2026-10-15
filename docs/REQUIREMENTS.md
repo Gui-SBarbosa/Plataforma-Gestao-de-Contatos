@@ -8,9 +8,9 @@ O GestCon centraliza a entrada controlada de operadores, o cadastro de contatos 
 
 | Ator          | Responsabilidade                                                          |
 | ------------- | ------------------------------------------------------------------------- |
-| Visitante     | Autenticar-se ou solicitar acesso como operador                           |
-| Operador      | Cadastrar e consultar os próprios contatos                                |
-| Administrador | Gerenciar acessos, usuários, contatos, notificações, auditoria e métricas |
+| Visitante / Pré-operador | Autenticar-se ou solicitar acesso como operador                 |
+| Operador      | Cadastrar e consultar somente os próprios contatos                         |
+| Administrador | Gerenciar operadores, solicitações, contatos, notificações, auditoria e métricas |
 
 ## Requisitos funcionais
 
@@ -41,6 +41,9 @@ O GestCon centraliza a entrada controlada de operadores, o cadastro de contatos 
 - RN-06 — Rejeição muda `PENDING` para `REJECTED`.
 - RN-07 — Operador consulta apenas contatos em que `createdById` corresponde ao usuário autenticado.
 - RN-08 — Administrador consulta todos os contatos.
+- RN-08a — Administrador não cadastra contatos; sua visão de contatos é somente leitura e inclui data e operador criador.
+- RN-08b — Operador pode cadastrar contatos e sua consulta, análise e métricas ficam limitadas aos contatos criados por ele.
+- RN-08c — Dashboard administrativo agrega todos os contatos e aceita filtros por período, intervalo e operador; dashboard do operador agrega somente seus contatos.
 - RN-09 — Criação de contato, notificação e auditoria deve ser atômica quando estiverem na mesma operação.
 - RN-10 — Evento em tempo real só é emitido após o commit.
 - RN-11 — Paginação padrão é 10 itens e o máximo aceito é 50.

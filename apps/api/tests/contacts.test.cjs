@@ -102,6 +102,14 @@ describe("contact creation", () => {
     expect(response.body.error.code).toBe("VALIDATION_ERROR");
   });
 
+  it("allows contact creation only for operators", async () => {
+    const { agent, csrfToken } = await login(adminEmail);
+    const response = await agent.post("/api/contacts").set("X-CSRF-Token", csrfToken).send(input);
+
+    expect(response.status).toBe(403);
+    expect(response.body.error.code).toBe("FORBIDDEN");
+  });
+
   it("requires authentication and CSRF protection", async () => {
     expect((await request(app).post("/api/contacts").send(input)).status).toBe(401);
 
@@ -177,6 +185,7 @@ describe("contact creation", () => {
     expect(response.body.data.map((contact) => contact.email)).toEqual(
       expect.arrayContaining(["operator-list@example.com", "other-list@example.com"]),
     );
+    expect(response.body.data.every((contact) => contact.createdBy?.name)).toBe(true);
 
     const invalidResponse = await agent.get("/api/contacts?pageSize=51");
 

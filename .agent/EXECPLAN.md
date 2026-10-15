@@ -23,6 +23,7 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 - Socket.IO no mesmo processo HTTP.
 - Jest + Supertest.
 - Operador visualiza somente contatos criados por ele; administrador visualiza todos.
+- ADMIN administra operadores e solicitações, consulta contatos em modo somente leitura e acompanha métricas globais; OPERATOR cria contatos e visualiza/análise somente seus próprios registros.
 - Aprovação não autentica automaticamente o solicitante.
 
 ## Etapas
@@ -43,9 +44,9 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | completed   | RBAC e ownership         | Consulta direta do próprio contato ou por administrador            |
 | completed   | Lista paginada           | Listagem de contatos com paginação backend                         |
 | completed   | Notificação em tempo real | Sala administrativa e evento pós-persistência de contato          |
-| completed   | Frontend de contatos | Interface modular baseada no Open Design e contratos HTTP existentes |
+| completed   | Frontend de contatos | Interface modular, escopo por papel e contratos HTTP existentes   |
 | pending     | Notificações e auditoria | Persistência, leitura e auditoria administrativa                   |
-| pending     | Dashboard                | Métricas essenciais e atualização por evento                      |
+| pending     | Dashboard                | Métricas por papel, filtros e atualização por evento              |
 | completed   | Qualidade                | Jest/Supertest, lint, typecheck, build e revisão de segurança     |
 | pending     | Deploy                   | Railway, migrations, seed de demo e smoke test                    |
 | pending     | Entrega                  | README final, UML, apresentação e roteiro de demonstração         |
@@ -111,6 +112,9 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — etapa de qualidade concluída: a suíte cobre sessão persistente após nova instância, limites persistentes, concorrência entre instâncias, `429` genérico para conta conhecida ou desconhecida e headers de limite para login, registro e tracking. Nenhuma funcionalidade de produto foi adicionada.
 - 14/10/2026 — por solicitação do usuário, o frontend de contatos foi antecipado para a etapa 15, após qualidade. A implementação seguirá a referência Open Design fornecida, com composição em `app`, módulos de domínio em `features`, componentes reutilizáveis em `shared` e acesso HTTP isolado em `services`. O backend permanece fonte de verdade para autenticação, autorização e contratos.
 - 14/10/2026 — frontend da etapa 15 concluído: login por sessão, listagem paginada, criação de contato, estados de carregamento/erro/vazio, modal e layout responsivo baseado no Open Design. O proxy de desenvolvimento usa `VITE_API_PROXY_TARGET`; nenhum token é persistido no navegador.
+- 15/10/2026 — regra de papel detalhada pelo solicitante: ADMIN não cria contatos, apenas gerencia operadores, solicitações e acompanha dados globais; OPERATOR cria contatos e possui escopo exclusivo sobre seus registros. A correção de `POST /api/contacts` e da interface será aplicada nesta etapa; dashboard com filtros ficará pendente como etapa própria.
+- 15/10/2026 — reaberta a etapa de frontend para corrigir o escopo por papel: a API passou a bloquear criação por ADMIN e a tela passou a ocultar criação para ADMIN, exibindo responsável/data na visão global.
+- 15/10/2026 — correção de papel concluída: `POST /api/contacts` exige `OPERATOR`, a lista administrativa exibe o nome do criador sem expor `createdById`, e a interface remove criação para ADMIN. O contrato de origem foi alinhado aos valores Prisma (`WEBSITE` e `SOCIAL_MEDIA`).
 
 ## Validações executadas
 
@@ -149,8 +153,10 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — lint, typecheck, 43 testes de integração da API e build completo aprovados após a notificação em tempo real, incluindo handshake de sessão Socket.IO e emissão de evento após persistência de contato.
 - 14/10/2026 — lint, typecheck, 45 testes de integração da API e build completo aprovados na etapa de qualidade; o recorte isolado de autenticação aprovou 10 testes.
 - 14/10/2026 — frontend validado com TypeScript, ESLint, build Vite e `git diff --check`. O wrapper `npm` falhou neste ambiente ao resolver `C:\Users\guiso`; os binários locais equivalentes executaram as validações sem erro.
+- 15/10/2026 — correção validada com TypeScript, ESLint, build Vite, teste de contatos com 8 casos aprovados e `git diff --check`; o teste cobre `403 FORBIDDEN` para criação por ADMIN e responsável na listagem administrativa.
 
 ## Pendências e próximos passos
 
 - Próximo item do plano: README executável e documentação de ambiente revisada.
 - Frontend modular de contatos concluído; a integração de notificações persistentes, auditoria e dashboard permanece pendente conforme backlog.
+- Correção de autorização por papel concluída. Próximo trabalho funcional: dashboard por papel com métricas e filtros, ainda pendente no backlog.

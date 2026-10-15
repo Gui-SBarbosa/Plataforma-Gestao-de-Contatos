@@ -13,6 +13,7 @@ const contactSelect = {
   name: true,
   phone: true,
   source: true,
+  createdBy: { select: { name: true } },
 } as const;
 
 export const createContact = (input: CreateContactInput, createdById: string) =>
