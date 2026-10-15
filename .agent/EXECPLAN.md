@@ -115,6 +115,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 15/10/2026 — regra de papel detalhada pelo solicitante: ADMIN não cria contatos, apenas gerencia operadores, solicitações e acompanha dados globais; OPERATOR cria contatos e possui escopo exclusivo sobre seus registros. A correção de `POST /api/contacts` e da interface será aplicada nesta etapa; dashboard com filtros ficará pendente como etapa própria.
 - 15/10/2026 — reaberta a etapa de frontend para corrigir o escopo por papel: a API passou a bloquear criação por ADMIN e a tela passou a ocultar criação para ADMIN, exibindo responsável/data na visão global.
 - 15/10/2026 — correção de papel concluída: `POST /api/contacts` exige `OPERATOR`, a lista administrativa exibe o nome do criador sem expor `createdById`, e a interface remove criação para ADMIN. O contrato de origem foi alinhado aos valores Prisma (`WEBSITE` e `SOCIAL_MEDIA`).
+- 15/10/2026 — tela de criação de operador adicionada em `features/admin-users`, acessível somente pela rota visual `#operators` para ADMIN. O formulário usa CSRF, valida confirmação de senha no cliente e não persiste credenciais.
 
 ## Validações executadas
 
@@ -154,6 +155,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 14/10/2026 — lint, typecheck, 45 testes de integração da API e build completo aprovados na etapa de qualidade; o recorte isolado de autenticação aprovou 10 testes.
 - 14/10/2026 — frontend validado com TypeScript, ESLint, build Vite e `git diff --check`. O wrapper `npm` falhou neste ambiente ao resolver `C:\Users\guiso`; os binários locais equivalentes executaram as validações sem erro.
 - 15/10/2026 — correção validada com TypeScript, ESLint, build Vite, teste de contatos com 8 casos aprovados e `git diff --check`; o teste cobre `403 FORBIDDEN` para criação por ADMIN e responsável na listagem administrativa.
+- 15/10/2026 — tela de operador validada com TypeScript, ESLint e build Vite; a autorização final continua no endpoint `POST /api/admin/users`, protegido por sessão, ADMIN e CSRF.
 
 ## Pendências e próximos passos
 
