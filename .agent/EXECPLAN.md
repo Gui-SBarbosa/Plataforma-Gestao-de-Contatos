@@ -180,6 +180,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 15/10/2026 — referência visual local do Open Design mapeada e aplicada à tela Dashboard: quatro métricas, gráfico temporal, distribuição por origem, contatos recentes e solicitações pendentes; os dados continuam vindo dos contratos HTTP existentes.
 - 15/10/2026 — réplica visual do dashboard validada com ESLint, typecheck e build Vite; nenhuma alteração foi feita em `docs/BACKLOG.md`.
 - 15/10/2026 — gráfico de linha corrigido para manter traço visível mesmo com apenas um ponto de série; typecheck, ESLint e build Vite passaram novamente.
+- 15/10/2026 — série diária do dashboard passou a normalizar sete dias, preencher ausências com zero e exibir escalas dinâmicas nos eixos X e Y; validação frontend passou novamente.
 
 ## Pendências e próximos passos
 
