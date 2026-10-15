@@ -105,4 +105,4 @@ SEED_ADMIN_EMAIL=<email de demonstração>
 SEED_ADMIN_PASSWORD=<senha de demonstração>
 ```
 
-Não configure nem reutilize secrets locais em produção. `DATABASE_URL` é fornecida pelo serviço PostgreSQL; `PORT` é fornecida pela plataforma e será adotada na etapa de deploy. Execute migrations com `npm run db:deploy`; nunca use `prisma db push` em produção.
+Não configure nem reutilize secrets locais em produção. `DATABASE_URL` vem do PostgreSQL Railway. `PORT` é fornecida pela plataforma e tem prioridade sobre `API_PORT`. O `railway.toml` executa migration e seed idempotente antes de iniciar a API. Nunca use `prisma db push` em produção.

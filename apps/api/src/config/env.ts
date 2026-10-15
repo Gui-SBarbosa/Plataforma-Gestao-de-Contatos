@@ -7,6 +7,7 @@ config({ path: fileURLToPath(new URL("../../../../.env", import.meta.url)), quie
 
 const environmentSchema = z.object({
   API_PORT: z.coerce.number().int().positive().default(3001),
+  PORT: z.coerce.number().int().positive().optional(),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   APP_ORIGIN: z.string().url().default("http://localhost:5173"),
   CSRF_SECRET: z.string().min(32),

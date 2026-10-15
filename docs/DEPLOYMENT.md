@@ -7,10 +7,6 @@
 - Uma única réplica da aplicação nesta entrega.
 - Express entrega API, Socket.IO e build estático do React.
 
-## Estado atual
-
-Esta documentação prepara o deploy Railway. A etapa de deploy ainda precisa ligar o build estático do React ao processo Express e usar `PORT` fornecida pela plataforma. Não publique antes dessa adequação.
-
 ## Pipeline esperado
 
 ```text
@@ -40,11 +36,12 @@ PORT=<fornecida pelo ambiente>
 
 ```text
 Build: npm ci && npm run build
-Start: npm run start --workspace=@gestcon/api
-Migration: npm run db:deploy
-Seed demo local: npm run db:seed
+Pre-deploy: npm run db:deploy && npm run db:seed
+Start: npm run start
 Rate limit cleanup: npm run rate-limit:cleanup
 ```
+
+`railway.toml` registra build, pre-deploy, start e healthcheck. O pre-deploy usa migration e seed idempotentes; uma falha interrompe a publicação.
 
 ## Health checks
 

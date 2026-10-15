@@ -5,6 +5,7 @@ import { pinoHttp } from "pino-http";
 
 import { env } from "./config/env.js";
 import { registerOpenApiDocs } from "./config/openapi.js";
+import { registerProductionWeb } from "./config/production-web.js";
 import { createSessionMiddleware } from "./config/session.js";
 import { errorHandler } from "./middlewares/error-handler.js";
 import { notFoundHandler } from "./middlewares/not-found.js";
@@ -52,6 +53,11 @@ export const createApp = () => {
   app.use("/api/admin/users", adminUsersRouter);
   app.use("/api/contacts", contactsRouter);
   registerOpenApiDocs(app, env.NODE_ENV);
+  app.use("/api", notFoundHandler);
+
+  if (env.NODE_ENV === "production") {
+    registerProductionWeb(app);
+  }
 
   app.use(notFoundHandler);
   app.use(errorHandler);

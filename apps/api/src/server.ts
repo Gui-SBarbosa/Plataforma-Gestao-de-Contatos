@@ -12,8 +12,10 @@ const realtime = createRegistrationRealtime(httpServer, app.locals.sessionMiddle
 app.locals.publishRegistrationDecision = realtime.publishRegistrationDecision;
 app.locals.publishContactCreated = realtime.publishContactCreated;
 
-httpServer.listen(env.API_PORT, () => {
-  console.info(`API listening on port ${env.API_PORT}`);
+const port = env.PORT ?? env.API_PORT;
+
+httpServer.listen(port, () => {
+  console.info(`API listening on port ${port}`);
 });
 
 startRateLimitCleanupSchedule();
