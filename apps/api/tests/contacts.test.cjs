@@ -12,10 +12,14 @@ process.env.RATE_LIMIT_SECRET = "test-rate-limit-secret-with-at-least-thirty-two
 process.env.SESSION_SECRET = "test-session-secret-with-at-least-thirty-two-characters";
 
 const operatorEmail = "contact-operator-test@example.com";
+const otherOperatorEmail = "other-contact-operator-test@example.com";
+const adminEmail = "contact-admin-test@example.com";
 const password = "contact-operator-test-password";
 
 describe("contact creation", () => {
   let app;
+  let admin;
+  let otherOperator;
   let operator;
   let prisma;
 
@@ -27,38 +31,41 @@ describe("contact creation", () => {
     ]);
     app = appModule.createApp();
     prisma = new PrismaClient();
-    await prisma.contact.deleteMany({ where: { createdBy: { email: operatorEmail } } });
-    await prisma.user.deleteMany({ where: { email: operatorEmail } });
-    operator = await prisma.user.create({
-      data: {
-        email: operatorEmail,
-        name: "Contact Operator",
-        passwordHash: await hash(password, { algorithm: 2 }),
-        role: UserRole.OPERATOR,
-        status: UserStatus.ACTIVE,
-      },
+    const emails = [operatorEmail, otherOperatorEmail, adminEmail];
+    await prisma.contact.deleteMany({ where: { createdBy: { email: { in: emails } } } });
+    await prisma.user.deleteMany({ where: { email: { in: emails } } });
+    const passwordHash = await hash(password, { algorithm: 2 });
+    await prisma.user.createMany({
+      data: [
+        { email: operatorEmail, name: "Contact Operator", passwordHash, role: UserRole.OPERATOR, status: UserStatus.ACTIVE },
+        { email: otherOperatorEmail, name: "Other Contact Operator", passwordHash, role: UserRole.OPERATOR, status: UserStatus.ACTIVE },
+        { email: adminEmail, name: "Contact Admin", passwordHash, role: UserRole.ADMIN, status: UserStatus.ACTIVE },
+      ],
     });
+    [operator, otherOperator, admin] = await Promise.all(
+      emails.map((email) => prisma.user.findUniqueOrThrow({ where: { email } })),
+    );
   });
 
   beforeEach(async () => {
-    await prisma.contact.deleteMany({ where: { createdById: operator.id } });
+    await prisma.contact.deleteMany({ where: { createdById: { in: [operator.id, otherOperator.id, admin.id] } } });
     await prisma.session.deleteMany();
   });
 
   afterAll(async () => {
-    await prisma.contact.deleteMany({ where: { createdById: operator.id } });
+    await prisma.contact.deleteMany({ where: { createdById: { in: [operator.id, otherOperator.id, admin.id] } } });
     await prisma.session.deleteMany();
-    await prisma.user.deleteMany({ where: { id: operator.id } });
+    await prisma.user.deleteMany({ where: { id: { in: [operator.id, otherOperator.id, admin.id] } } });
     await prisma.$disconnect();
   });
 
-  const login = async () => {
+  const login = async (email = operatorEmail) => {
     const agent = request.agent(app);
     const csrf = await agent.get("/api/auth/csrf");
     const response = await agent
       .post("/api/auth/login")
       .set("X-CSRF-Token", csrf.body.data.csrfToken)
-      .send({ email: operatorEmail, password });
+      .send({ email, password });
 
     expect(response.status).toBe(200);
     return { agent, csrfToken: response.body.data.csrfToken };
@@ -103,5 +110,30 @@ describe("contact creation", () => {
 
     expect(response.status).toBe(403);
     expect(response.body.error.code).toBe("CSRF_INVALID");
+  });
+
+  it("returns only a contact owned by the authenticated operator", async () => {
+    const contact = await prisma.contact.create({ data: { ...input, createdById: operator.id, email: "owned@example.com" } });
+    const { agent } = await login();
+    const response = await agent.get(`/api/contacts/${contact.id}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.contact).toMatchObject({ id: contact.id, email: "owned@example.com" });
+    expect(response.body.data.contact.createdById).toBeUndefined();
+  });
+
+  it("hides another operator contact and allows administrator access", async () => {
+    const contact = await prisma.contact.create({ data: { ...input, createdById: otherOperator.id, email: "other@example.com" } });
+    const operatorSession = await login();
+    const operatorResponse = await operatorSession.agent.get(`/api/contacts/${contact.id}`);
+
+    expect(operatorResponse.status).toBe(404);
+    expect(operatorResponse.body.error.code).toBe("CONTACT_NOT_FOUND");
+
+    const adminSession = await login(adminEmail);
+    const adminResponse = await adminSession.agent.get(`/api/contacts/${contact.id}`);
+
+    expect(adminResponse.status).toBe(200);
+    expect(adminResponse.body.data.contact).toMatchObject({ id: contact.id, email: "other@example.com" });
   });
 });

@@ -19,7 +19,7 @@ posteriores não são iniciados enquanto o item corrente estiver pendente ou blo
 - [x] 08. Aprovação e rejeição de solicitações.
 - [x] 09. Acompanhamento da aprovação em tempo real.
 - [x] 10. Cadastro de contato.
-- [ ] 11. RBAC e ownership de contatos.
+- [x] 11. RBAC e ownership de contatos.
 - [ ] 12. Lista paginada de contatos.
 - [ ] 13. Notificação em tempo real para administrador.
 - [ ] 14. Testes críticos, de persistência, concorrência e resposta `429`.

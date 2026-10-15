@@ -227,6 +227,23 @@ export const openApiDocument = {
         tags: ["Contacts"],
       },
     },
+    "/api/contacts/{id}": {
+      get: {
+        parameters: [{ $ref: "#/components/parameters/ContactId" }],
+        responses: {
+          "200": {
+            content: { "application/json": { schema: { $ref: "#/components/schemas/ContactResponse" } } },
+            description: "Visible contact.",
+          },
+          "400": { ...errorResponse, description: "Invalid contact identifier." },
+          "401": { ...errorResponse, description: "Unauthenticated or inactive user." },
+          "404": { ...errorResponse, description: "Contact not found or not visible." },
+        },
+        security: [{ sessionCookie: [] }],
+        summary: "Get a visible contact",
+        tags: ["Contacts"],
+      },
+    },
     "/api/health": {
       get: {
         responses: {
@@ -242,6 +259,13 @@ export const openApiDocument = {
   },
   components: {
     parameters: {
+      ContactId: {
+        description: "Contact UUID.",
+        in: "path",
+        name: "id",
+        required: true,
+        schema: { format: "uuid", type: "string" },
+      },
       CsrfToken: {
         description: "Token returned by GET /api/auth/csrf.",
         in: "header",

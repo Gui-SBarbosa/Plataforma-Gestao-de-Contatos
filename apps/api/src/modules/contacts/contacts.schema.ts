@@ -10,4 +10,8 @@ export const createContactSchema = z.object({
   source: z.nativeEnum(ContactSource),
 });
 
+export const contactIdSchema = z.object({
+  id: z.uuid(),
+});
+
 export type CreateContactInput = z.infer<typeof createContactSchema>;

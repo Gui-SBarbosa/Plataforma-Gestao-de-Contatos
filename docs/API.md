@@ -114,6 +114,7 @@ Nesta etapa, `POST /admin/users` cria somente um operador `ACTIVE` e exige `name
 | Método | Rota | Acesso |
 |---|---|---|
 | POST | `/contacts` | OPERATOR ou ADMIN |
+| GET | `/contacts/:id` | Dono ou ADMIN |
 
 Cadastro:
 
@@ -130,7 +131,11 @@ Cadastro:
 
 `POST /contacts` exige sessão autenticada e `X-CSRF-Token`. A resposta `201` retorna
 o contato criado sem dados internos do criador. O backend atribui `createdById` ao usuário
-da sessão; regras de consulta, ownership e paginação serão disponibilizadas em etapas posteriores.
+da sessão; a listagem paginada será disponibilizada em etapa posterior.
+
+`GET /contacts/:id` exige sessão autenticada. Operadores recebem somente contatos cujo
+`createdById` pertence à própria sessão. Administradores acessam qualquer contato. Um contato
+inexistente ou não visível retorna `404`; a resposta não expõe o identificador do criador.
 
 ## Notificações
 
