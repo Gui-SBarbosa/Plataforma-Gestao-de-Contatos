@@ -103,8 +103,9 @@ export const RegistrationTrackingPage = () => {
           {!tracking.isLoading && tracking.registration && copy && <><span className={`status-pill ${tracking.registration.status.toLowerCase()}`}>{tracking.registration.status === "ACTIVE" ? "Aprovado" : tracking.registration.status === "REJECTED" ? "Não aprovado" : "Pendente"}</span><h2>{copy.title}</h2><p>{copy.detail}</p></>}
           {tracking.error && <p className="form-error" role="alert">{tracking.error}</p>}
           {!tracking.isLoading && tracking.registration?.status === "PENDING" && <p className="connection-status">{tracking.isConnected ? "Atualização em tempo real conectada" : "Conectando às atualizações em tempo real…"}</p>}
-          <div className="token-display"><span>Seu código de acompanhamento</span><code>{trackingToken}</code><small>Guarde este código em local seguro. Ele não é salvo neste navegador.</small></div>
+          {tracking.registration?.status === "PENDING" && <div className="token-display"><span>Seu código de acompanhamento</span><code>{trackingToken}</code><small>Guarde este código em local seguro. Ele não é salvo neste navegador.</small></div>}
           <button className="button button-secondary" onClick={reset} type="button">Nova solicitação ou outro código</button>
+          {tracking.registration?.status === "ACTIVE" && <a className="button button-primary" href="#">Ir para o login</a>}
         </section>
       )}
     </main>
