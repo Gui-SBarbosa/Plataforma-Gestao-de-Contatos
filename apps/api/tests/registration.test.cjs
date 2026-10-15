@@ -67,7 +67,7 @@ describe("public operator registration", () => {
     expect(response.status).toBe(202);
     expect(response.body.data).toMatchObject({ status: "PENDING", trackingToken: expect.any(String) });
 
-    const user = await prisma.user.findUnique({ where: { email: registrationEmails[0] } });
+    const user = await prisma.user.findFirst({ where: { email: registrationEmails[0] } });
 
     expect(user).toMatchObject({ email: registrationEmails[0], name: "Operator Request", role: "OPERATOR", status: "PENDING" });
     expect(user.passwordHash).not.toBe(password);

@@ -68,7 +68,7 @@ describe("operator request decisions", () => {
     return { agent, csrfToken: response.body.data.csrfToken };
   };
 
-  const findUser = (email) => prisma.user.findUniqueOrThrow({ where: { email } });
+  const findUser = (email) => prisma.user.findFirstOrThrow({ where: { email } });
 
   it("lists only pending operator requests with pagination", async () => {
     const { agent } = await login(emails.admin);
@@ -117,7 +117,7 @@ describe("operator request decisions", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.data.user).toMatchObject({ id: pendingUser.id, status: "REJECTED" });
-    await expect(findUser(emails.pendingTwo)).resolves.toMatchObject({ status: statuses.REJECTED });
+    await expect(prisma.user.findUnique({ where: { id: pendingUser.id } })).resolves.toMatchObject({ email: null, status: statuses.REJECTED });
 
     const rejectedSession = request.agent(app);
     const rejectedCsrf = await rejectedSession.get("/api/auth/csrf");

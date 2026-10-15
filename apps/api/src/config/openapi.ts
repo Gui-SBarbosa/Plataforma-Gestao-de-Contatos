@@ -233,6 +233,7 @@ export const openApiDocument = {
     "/api/admin/users/{id}/activate": {
       patch: {
         parameters: [{ $ref: "#/components/parameters/UserId" }, { $ref: "#/components/parameters/CsrfToken" }],
+        requestBody: { content: { "application/json": { schema: { $ref: "#/components/schemas/OperatorActivationInput" } } }, required: true },
         responses: { "200": { content: { "application/json": { schema: { $ref: "#/components/schemas/AdminUserResponse" } } }, description: "Operator reactivated." }, "401": { ...errorResponse, description: "Unauthenticated." }, "403": { ...errorResponse, description: "Administrator role or valid CSRF token required." }, "404": { ...errorResponse, description: "Operator not found." }, "409": { ...errorResponse, description: "Invalid status transition." } },
         security: [{ sessionCookie: [] }], summary: "Reactivate an operator", tags: ["Administration"],
       },
@@ -341,7 +342,12 @@ export const openApiDocument = {
       },
       OperatorUpdateInput: {
         properties: { email: { format: "email", type: "string" }, name: { maxLength: 120, minLength: 2, type: "string" } },
-        required: ["name", "email"],
+        required: ["name"],
+        type: "object",
+      },
+      OperatorActivationInput: {
+        properties: { email: { format: "email", type: "string" } },
+        required: ["email"],
         type: "object",
       },
       AdminUserResponse: {
@@ -485,7 +491,7 @@ export const openApiDocument = {
       },
       User: {
         properties: {
-          email: { format: "email", type: "string" },
+          email: { format: "email", nullable: true, type: "string" },
           id: { format: "uuid", type: "string" },
           name: { type: "string" },
           role: { enum: ["ADMIN", "OPERATOR"], type: "string" },

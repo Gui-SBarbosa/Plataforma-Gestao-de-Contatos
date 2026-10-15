@@ -36,14 +36,14 @@ describe("authentication endpoints", () => {
     await prisma.rateLimitBucket.deleteMany();
     await prisma.session.deleteMany();
     await prisma.user.deleteMany({
-      where: { email: { in: [activeUserEmail, disabledUserEmail, pendingUserEmail, rejectedUserEmail] } },
+      where: { name: { in: ["Active Test", "Disabled Test", "Pending Test", "Rejected Test"] } },
     });
     await prisma.user.createMany({
       data: [
         { name: "Active Test", email: activeUserEmail, passwordHash, role: UserRole.ADMIN, status: UserStatus.ACTIVE },
-        { name: "Disabled Test", email: disabledUserEmail, passwordHash, role: UserRole.OPERATOR, status: UserStatus.DISABLED },
+        { name: "Disabled Test", email: null, passwordHash, role: UserRole.OPERATOR, status: UserStatus.DISABLED },
         { name: "Pending Test", email: pendingUserEmail, passwordHash, role: UserRole.OPERATOR, status: UserStatus.PENDING },
-        { name: "Rejected Test", email: rejectedUserEmail, passwordHash, role: UserRole.OPERATOR, status: UserStatus.REJECTED },
+        { name: "Rejected Test", email: null, passwordHash, role: UserRole.OPERATOR, status: UserStatus.REJECTED },
       ],
     });
   });
@@ -52,7 +52,7 @@ describe("authentication endpoints", () => {
     await prisma.rateLimitBucket.deleteMany();
     await prisma.session.deleteMany();
     await prisma.user.deleteMany({
-      where: { email: { in: [activeUserEmail, disabledUserEmail, pendingUserEmail, rejectedUserEmail] } },
+      where: { name: { in: ["Active Test", "Disabled Test", "Pending Test", "Rejected Test"] } },
     });
     await prisma.$disconnect();
   });

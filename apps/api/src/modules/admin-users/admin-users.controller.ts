@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express";
 
-import { createAdminOperatorSchema, listOperatorsSchema, listPendingUsersSchema, updateOperatorSchema, userIdSchema } from "./admin-users.schema.js";
+import { activateOperatorSchema, createAdminOperatorSchema, listOperatorsSchema, listPendingUsersSchema, updateOperatorSchema, userIdSchema } from "./admin-users.schema.js";
 import {
   AdminUserConflictError,
   PendingUserNotFoundError,
@@ -81,12 +81,16 @@ export const update: RequestHandler = async (request, response, next) => {
 };
 
 export const deactivate: RequestHandler = async (request, response, next) => changeStatus(request, response, next, "DISABLED");
-export const activate: RequestHandler = async (request, response, next) => changeStatus(request, response, next, "ACTIVE");
+export const activate: RequestHandler = async (request, response, next) => {
+  const input = activateOperatorSchema.safeParse(request.body);
+  if (!input.success) { response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Unable to process the request.", requestId: request.id } }); return; }
+  await changeStatus(request, response, next, "ACTIVE", input.data);
+};
 
-const changeStatus = async (request: Parameters<RequestHandler>[0], response: Parameters<RequestHandler>[1], next: Parameters<RequestHandler>[2], status: "ACTIVE" | "DISABLED") => {
+const changeStatus = async (request: Parameters<RequestHandler>[0], response: Parameters<RequestHandler>[1], next: Parameters<RequestHandler>[2], status: "ACTIVE" | "DISABLED", input?: { email: string }) => {
   const params = userIdSchema.safeParse(request.params);
   if (!params.success) { response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Unable to process the request.", requestId: request.id } }); return; }
-  try { response.status(200).json({ data: { user: await setOperatorStatus(params.data.id, status) } }); } catch (error) {
+  try { response.status(200).json({ data: { user: await setOperatorStatus(params.data.id, status, input) } }); } catch (error) {
     if (error instanceof OperatorNotFoundError) { response.status(404).json({ error: { code: "USER_NOT_FOUND", message: "Unable to process the request.", requestId: request.id } }); return; }
     if (error instanceof OperatorConflictError) { response.status(409).json({ error: { code: "INVALID_USER_TRANSITION", message: "Unable to process the request.", requestId: request.id } }); return; }
     next(error);

@@ -160,7 +160,7 @@ describe("registration tracking", () => {
 
     const event = new Promise((resolve) => socket.once("registration:approved", resolve));
     const { agent, csrfToken } = await loginAdmin();
-    const pendingUser = await prisma.user.findUniqueOrThrow({ where: { email: pendingEmail } });
+    const pendingUser = await prisma.user.findFirstOrThrow({ where: { email: pendingEmail } });
     const response = await agent.patch(`/api/admin/users/${pendingUser.id}/approve`).set("X-CSRF-Token", csrfToken);
 
     expect(response.status).toBe(200);

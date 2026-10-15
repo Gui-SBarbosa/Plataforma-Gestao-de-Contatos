@@ -1,5 +1,5 @@
 import { verify } from "@node-rs/argon2";
-import { UserStatus } from "@prisma/client";
+import { UserRole, UserStatus } from "@prisma/client";
 
 import { prisma } from "../../config/prisma.js";
 
@@ -13,13 +13,15 @@ const authenticatedUserSelect = {
   status: true,
 } as const;
 
+type ActiveUser = { email: string; id: string; name: string; role: UserRole; status: UserStatus };
+
 export const authenticateUser = async ({ email, password }: LoginInput) => {
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findFirst({
     where: { email },
     select: { ...authenticatedUserSelect, passwordHash: true },
   });
 
-  if (!user || user.status !== UserStatus.ACTIVE || !(await verify(user.passwordHash, password))) {
+  if (!user || !user.email || user.status !== UserStatus.ACTIVE || !(await verify(user.passwordHash, password))) {
     return null;
   }
 
@@ -32,11 +34,12 @@ export const authenticateUser = async ({ email, password }: LoginInput) => {
   };
 };
 
-export const getActiveUser = async (userId: string) => {
+export const getActiveUser = async (userId: string): Promise<ActiveUser | null> => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: authenticatedUserSelect,
   });
 
-  return user?.status === UserStatus.ACTIVE ? user : null;
+  if (!user || user.status !== UserStatus.ACTIVE || !user.email) return null;
+  return { email: user.email, id: user.id, name: user.name, role: user.role, status: user.status };
 };

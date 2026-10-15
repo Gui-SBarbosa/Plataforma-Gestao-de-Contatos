@@ -43,7 +43,7 @@ describe("contact creation", () => {
       ],
     });
     [operator, otherOperator, admin] = await Promise.all(
-      emails.map((email) => prisma.user.findUniqueOrThrow({ where: { email } })),
+      emails.map((email) => prisma.user.findFirstOrThrow({ where: { email } })),
     );
   });
 

@@ -19,6 +19,6 @@ const mutateOperator = async (path: string, init: RequestInit = {}) => {
   return response.data.user;
 };
 
-export const updateOperator = (id: string, input: Pick<OperatorInput, "email" | "name">) => mutateOperator(`/api/admin/users/${id}`, { body: JSON.stringify(input), method: "PATCH" });
+export const updateOperator = (id: string, input: Pick<OperatorInput, "name"> & Partial<Pick<OperatorInput, "email">>) => mutateOperator(`/api/admin/users/${id}`, { body: JSON.stringify(input), method: "PATCH" });
 export const deactivateOperator = (id: string) => mutateOperator(`/api/admin/users/${id}`, { method: "DELETE" });
-export const activateOperator = (id: string) => mutateOperator(`/api/admin/users/${id}/activate`, { method: "PATCH" });
+export const activateOperator = (id: string, email: string) => mutateOperator(`/api/admin/users/${id}/activate`, { body: JSON.stringify({ email }), method: "PATCH" });

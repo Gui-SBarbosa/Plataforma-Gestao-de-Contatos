@@ -70,7 +70,7 @@ describe("admin user creation", () => {
     expect(response.body.data.user).toMatchObject({ email: createdOperatorEmail, role: "OPERATOR", status: "ACTIVE" });
     expect(response.body.data.user.passwordHash).toBeUndefined();
 
-    await expect(prisma.user.findUnique({ where: { email: createdOperatorEmail } })).resolves.toMatchObject({
+    await expect(prisma.user.findFirst({ where: { email: createdOperatorEmail } })).resolves.toMatchObject({
       role: "OPERATOR",
       status: "ACTIVE",
     });
@@ -107,6 +107,23 @@ describe("admin user creation", () => {
     expect(response.body.error.code).toBe("CSRF_INVALID");
   });
 
+  it("allows reusing an email after operator deactivation", async () => {
+    const { agent, csrfToken } = await login(adminEmail);
+    const first = await agent.post("/api/admin/users").set("X-CSRF-Token", csrfToken).send(input);
+    expect(first.status).toBe(201);
+
+    const disableCsrf = await agent.get("/api/auth/csrf");
+    const disabled = await agent.delete(`/api/admin/users/${first.body.data.user.id}`).set("X-CSRF-Token", disableCsrf.body.data.csrfToken);
+    expect(disabled.status).toBe(200);
+    expect(disabled.body.data.user.email).toBeNull();
+
+    const createCsrf = await agent.get("/api/auth/csrf");
+    const second = await agent.post("/api/admin/users").set("X-CSRF-Token", createCsrf.body.data.csrfToken).send(input);
+    expect(second.status).toBe(201);
+
+    await prisma.user.deleteMany({ where: { name: { in: ["Created Operator", "Created Operator"] } } });
+  });
+
   it("lists, updates, deactivates and reactivates operators", async () => {
     const { agent, csrfToken } = await login(adminEmail);
     const created = await agent.post("/api/admin/users").set("X-CSRF-Token", csrfToken).send(input);
@@ -127,8 +144,10 @@ describe("admin user creation", () => {
     expect(disabled.status).toBe(200);
     expect(disabled.body.data.user.status).toBe("DISABLED");
 
+    expect(disabled.body.data.user.email).toBeNull();
+
     const activateCsrf = await agent.get("/api/auth/csrf");
-    const activated = await agent.patch(`/api/admin/users/${created.body.data.user.id}/activate`).set("X-CSRF-Token", activateCsrf.body.data.csrfToken);
+    const activated = await agent.patch(`/api/admin/users/${created.body.data.user.id}/activate`).set("X-CSRF-Token", activateCsrf.body.data.csrfToken).send({ email: createdOperatorEmail });
     expect(activated.status).toBe(200);
     expect(activated.body.data.user.status).toBe("ACTIVE");
   });

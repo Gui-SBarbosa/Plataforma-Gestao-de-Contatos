@@ -3,7 +3,7 @@ import { Prisma, UserRole, UserStatus } from "@prisma/client";
 
 import { prisma } from "../../config/prisma.js";
 
-import type { CreateAdminOperatorInput, ListOperatorsInput, ListPendingUsersInput, UpdateOperatorInput } from "./admin-users.schema.js";
+import type { ActivateOperatorInput, CreateAdminOperatorInput, ListOperatorsInput, ListPendingUsersInput, UpdateOperatorInput } from "./admin-users.schema.js";
 
 export class AdminUserConflictError extends Error {}
 export class PendingUserNotFoundError extends Error {}
@@ -69,8 +69,11 @@ export const listOperators = async ({ page, pageSize, status }: ListOperatorsInp
 
 export const updateOperator = async (userId: string, input: UpdateOperatorInput) => {
   try {
+    const current = await prisma.user.findFirst({ where: { id: userId, role: UserRole.OPERATOR }, select: { status: true } });
+    if (!current) throw new OperatorNotFoundError();
+    if (current.status === UserStatus.DISABLED && input.email) throw new OperatorConflictError();
     return await prisma.user.update({
-      data: input,
+      data: { name: input.name, ...(input.email ? { email: input.email } : {}) },
       where: { id: userId, role: UserRole.OPERATOR },
       select: { ...adminUserSelect, createdAt: true, updatedAt: true },
     });
@@ -81,8 +84,14 @@ export const updateOperator = async (userId: string, input: UpdateOperatorInput)
   }
 };
 
-export const setOperatorStatus = async (userId: string, status: "ACTIVE" | "DISABLED") => {
-  const result = await prisma.user.updateMany({ data: { status }, where: { id: userId, role: UserRole.OPERATOR, status: { in: [UserStatus.ACTIVE, UserStatus.DISABLED] } } });
+export const setOperatorStatus = async (userId: string, status: "ACTIVE" | "DISABLED", input?: ActivateOperatorInput) => {
+  let result;
+  try {
+    result = await prisma.user.updateMany({ data: status === "DISABLED" ? { email: null, status } : { email: input!.email, status }, where: { id: userId, role: UserRole.OPERATOR, status: { in: [UserStatus.ACTIVE, UserStatus.DISABLED] } } });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") throw new OperatorConflictError();
+    throw error;
+  }
   if (result.count === 0) {
     const user = await prisma.user.findFirst({ where: { id: userId, role: UserRole.OPERATOR }, select: { id: true } });
     if (!user) throw new OperatorNotFoundError();
@@ -99,7 +108,7 @@ const decidePendingUser = async (
   const decisionData =
     status === UserStatus.ACTIVE
       ? { approvedAt: new Date(), approvedById: administratorId, status }
-      : { status };
+      : { email: null, status };
   const result = await prisma.user.updateMany({
     data: decisionData,
     where: { id: userId, role: UserRole.OPERATOR, status: UserStatus.PENDING },

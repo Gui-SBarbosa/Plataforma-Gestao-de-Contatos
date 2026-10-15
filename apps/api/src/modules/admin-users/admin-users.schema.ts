@@ -19,8 +19,12 @@ export const listOperatorsSchema = z.object({
 });
 
 export const updateOperatorSchema = z.object({
-  email: z.string().trim().toLowerCase().email().max(320),
+  email: z.string().trim().toLowerCase().email().max(320).optional(),
   name: z.string().trim().min(2).max(120),
+});
+
+export const activateOperatorSchema = z.object({
+  email: z.string().trim().toLowerCase().email().max(320),
 });
 
 export const userIdSchema = z.object({
@@ -31,3 +35,4 @@ export type CreateAdminOperatorInput = z.infer<typeof createAdminOperatorSchema>
 export type ListPendingUsersInput = z.infer<typeof listPendingUsersSchema>;
 export type ListOperatorsInput = z.infer<typeof listOperatorsSchema>;
 export type UpdateOperatorInput = z.infer<typeof updateOperatorSchema>;
+export type ActivateOperatorInput = z.infer<typeof activateOperatorSchema>;

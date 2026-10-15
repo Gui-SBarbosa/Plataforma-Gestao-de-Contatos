@@ -29,11 +29,18 @@ const main = async () => {
   const adminEmail = requiredAdminEmail();
   const adminPasswordHash = await hash(requiredSeedValue("SEED_ADMIN_PASSWORD"), { algorithm: 2 });
 
-  await prisma.user.upsert({
-    where: { email: adminEmail },
-    update: { name: "GestCon Admin", passwordHash: adminPasswordHash, role: UserRole.ADMIN, status: UserStatus.ACTIVE },
-    create: { name: "GestCon Admin", email: adminEmail, passwordHash: adminPasswordHash, role: UserRole.ADMIN, status: UserStatus.ACTIVE },
-  });
+  const existingAdmin = await prisma.user.findFirst({ where: { email: adminEmail } });
+
+  if (existingAdmin) {
+    await prisma.user.update({
+      where: { id: existingAdmin.id },
+      data: { name: "GestCon Admin", passwordHash: adminPasswordHash, role: UserRole.ADMIN, status: UserStatus.ACTIVE },
+    });
+  } else {
+    await prisma.user.create({
+      data: { name: "GestCon Admin", email: adminEmail, passwordHash: adminPasswordHash, role: UserRole.ADMIN, status: UserStatus.ACTIVE },
+    });
+  }
 
   console.info("Seeded the demo administrator.");
 };

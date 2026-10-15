@@ -51,6 +51,8 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | pending     | Deploy                   | Railway, migrations, seed de demo e smoke test                    |
 | pending     | Entrega                  | README final, UML, apresentação e roteiro de demonstração         |
 
+| completed   | Conditional user email uniqueness | Active/pending emails required and unique; disabled/rejected emails nullable and reusable |
+
 ## Critérios de aceite
 
 Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etapa obrigatória termina com critérios relacionados falhando.
@@ -119,6 +121,9 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 15/10/2026 — tela de operadores evoluída para CRUD: sem operadores ativos abre o cadastro; com operadores exibe listagem administrativa, edição de nome/e-mail, desativação lógica e reativação. Exclusão física não será usada para preservar contatos e histórico.
 
 ## Validações executadas
+
+- 15/10/2026 — unicidade condicional de e-mail implementada com `CHECK`, índice único parcial e limpeza de e-mail em rejeição/desativação; reativação exige novo e-mail válido.
+- 15/10/2026 — migration local e de teste aplicadas; lint, typecheck, builds e 48 testes de integração aprovados após a regra de e-mail condicional.
 
 - 14/10/2026 — `npm run lint`: aprovado.
 - 14/10/2026 — `npm run typecheck`: aprovado para API e web.

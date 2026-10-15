@@ -33,7 +33,8 @@ O GestCon centraliza a entrada controlada de operadores, o cadastro de contatos 
 
 ## Regras de negócio
 
-- RN-01 — E-mail de usuário é único após normalização para minúsculas e remoção de espaços externos.
+- RN-01 — E-mail de usuário ativo ou pendente é obrigatório e único após normalização para minúsculas e remoção de espaços externos.
+- RN-01a — Usuário desativado ou rejeitado perde o e-mail persistido; o e-mail pode ser reutilizado em novo cadastro.
 - RN-02 — Nova solicitação recebe status `PENDING` e papel `OPERATOR`.
 - RN-03 — Apenas `ACTIVE` pode autenticar.
 - RN-04 — Apenas `ADMIN` pode criar, aprovar, rejeitar, desativar ou reativar usuários.
