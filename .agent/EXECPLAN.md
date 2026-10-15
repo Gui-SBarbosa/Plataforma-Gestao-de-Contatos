@@ -181,6 +181,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 15/10/2026 — réplica visual do dashboard validada com ESLint, typecheck e build Vite; nenhuma alteração foi feita em `docs/BACKLOG.md`.
 - 15/10/2026 — gráfico de linha corrigido para manter traço visível mesmo com apenas um ponto de série; typecheck, ESLint e build Vite passaram novamente.
 - 15/10/2026 — série diária do dashboard passou a normalizar sete dias, preencher ausências com zero e exibir escalas dinâmicas nos eixos X e Y; validação frontend passou novamente.
+- 15/10/2026 — marcadores do gráfico passaram de círculos SVG deformados pelo redimensionamento para pontos HTML circulares, alinhados à linha e com foco visual no hover; lint, typecheck, build Vite e `git diff --check` aprovados.
 
 ## Pendências e próximos passos
 
