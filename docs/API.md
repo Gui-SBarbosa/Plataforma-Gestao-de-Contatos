@@ -100,20 +100,20 @@ Resposta `202 Accepted`:
 | POST | `/admin/users` | ADMIN |
 | PATCH | `/admin/users/:id/approve` | ADMIN |
 | PATCH | `/admin/users/:id/reject` | ADMIN |
-| PATCH | `/admin/users/:id/disable` | ADMIN |
+| DELETE | `/admin/users/:id` | ADMIN |
 | PATCH | `/admin/users/:id/activate` | ADMIN |
 
 Transições inválidas retornam `409 Conflict`.
 
 Nesta etapa, `POST /admin/users` cria somente um operador `ACTIVE` e exige `name`, `email` e `password`; a rota requer sessão de administrador e `X-CSRF-Token`.
 
-`GET /admin/users` retorna apenas solicitações `PENDING`, com paginação e sem hashes ou tracking tokens. `PATCH /admin/users/:id/approve` muda uma solicitação pendente para `ACTIVE`, registra o administrador e a data da aprovação; `PATCH /admin/users/:id/reject` muda-a para `REJECTED`. As duas rotas exigem sessão administrativa e `X-CSRF-Token`, retornam `409 Conflict` para estados diferentes de `PENDING` e não iniciam sessão para o operador.
+`GET /admin/users` retorna apenas solicitações `PENDING`, com paginação e sem hashes ou tracking tokens. `GET /admin/users/operators` retorna os operadores administráveis. `PATCH /admin/users/:id` atualiza nome ou e-mail de operador ativo. `DELETE /admin/users/:id` faz desativação lógica; `PATCH /admin/users/:id/activate` reativa com novo e-mail obrigatório. `PATCH /admin/users/:id/approve` muda uma solicitação pendente para `ACTIVE`, registra o administrador e a data da aprovação; `PATCH /admin/users/:id/reject` muda-a para `REJECTED`. As rotas de escrita exigem sessão administrativa e `X-CSRF-Token`, retornam `409 Conflict` para transições inválidas e não iniciam sessão para o operador.
 
 ## Contatos
 
 | Método | Rota | Acesso |
 |---|---|---|
-| POST | `/contacts` | OPERATOR ou ADMIN |
+| POST | `/contacts` | OPERATOR |
 | GET | `/contacts?page=1&pageSize=10` | OPERATOR ou ADMIN |
 | GET | `/contacts/:id` | Dono ou ADMIN |
 
@@ -130,7 +130,7 @@ Cadastro:
 }
 ```
 
-`POST /contacts` exige sessão autenticada e `X-CSRF-Token`. A resposta `201` retorna
+`POST /contacts` exige sessão de `OPERATOR` e `X-CSRF-Token`. A resposta `201` retorna
 o contato criado sem dados internos do criador. O backend atribui `createdById` ao usuário
 da sessão.
 

@@ -7,6 +7,10 @@
 - Uma única réplica da aplicação nesta entrega.
 - Express entrega API, Socket.IO e build estático do React.
 
+## Estado atual
+
+Esta documentação prepara o deploy Railway. A etapa de deploy ainda precisa ligar o build estático do React ao processo Express e usar `PORT` fornecida pela plataforma. Não publique antes dessa adequação.
+
 ## Pipeline esperado
 
 ```text
@@ -32,11 +36,11 @@ APP_ORIGIN=https://<dominio-da-aplicacao>
 PORT=<fornecida pelo ambiente>
 ```
 
-## Comandos previstos
+## Comandos do serviço
 
 ```text
 Build: npm ci && npm run build
-Start: npm run start
+Start: npm run start --workspace=@gestcon/api
 Migration: npm run db:deploy
 Seed demo local: npm run db:seed
 Rate limit cleanup: npm run rate-limit:cleanup
@@ -44,8 +48,7 @@ Rate limit cleanup: npm run rate-limit:cleanup
 
 ## Health checks
 
-- `GET /health/live`: processo responde, sem consultar dependências.
-- `GET /health/ready`: verifica acesso essencial ao PostgreSQL.
+- `GET /api/health`: processo responde sem expor configuração ou credenciais.
 - Respostas não expõem configuração ou credenciais.
 
 ## Migrações e seed

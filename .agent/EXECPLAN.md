@@ -49,7 +49,7 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | pending     | Dashboard                | Métricas por papel, filtros e atualização por evento              |
 | completed   | Qualidade                | Jest/Supertest, lint, typecheck, build e revisão de segurança     |
 | pending     | Deploy                   | Railway, migrations, seed de demo e smoke test                    |
-| pending     | Entrega                  | README final, UML, apresentação e roteiro de demonstração         |
+| completed   | Entrega (P0.16)          | README executável e documentação de ambiente revisada             |
 
 | completed   | Conditional user email uniqueness | Active/pending emails required and unique; disabled/rejected emails nullable and reusable |
 | completed   | Frontend de requests | Admin list and approve/reject actions for pending operators |
@@ -122,6 +122,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 15/10/2026 — correção de papel concluída: `POST /api/contacts` exige `OPERATOR`, a lista administrativa exibe o nome do criador sem expor `createdById`, e a interface remove criação para ADMIN. O contrato de origem foi alinhado aos valores Prisma (`WEBSITE` e `SOCIAL_MEDIA`).
 - 15/10/2026 — tela de criação de operador adicionada em `features/admin-users`, acessível somente pela rota visual `#operators` para ADMIN. O formulário usa CSRF, valida confirmação de senha no cliente e não persiste credenciais.
 - 15/10/2026 — tela de operadores evoluída para CRUD: sem operadores ativos abre o cadastro; com operadores exibe listagem administrativa, edição de nome/e-mail, desativação lógica e reativação. Exclusão física não será usada para preservar contatos e histórico.
+- 15/10/2026 — P0.16 concluída: README e documentação de deploy foram revisados para comandos reais, variáveis obrigatórias, segurança de produção e fluxo Railway. O deploy permanece pendente até a API servir o build web e adotar a porta fornecida pela plataforma.
 
 ## Validações executadas
 
@@ -169,9 +170,11 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 15/10/2026 — correção validada com TypeScript, ESLint, build Vite, teste de contatos com 8 casos aprovados e `git diff --check`; o teste cobre `403 FORBIDDEN` para criação por ADMIN e responsável na listagem administrativa.
 - 15/10/2026 — tela de operador validada com TypeScript, ESLint e build Vite; a autorização final continua no endpoint `POST /api/admin/users`, protegido por sessão, ADMIN e CSRF.
 - 15/10/2026 — CRUD de operadores validado com TypeScript, ESLint, build Vite e suíte administrativa aprovada; OpenAPI atualizado para listagem, edição, desativação e reativação.
+- 15/10/2026 — P0.16 validada com ESLint, typecheck, 48 testes de integração da API, build Vite e `git diff --check`. O wrapper `npm` permanece incompatível com o sandbox ao resolver `C:\Users\guiso`; binários locais equivalentes foram usados.
 
 ## Pendências e próximos passos
 
-- Próximo item do plano: README executável e documentação de ambiente revisada.
+- Próximo item P0: deploy Railway e smoke test.
+- Antes do deploy Railway, a aplicação deve usar a porta `PORT` fornecida pela plataforma e servir o build web no mesmo processo HTTP.
 - Frontend modular de contatos concluído; a integração de notificações persistentes, auditoria e dashboard permanece pendente conforme backlog.
 - Correção de autorização por papel concluída. Próximo trabalho funcional: dashboard por papel com métricas e filtros, ainda pendente no backlog.
