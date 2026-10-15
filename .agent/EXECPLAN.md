@@ -177,6 +177,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 15/10/2026 — P0.16 validada com ESLint, typecheck, 48 testes de integração da API, build Vite e `git diff --check`. O wrapper `npm` permanece incompatível com o sandbox ao resolver `C:\Users\guiso`; binários locais equivalentes foram usados.
 - 15/10/2026 — preparação P0.17 validada com ESLint, typecheck, 48 testes de integração e smoke de produção local para `PORT`, raiz, fallback SPA e `404` de API desconhecida. Publicação e smoke remoto não foram executados: não há sessão Railway nem CLI disponível.
 - 15/10/2026 — dashboard validado com typecheck, build Vite e 4 testes de integração novos: ownership de operador, visão e filtro administrativo, bloqueio de `operatorId` para operador e filtros inválidos. O agrupamento semanal inicia na segunda-feira em UTC.
+- 15/10/2026 — referência visual local do Open Design mapeada e aplicada à tela Dashboard: quatro métricas, gráfico temporal, distribuição por origem, contatos recentes e solicitações pendentes; os dados continuam vindo dos contratos HTTP existentes.
+- 15/10/2026 — réplica visual do dashboard validada com ESLint, typecheck e build Vite; nenhuma alteração foi feita em `docs/BACKLOG.md`.
 
 ## Pendências e próximos passos
 
