@@ -154,8 +154,19 @@ inexistente ou não visível retorna `404`; a resposta não expõe o identificad
 
 | Método | Rota | Acesso |
 |---|---|---|
-| GET | `/admin/dashboard` | ADMIN |
+| GET | `/dashboard?from=YYYY-MM-DD&to=YYYY-MM-DD&interval=day` | Autenticado |
 | GET | `/admin/audit-logs?page=1&pageSize=20` | ADMIN |
+
+`GET /dashboard` exige sessão ativa. Operadores recebem somente agregados dos contatos
+criados por eles e não podem enviar `operatorId` (`403`). Administradores recebem a visão
+global, a lista de operadores ativos em `availableOperators` e podem filtrar por
+`operatorId`. Os filtros opcionais `from` e `to` usam datas UTC inclusivas; `from` posterior
+a `to`, datas inválidas, UUID inválido ou `interval` diferente de `day`, `week` ou `month`
+retornam `400`.
+
+A resposta contém `summary.contacts`, agregados completos por origem em `bySource`, série
+temporal em `series` e, para administrador, totais por operador em `byOperator`. O intervalo
+`week` agrupa semanas iniciadas na segunda-feira em UTC.
 
 ## Eventos Socket.IO
 

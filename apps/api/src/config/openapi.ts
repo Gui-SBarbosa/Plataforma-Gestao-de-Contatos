@@ -293,6 +293,28 @@ export const openApiDocument = {
         tags: ["Contacts"],
       },
     },
+    "/api/dashboard": {
+      get: {
+        parameters: [
+          { in: "query", name: "from", schema: { format: "date", type: "string" } },
+          { in: "query", name: "to", schema: { format: "date", type: "string" } },
+          { in: "query", name: "interval", schema: { default: "day", enum: ["day", "week", "month"], type: "string" } },
+          { description: "Administrator only.", in: "query", name: "operatorId", schema: { format: "uuid", type: "string" } },
+        ],
+        responses: {
+          "200": {
+            content: { "application/json": { schema: { $ref: "#/components/schemas/DashboardResponse" } } },
+            description: "Metrics visible to the authenticated user.",
+          },
+          "400": { ...errorResponse, description: "Invalid dashboard filters." },
+          "401": { ...errorResponse, description: "Unauthenticated or inactive user." },
+          "403": { ...errorResponse, description: "Only administrators may filter by operator." },
+        },
+        security: [{ sessionCookie: [] }],
+        summary: "Get role-scoped contact metrics",
+        tags: ["Dashboard"],
+      },
+    },
     "/api/health": {
       get: {
         responses: {
@@ -400,6 +422,39 @@ export const openApiDocument = {
         required: ["data"],
         type: "object",
       },
+      DashboardResponse: {
+        properties: {
+          data: {
+            properties: {
+              availableOperators: { items: { $ref: "#/components/schemas/DashboardOperator" }, type: "array" },
+              byOperator: { items: { $ref: "#/components/schemas/DashboardOperatorMetric" }, type: "array" },
+              bySource: { items: { $ref: "#/components/schemas/SourceMetric" }, type: "array" },
+              interval: { enum: ["day", "week", "month"], type: "string" },
+              series: { items: { $ref: "#/components/schemas/PeriodMetric" }, type: "array" },
+              summary: { $ref: "#/components/schemas/DashboardSummary" },
+            },
+            required: ["availableOperators", "byOperator", "bySource", "interval", "series", "summary"],
+            type: "object",
+          },
+        },
+        required: ["data"],
+        type: "object",
+      },
+      DashboardOperator: {
+        properties: { id: { format: "uuid", type: "string" }, name: { type: "string" } },
+        required: ["id", "name"],
+        type: "object",
+      },
+      DashboardOperatorMetric: {
+        properties: { id: { format: "uuid", type: "string" }, name: { type: "string" }, total: { type: "integer" } },
+        required: ["id", "name", "total"],
+        type: "object",
+      },
+      DashboardSummary: {
+        properties: { contacts: { type: "integer" } },
+        required: ["contacts"],
+        type: "object",
+      },
       CurrentUserResponse: {
         properties: { data: { properties: { user: { $ref: "#/components/schemas/User" } }, required: ["user"], type: "object" } },
         required: ["data"],
@@ -455,6 +510,11 @@ export const openApiDocument = {
         required: ["page", "pageSize", "total", "totalPages"],
         type: "object",
       },
+      PeriodMetric: {
+        properties: { period: { type: "string" }, total: { type: "integer" } },
+        required: ["period", "total"],
+        type: "object",
+      },
       RegistrationInput: {
         properties: {
           email: { format: "email", type: "string" },
@@ -462,6 +522,11 @@ export const openApiDocument = {
           password: { format: "password", minLength: 12, type: "string" },
         },
         required: ["name", "email", "password"],
+        type: "object",
+      },
+      SourceMetric: {
+        properties: { source: { enum: ["WEBSITE", "REFERRAL", "SOCIAL_MEDIA", "PHONE", "OTHER"], type: "string" }, total: { type: "integer" } },
+        required: ["source", "total"],
         type: "object",
       },
       RegistrationResponse: {
