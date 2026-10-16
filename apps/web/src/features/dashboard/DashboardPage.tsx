@@ -9,6 +9,7 @@ import type { AuthUser } from "../auth/auth.types";
 import { listContacts } from "../contacts/contacts.api";
 import type { Contact, ContactSource } from "../contacts/contacts.types";
 
+import { DashboardFilters } from "./DashboardFilters";
 import { getDashboard, type DashboardData } from "./dashboard.api";
 
 type DashboardPageProps = { onLogout: () => void; user: AuthUser };
@@ -20,16 +21,11 @@ export const DashboardPage = ({ user, onLogout }: DashboardPageProps) => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [pending, setPending] = useState<PendingRequest[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [interval, setInterval] = useState("day");
   const [operatorId, setOperatorId] = useState("");
 
   useEffect(() => {
     let active = true;
-    const query = new URLSearchParams({ interval });
-    if (from) query.set("from", from);
-    if (to) query.set("to", to);
+    const query = new URLSearchParams();
     if (operatorId) query.set("operatorId", operatorId);
     const load = async () => {
       try {
@@ -49,11 +45,11 @@ export const DashboardPage = ({ user, onLogout }: DashboardPageProps) => {
     };
     void load();
     return () => { active = false; };
-  }, [from, interval, operatorId, to, user.role]);
+  }, [operatorId, user.role]);
 
   const signOut = async () => { try { await logout(); } finally { onLogout(); } };
   return <AppShell activeSection="overview" breadcrumb="Workspace / Dashboard" title="Dashboard" user={user} onLogout={() => void signOut()}>
-    <section className="dashboard-page-head"><div><p className="eyebrow">Visao geral</p><h2>Acompanhe contatos, operadores e solicitacoes</h2><p className="muted">Metricas atualizadas a partir dos registros visiveis para seu perfil.</p></div><div className="dashboard-filters"><label>De<input className="input" type="date" value={from} onChange={(event) => setFrom(event.target.value)} /></label><label>Ate<input className="input" type="date" value={to} onChange={(event) => setTo(event.target.value)} /></label><label>Intervalo<select className="input" value={interval} onChange={(event) => setInterval(event.target.value)}><option value="day">Dia</option><option value="week">Semana</option><option value="month">Mes</option></select></label>{user.role === "ADMIN" && <label>Operador<select className="input" value={operatorId} onChange={(event) => setOperatorId(event.target.value)}><option value="">Todos</option>{data?.availableOperators.map((operator) => <option key={operator.id} value={operator.id}>{operator.name}</option>)}</select></label>}</div></section>
+    <section className="dashboard-page-head"><div><p className="eyebrow">Visao geral</p><h2>Acompanhe contatos, operadores e solicitacoes</h2><p className="muted">Metricas atualizadas a partir dos registros visiveis para seu perfil.</p></div><DashboardFilters onOperatorChange={setOperatorId} operatorId={operatorId} operators={data?.availableOperators ?? []} role={user.role} /></section>
     {error && <div className="notice danger">{error}</div>}
     {!data ? <EmptyState>Carregando metricas...</EmptyState> : <DashboardContent contacts={contacts} data={data} pending={pending} user={user} />}
   </AppShell>;
@@ -64,13 +60,22 @@ const DashboardContent = ({ contacts, data, pending, user }: { contacts: Contact
   const todayTotal = data.series.find((item) => item.period === today)?.total ?? 0;
   const sourceTotal = data.bySource.reduce((total, item) => total + item.total, 0);
   return <>
-    <section className="dashboard-metrics"><MetricCard tone="blue" value={data.summary.contacts} label="Total de contatos" detail="no periodo" /><MetricCard tone="green" value={todayTotal} label="Contatos cadastrados hoje" detail={data.interval === "day" ? "intervalo diario" : "intervalo selecionado"} /><MetricCard tone="navy" value={data.availableOperators.length || (user.role === "OPERATOR" ? 1 : 0)} label="Operadores ativos" detail="com acesso ativo" /><MetricCard tone="amber" value={sourceTotal ? data.bySource.filter((item) => item.total > 0).length : 0} label="Origens utilizadas" detail="fontes com registros" /></section>
+    <section className="dashboard-metrics"><MetricCard icon="contacts" tone="blue" value={data.summary.contacts} label="Total de contatos" detail="no periodo" /><MetricCard icon="today" tone="green" value={todayTotal} label="Contatos cadastrados hoje" detail={data.interval === "day" ? "intervalo diario" : "intervalo selecionado"} /><MetricCard icon="operators" tone="navy" value={data.availableOperators.length || (user.role === "OPERATOR" ? 1 : 0)} label="Operadores ativos" detail="com acesso ativo" /><MetricCard icon="sources" tone="amber" value={sourceTotal ? data.bySource.filter((item) => item.total > 0).length : 0} label="Origens utilizadas" detail="fontes com registros" /></section>
     <section className="dashboard-grid dashboard-grid-charts"><article className="card dashboard-card"><DashboardCardHead title="Contatos cadastrados" subtitle="Ultimos sete dias" /><LineChart data={data.series} interval={data.interval} /></article><article className="card dashboard-card"><DashboardCardHead title="Contatos por origem" subtitle="Distribuicao total" /><SourceChart data={data.bySource} /></article></section>
     <section className="dashboard-grid dashboard-grid-lower"><article className="card dashboard-card"><DashboardCardHead title={user.role === "ADMIN" ? "Contatos recentes" : "Meus contatos recentes"} subtitle="Ultimos cadastros visiveis" actionLabel="Ver todos" actionHref="#contacts" /><RecentContacts contacts={contacts} showOperator={user.role === "ADMIN"} /></article>{user.role === "ADMIN" && <article className="card dashboard-card"><DashboardCardHead title="Solicitacoes pendentes" subtitle="Aguardando analise" actionLabel="Ver todas" actionHref="#requests" /><PendingList pending={pending} /></article>}</section>
   </>;
 };
 
-const MetricCard = ({ detail, label, tone, value }: { detail: string; label: string; tone: string; value: number }) => <article className="card dashboard-metric"><span className={`dashboard-metric-icon ${tone}`}>{tone === "green" ? "✓" : tone === "navy" ? "♟" : tone === "amber" ? "◷" : "▣"}</span><strong>{value}</strong><span className="dashboard-metric-label">{label}</span><small>{detail}</small></article>;
+type MetricIconName = "contacts" | "operators" | "sources" | "today";
+
+const MetricIcon = ({ name }: { name: MetricIconName }) => {
+  if (name === "contacts") return <svg className="dashboard-metric-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3" /><path d="M3.5 19c.7-3 2.5-4.5 5.5-4.5s4.8 1.5 5.5 4.5" /><path d="M16 5.5a3 3 0 0 1 0 5.8M16.5 14.7c2.1.5 3.4 1.9 4 4.3" /></svg>;
+  if (name === "today") return <svg className="dashboard-metric-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2" /><path d="M7 3.5v3M17 3.5v3M3.5 9.5h17M8 14l2 2 5-5" /></svg>;
+  if (name === "operators") return <svg className="dashboard-metric-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3" /><path d="M3.5 19c.7-3 2.5-4.5 5.5-4.5 1.7 0 3 .5 4 1.5M17 11v6M14 14h6" /></svg>;
+  return <svg className="dashboard-metric-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2" /><path d="m4 7 6-3 6 4 6-5" /></svg>;
+};
+
+const MetricCard = ({ detail, icon, label, tone, value }: { detail: string; icon: MetricIconName; label: string; tone: string; value: number }) => <article className="card dashboard-metric"><span className={`dashboard-metric-icon ${tone}`}><MetricIcon name={icon} /></span><strong>{value}</strong><span className="dashboard-metric-label">{label}</span><small>{detail}</small></article>;
 const DashboardCardHead = ({ actionHref, actionLabel, subtitle, title }: { actionHref?: string; actionLabel?: string; subtitle: string; title: string }) => <div className="dashboard-card-head"><div><h3>{title}</h3><p>{subtitle}</p></div>{actionHref && actionLabel && <a className="button button-secondary button-small" href={actionHref}>{actionLabel}</a>}</div>;
 
 const formatPeriod = (period: string, interval: string) => {
