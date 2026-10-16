@@ -13,5 +13,9 @@ export const NotificationMessage = ({ notification }: { notification: Notificati
   if (notification.type === "NEW_CONTACT" && typeof creatorName === "string") {
     return <p>Operador <strong>{creatorName}</strong> cadastrou <strong>{getContactName(notification, creatorName)}</strong>.</p>;
   }
+  const requesterName = notification.payload?.requesterName;
+  if (notification.type === "REGISTRATION_REQUEST" && typeof requesterName === "string") {
+    return <p><strong>{requesterName}</strong> solicitou cadastro como operador.</p>;
+  }
   return <p>{notification.message}</p>;
 };

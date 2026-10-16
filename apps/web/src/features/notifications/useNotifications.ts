@@ -30,6 +30,7 @@ export const useNotifications = (enabled: boolean, pageSize = 5) => {
 
     const socket = io({ autoConnect: false, transports: ["websocket"] });
     socket.on("contact:created", () => { void refresh(); });
+    socket.on("registration:requested", () => { void refresh(); });
     const handleNotificationsChanged = () => { void refresh(); };
     window.addEventListener("notifications:changed", handleNotificationsChanged);
     socket.connect();

@@ -22,6 +22,12 @@ type ContactCreated = {
   creatorName: string;
 };
 
+type RegistrationRequested = {
+  createdAt: Date;
+  registrationId: string;
+  requesterName: string;
+};
+
 type RegistrationWatchAcknowledgement = (response: { code?: string; data?: { decidedAt: Date | null; status: string }; ok: boolean }) => void;
 
 const registrationRoom = (registrationId: string) => `registration:${registrationId}`;
@@ -126,6 +132,9 @@ export const createRegistrationRealtime = (httpServer: HttpServer, sessionMiddle
     },
     publishContactCreated: ({ contactId, createdAt, creatorName }: ContactCreated) => {
       io.to(adminRoom).emit("contact:created", { contactId, createdAt, creatorName });
+    },
+    publishRegistrationRequested: ({ createdAt, registrationId, requesterName }: RegistrationRequested) => {
+      io.to(adminRoom).emit("registration:requested", { createdAt, registrationId, requesterName });
     },
   };
 };

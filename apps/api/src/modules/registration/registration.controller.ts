@@ -15,8 +15,16 @@ export const register: RequestHandler = async (request, response, next) => {
 
   try {
     const registration = await registerOperator(input.data);
+    const publishRegistrationRequested = request.app.locals.publishRegistrationRequested as
+      | ((notification: { createdAt: Date; registrationId: string; requesterName: string }) => void)
+      | undefined;
+    publishRegistrationRequested?.({
+      createdAt: registration.createdAt,
+      registrationId: registration.registrationId,
+      requesterName: registration.requesterName,
+    });
 
-    response.status(202).json({ data: registration });
+    response.status(202).json({ data: { status: registration.status, trackingToken: registration.trackingToken } });
   } catch (error) {
     if (error instanceof RegistrationConflictError) {
       response.status(409).json({

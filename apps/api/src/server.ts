@@ -11,6 +11,7 @@ const realtime = createRegistrationRealtime(httpServer, app.locals.sessionMiddle
 
 app.locals.publishRegistrationDecision = realtime.publishRegistrationDecision;
 app.locals.publishContactCreated = realtime.publishContactCreated;
+app.locals.publishRegistrationRequested = realtime.publishRegistrationRequested;
 
 const port = env.PORT ?? env.API_PORT;
 

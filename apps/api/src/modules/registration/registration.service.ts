@@ -19,16 +19,41 @@ export const registerOperator = async ({ email, name, password }: RegistrationIn
     Promise.resolve(createTrackingToken()),
   ]);
 
+  let registration: { createdAt: Date; id: string; name: string };
   try {
-    await prisma.user.create({
-      data: {
-        email,
-        name,
-        passwordHash,
-        registrationTokenHash: hashTrackingToken(trackingToken),
-        role: UserRole.OPERATOR,
-        status: UserStatus.PENDING,
-      },
+    registration = await prisma.$transaction(async (transaction) => {
+      const user = await transaction.user.create({
+        data: {
+          email,
+          name,
+          passwordHash,
+          registrationTokenHash: hashTrackingToken(trackingToken),
+          role: UserRole.OPERATOR,
+          status: UserStatus.PENDING,
+        },
+        select: { createdAt: true, id: true, name: true },
+      });
+      const administrators = await transaction.user.findMany({
+        select: { id: true },
+        where: { role: UserRole.ADMIN, status: UserStatus.ACTIVE },
+      });
+
+      await Promise.all([
+        transaction.notification.createMany({
+          data: administrators.map((administrator) => ({
+            message: `${user.name} solicitou cadastro como operador.`,
+            payload: { requesterName: user.name, registrationId: user.id, createdAt: user.createdAt.toISOString() },
+            recipientId: administrator.id,
+            title: "Nova solicitação de cadastro",
+            type: "REGISTRATION_REQUEST" as const,
+          })),
+        }),
+        transaction.auditLog.create({
+          data: { action: "REGISTRATION_REQUESTED", actorId: user.id, entityId: user.id, entityType: "USER" },
+        }),
+      ]);
+
+      return user;
     });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
@@ -38,7 +63,7 @@ export const registerOperator = async ({ email, name, password }: RegistrationIn
     throw error;
   }
 
-  return { status: UserStatus.PENDING, trackingToken };
+  return { createdAt: registration.createdAt, registrationId: registration.id, requesterName: registration.name, status: UserStatus.PENDING, trackingToken };
 };
 
 export const findRegistrationByTrackingToken = (trackingToken: string) =>
