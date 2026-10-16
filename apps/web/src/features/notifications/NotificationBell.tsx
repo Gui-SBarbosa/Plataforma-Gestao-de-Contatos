@@ -21,7 +21,7 @@ export const NotificationBell = ({ isLoading, items, onMarkRead, unread }: Notif
       <header><div><strong>Notificações</strong><small>{unread ? `${unread} não lida${unread === 1 ? "" : "s"}` : "Tudo em dia"}</small></div></header>
       {isLoading && <p className="notification-empty">Carregando notificações…</p>}
       {!isLoading && items.length === 0 && <p className="notification-empty">Nenhuma notificação até agora.</p>}
-      {!isLoading && items.map((notification) => <button className={`notification-row ${notification.readAt ? "" : "unread"}`} key={notification.id} type="button" onClick={() => void onMarkRead(notification.id)}><span className="notification-row-icon"><BellIcon /></span><span><strong>{notification.title}</strong><NotificationMessage notification={notification} /><time dateTime={notification.createdAt}>{new Date(notification.createdAt).toLocaleString("pt-BR")}</time></span></button>)}
+      {!isLoading && items.map((notification) => <button className={`notification-row ${notification.readAt ? "" : "unread"}`} key={notification.id} type="button" onClick={() => void onMarkRead(notification.id)}><span className="notification-row-icon"><BellIcon /></span><span><strong className="notification-title">{notification.title}</strong><NotificationMessage notification={notification} /><time dateTime={notification.createdAt}>{new Date(notification.createdAt).toLocaleString("pt-BR")}</time></span></button>)}
       <a className="notification-menu-link" href="#notifications" onClick={() => setIsOpen(false)}>Ver todas as notificações</a>
     </section>}
   </div>;

@@ -75,12 +75,12 @@ export const NotificationsPage = ({ user, onLogout }: { user: AuthUser; onLogout
         <div className="notifications-list">
           {page.data.map((notification) => <button className={`notification-list-row ${notification.readAt ? "" : "unread"}`} key={notification.id} onClick={() => void openNotification(notification)} type="button">
             <span className="notification-status-dot" aria-label={notification.readAt ? "Lida" : "Não lida"} />
-            <span className="notification-list-copy"><strong>{notification.title}</strong><NotificationMessage notification={notification} /><time dateTime={notification.createdAt}>{new Date(notification.createdAt).toLocaleString("pt-BR")}</time></span>
+            <span className="notification-list-copy"><strong className="notification-title">{notification.title}</strong><NotificationMessage notification={notification} /><time dateTime={notification.createdAt}>{new Date(notification.createdAt).toLocaleString("pt-BR")}</time></span>
           </button>)}
         </div>
         {page.meta.totalPages > 1 && <PaginationControls isLoading={isLoading} onNext={() => void load(page.meta.page + 1)} onPrevious={() => void load(page.meta.page - 1)} page={page.meta.page} totalPages={page.meta.totalPages} />}
       </>}
     </section>
-    {selected && <div className="overlay" onMouseDown={() => setSelected(null)}><article aria-modal="true" className="modal notification-detail" onMouseDown={(event) => event.stopPropagation()} role="dialog"><div className="modal-head"><div><p className="eyebrow">Notificação</p><h2>{selected.title}</h2></div><button className="close-button" onClick={() => setSelected(null)} type="button" aria-label="Fechar">×</button></div><div className="notification-detail-body"><NotificationMessage notification={selected} /><time dateTime={selected.createdAt}>{new Date(selected.createdAt).toLocaleString("pt-BR")}</time></div></article></div>}
+    {selected && <div className="overlay" onMouseDown={() => setSelected(null)}><article aria-modal="true" className="modal notification-detail" onMouseDown={(event) => event.stopPropagation()} role="dialog"><div className="modal-head"><div><p className="eyebrow">Notificação</p><h2 className="notification-title">{selected.title}</h2></div><button className="close-button" onClick={() => setSelected(null)} type="button" aria-label="Fechar">×</button></div><div className="notification-detail-body"><NotificationMessage notification={selected} /><time dateTime={selected.createdAt}>{new Date(selected.createdAt).toLocaleString("pt-BR")}</time></div></article></div>}
   </AppShell>;
 };
