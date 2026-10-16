@@ -1,25 +1,37 @@
 @startuml
-actor Operador
+actor "Visitante / pré-operador" as Visitante
 participant "React" as Web
 participant "Express API" as API
 database PostgreSQL as DB
 participant "Socket.IO" as Socket
 actor Administrador as Admin
 
-Operador -> Web : preenche solicitação
-Web -> API : POST /auth/register
-API -> DB : cria User(PENDING) + token hash
+Visitante -> Web : preenche solicitação
+Web -> API : POST /api/auth/register
+API -> DB : transação: User(PENDING) + token hash\n+ notificação + auditoria
 DB --> API : commit
 API --> Web : 202 + trackingToken
 Web -> Socket : registration:watch(token)
 Socket -> DB : valida token hash e status
-Socket --> Web : acompanhamento ativo
+Socket --> Web : ACK com status atual
 Socket --> Admin : registration:requested
-Admin -> API : PATCH /admin/users/:id/approve
-API -> DB : User=ACTIVE + audit log
-DB --> API : commit
-API -> Socket : registration:approved
-Socket --> Web : status ACTIVE
-Web --> Operador : aprovado; ir para login
+alt aprovar
+  Admin -> API : PATCH /api/admin/users/:id/approve
+  API -> DB : transação: User=ACTIVE + auditoria
+  DB --> API : commit
+  API -> Socket : registration:approved
+  Socket --> Web : status ACTIVE
+  Web --> Visitante : aprovado; ir para login
+else rejeitar
+  Admin -> API : PATCH /api/admin/users/:id/reject
+  API -> DB : transação: User=REJECTED + auditoria
+  DB --> API : commit
+  API -> Socket : registration:rejected
+  Socket --> Web : status REJECTED
+end
+note over Web,Socket
+  Em reconexão, registration:watch recebe
+  o estado persistido atual. A consulta HTTP
+  é recuperação apenas enquanto o socket falha.
+end note
 @enduml
-

@@ -3,13 +3,15 @@ hide methods
 class User {
   +UUID id
   +String name
-  +String email
+  +String? email
   -String passwordHash
+  -String? registrationTokenHash
   +Role role
   +UserStatus status
   +UUID approvedById
   +DateTime approvedAt
   +DateTime createdAt
+  +DateTime updatedAt
 }
 class Contact {
   +UUID id
@@ -21,22 +23,24 @@ class Contact {
   +ContactSource source
   +UUID createdById
   +DateTime createdAt
+  +DateTime updatedAt
 }
 class Notification {
   +UUID id
   +UUID recipientId
   +NotificationType type
   +String title
+  +String message
   +Json payload
   +DateTime readAt
   +DateTime createdAt
 }
 class AuditLog {
   +UUID id
-  +UUID actorId
+  +UUID? actorId
   +String action
   +String entityType
-  +UUID entityId
+  +UUID? entityId
   +Json metadata
   +DateTime createdAt
 }
@@ -59,7 +63,9 @@ User "1" -- "0..*" Notification : receives
 User "0..1" -- "0..*" AuditLog : performs
 User "0..1" -- "0..*" User : approves
 Session ..> User : contains identity
-RateLimitBucket ..> User : protects authentication
+note right of RateLimitBucket
+  Chaves HMAC de IP, e-mail
+  normalizado ou tracking token.
+end note
 @enduml
-
 
