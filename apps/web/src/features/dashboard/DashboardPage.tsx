@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
-
 import { AppShell } from "../../components/layout/AppShell";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { listPendingRequests } from "../admin-requests/admin-requests.api";
@@ -12,6 +10,7 @@ import type { Contact, ContactSource } from "../contacts/contacts.types";
 
 import { DashboardFilters } from "./DashboardFilters";
 import { getDashboard, type DashboardData } from "./dashboard.api";
+import { createRealtimeSocket } from "../../services/realtime";
 
 type DashboardPageProps = { onLogout: () => void; user: AuthUser };
 const sourceLabels: Record<ContactSource, string> = { OTHER: "Outro", PHONE: "Telefone", REFERRAL: "Indicacao", SOCIAL_MEDIA: "Redes sociais", WEBSITE: "Site" };
@@ -45,11 +44,13 @@ export const DashboardPage = ({ user, onLogout }: DashboardPageProps) => {
       }
     };
     void load();
-    const socket = io({ autoConnect: false, transports: ["websocket"] });
+    const socket = createRealtimeSocket();
     socket.on("contact:created", () => { void load(); });
     if (user.role === "ADMIN") socket.on("registration:requested", () => { void load(); });
+    socket.on("connect", () => { void load(); });
     socket.connect();
-    return () => { active = false; socket.disconnect(); };
+    const recoveryTimer = window.setInterval(() => { void load(); }, 15000);
+    return () => { active = false; window.clearInterval(recoveryTimer); socket.disconnect(); };
   }, [operatorId, user.role]);
 
   const signOut = async () => { try { await logout(); } finally { onLogout(); } };

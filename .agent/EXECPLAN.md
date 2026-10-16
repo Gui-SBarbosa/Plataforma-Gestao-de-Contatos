@@ -196,10 +196,12 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 16/10/2026 — Após corrigir o cache do Railway, o build falhou porque o Prisma Client não era gerado antes do TypeScript. O comando de build passou a executar `npm run db:generate` antes de `npm run build`.
 
 - 16/10/2026 — Como o Railway iniciou a API sem evidenciar a execução do pre deploy, o comando de start passou a repetir migration e seed segura. A seed considera somente registros de negócio para decidir se deve pular; sessões e buckets técnicos não impedem a população inicial.
+- 16/10/2026 — Após smoke test manual no Railway indicar notificações visíveis somente após recarregar a página, o cliente web passou a iniciar Socket.IO com polling e upgrade para WebSocket, sincronizar ao conectar/reconectar e executar uma leitura periódica de recuperação. A persistência no PostgreSQL continua sendo a fonte de verdade.
 
 ## Pendências e próximos passos
 
 - 16/10/2026 — A primeira execução remota da CI falhou antes das migrations porque dotenv-cli aceita -f, e não -e. Os scripts Prisma foram corrigidos; geração do client, lint, typecheck, 52 testes de integração e build passaram localmente.
+- 16/10/2026 — A correção de resiliência do realtime foi validada com typecheck web, ESLint web, build Vite e `git diff --check`. O wrapper `npm` continua falhando neste sandbox ao resolver `C:\Users\guiso`; os binários/workspace locais equivalentes foram usados.
 
 - Notificações persistentes, auditoria administrativa e dashboard em tempo real concluídos.
 - Deploy Railway em andamento: validar build de produção, variáveis, migrations, seed, health check e smoke test.
