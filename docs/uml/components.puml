@@ -1,16 +1,21 @@
 @startuml
 skinparam componentStyle rectangle
+left to right direction
 actor Usuario
 component "React + Vite" as Web
 node "GestCon — Express" {
   component "REST API" as API
   component "Socket.IO" as Socket
-  component "Auth" as Auth
-  component "Users" as Users
-  component "Contacts" as Contacts
-  component "Notifications" as Notifications
-  component "Dashboard" as Dashboard
-  component "Audit" as Audit
+  package "Módulos de domínio" {
+    component "Auth" as Auth
+    component "Registration" as Registration
+    component "Admin Users" as AdminUsers
+    component "Contacts" as Contacts
+    component "Notifications" as Notifications
+    component "Dashboard" as Dashboard
+    component "Audit" as Audit
+    component "Rate Limit" as RateLimit
+  }
   component "Prisma repositories" as Repos
 }
 database PostgreSQL
@@ -19,19 +24,23 @@ Usuario --> Web
 Web --> API : HTTPS/JSON
 Web <--> Socket : WSS
 API --> Auth
-API --> Users
+API --> Registration
+API --> AdminUsers
 API --> Contacts
 API --> Notifications
 API --> Dashboard
+API --> Audit
+API --> RateLimit
 Auth --> Repos
-Users --> Repos
+Registration --> Repos
+AdminUsers --> Repos
 Contacts --> Repos
 Notifications --> Repos
 Dashboard --> Repos
 Audit --> Repos
-Contacts --> Notifications : evento de aplicação
-Users --> Socket : pós-commit
-Notifications --> Socket : pós-commit
+RateLimit --> Repos
+Registration --> Notifications : persiste aviso
+Contacts --> Notifications : persiste aviso
+API --> Socket : eventos pós-commit
 Repos --> PostgreSQL
 @enduml
-

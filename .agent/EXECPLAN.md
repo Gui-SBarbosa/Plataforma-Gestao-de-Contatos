@@ -203,6 +203,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 
 - 16/10/2026 — Auditorias de decisões e ativação/desativação foram reunidas à mesma transação da mutação, e login/logout passaram a registrar eventos aguardados. A revisão foi validada com `npm run typecheck`, `npm run lint` e os testes `auth.test.cjs` e `admin-users.test.cjs` (16 casos aprovados).
 - 16/10/2026 — Com `APP_ORIGIN` corrigido no Railway e o handshake Socket.IO validado, a recuperação HTTP passou a ser acionada somente durante `connect_error` ou `disconnect`; quando conectado, sidebar, notificações, solicitações e dashboard usam exclusivamente eventos Socket.IO. A revisão foi validada com `npm run typecheck`, `npm run lint` e `npm run build:workspaces`.
+- 16/10/2026 — Documentação de arquitetura e ambiente revisada contra a implementação final: a arquitetura explicita os módulos de registro/administração/rate-limit, e `.env.example` e README agora incluem `SEED_OPERATOR_PASSWORD`.
+- 16/10/2026 — Fontes UML foram alinhadas às entidades opcionais, ao fluxo Socket.IO de aprovação/rejeição e ao CI/CD; os SVGs foram regenerados pelo PlantUML e inspecionados visualmente. `git diff --check` aprovado para a revisão documental.
 
 ## Pendências e próximos passos
 

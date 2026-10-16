@@ -9,9 +9,10 @@ cloud "Railway" {
   }
   database "PostgreSQL" as DB
 }
+cloud "GitHub Actions" as CI
 
 Browser --> App : HTTPS / WSS
 Server --> DB : TLS / SQL
 Server --> Build : arquivos estáticos
+CI --> App : deploy após push na main
 @enduml
-
