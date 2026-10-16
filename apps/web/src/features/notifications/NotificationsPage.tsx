@@ -6,18 +6,10 @@ import { PaginationControls } from "../../components/ui/PaginationControls";
 import { logout } from "../auth/auth.api";
 import type { AuthUser } from "../auth/auth.types";
 import { listNotifications, markAllNotificationsRead, markNotificationRead } from "./notifications.api";
+import { NotificationMessage } from "./NotificationMessage";
 import type { NotificationItem, NotificationPage } from "./notifications.types";
 
 const CheckIcon = () => <svg className="notification-check-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.2 4.2L19 6.5" /></svg>;
-
-const NotificationMessage = ({ notification }: { notification: NotificationItem }) => {
-  const creatorName = notification.payload?.creatorName;
-  const contactName = notification.payload?.contactName;
-  if (notification.type === "NEW_CONTACT" && typeof creatorName === "string" && typeof contactName === "string") {
-    return <p><strong>Operador {creatorName}</strong> cadastrou <strong>{contactName}</strong>.</p>;
-  }
-  return <p>{notification.message}</p>;
-};
 
 export const NotificationsPage = ({ user, onLogout }: { user: AuthUser; onLogout: () => void }) => {
   const [page, setPage] = useState<NotificationPage | null>(null);

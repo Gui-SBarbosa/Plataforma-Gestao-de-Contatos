@@ -63,6 +63,8 @@ h1 { max-width: 650px; margin: 10px 0 16px; color: #172554; font-size: clamp(34p
 .notification-row strong, .notification-row small, .notification-row time { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .notification-row strong { color: #0f172a; font-size: 13px; font-weight: 650; }
 .notification-row small { color: #475569; font-size: 12px; }
+.notification-row p { margin: 0; overflow: hidden; color: #475569; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.notification-row p strong { color: #1e3a8a; font-weight: 750; }
 .notification-row time { color: #94a3b8; font-size: 11px; }
 .notification-row-icon { display: grid; place-items: center; flex: 0 0 32px; width: 32px; height: 32px; border-radius: 9px; color: #2563eb; background: #dbeafe; }
 .notification-row-icon .topbar-icon { width: 16px; height: 16px; }
