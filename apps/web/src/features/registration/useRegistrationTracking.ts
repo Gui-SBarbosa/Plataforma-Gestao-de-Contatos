@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
+import { createRealtimeSocket } from "../../services/realtime";
 
 import { getRegistrationStatus } from "./registration.api";
 import type { RegistrationStatusData } from "./registration.types";
@@ -23,7 +23,7 @@ export const useRegistrationTracking = (trackingToken: string | null) => {
     }
 
     const abortController = new AbortController();
-    const socket = io({ autoConnect: false, transports: ["websocket"] });
+    const socket = createRealtimeSocket();
 
     const load = async () => {
       setState({ error: null, isConnected: false, isLoading: true, registration: null });
@@ -61,12 +61,25 @@ export const useRegistrationTracking = (trackingToken: string | null) => {
       if (!abortController.signal.aborted) setState({ error: null, isConnected: true, isLoading: false, registration });
     };
 
+    const refreshPersistedStatus = async () => {
+      try {
+        const registration = await getRegistrationStatus(trackingToken);
+        if (!abortController.signal.aborted) {
+          setState((current) => ({ ...current, error: null, isLoading: false, registration }));
+        }
+      } catch {
+        // The last known status remains visible while the next recovery attempt is scheduled.
+      }
+    };
+
     socket.on("registration:approved", updateRegistration);
     socket.on("registration:rejected", updateRegistration);
     void load();
+    const recoveryTimer = window.setInterval(() => { void refreshPersistedStatus(); }, 15000);
 
     return () => {
       abortController.abort();
+      window.clearInterval(recoveryTimer);
       socket.emit("registration:unwatch");
       socket.disconnect();
     };
