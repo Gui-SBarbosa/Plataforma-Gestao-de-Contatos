@@ -8,16 +8,16 @@ posteriores não são iniciados enquanto o item corrente estiver pendente ou blo
 
 ## P0 — Obrigatório
 
-- [x] 01. Fundação TypeScript, lint, build e configuração.
-- [x] 02. Banco local: aplicar migrations e executar o seed em um PostgreSQL disponível.
+- [x] 1.  Fundação TypeScript, lint, build e configuração.
+- [x] 2.  Banco local: aplicar migrations e executar o seed em um PostgreSQL disponível.
   - Schema, migration e seed idempotente do administrador foram validados em PostgreSQL local.
-- [x] 03. Login, logout e sessão atual.
-- [x] 04. Rate limiter persistente para autenticação, registro e tracking.
-- [x] 05. Job idempotente de limpeza de buckets expirados.
-- [x] 06. Registro público de operador.
-- [x] 07. Cadastro direto de usuário pelo administrador.
-- [x] 08. Aprovação e rejeição de solicitações.
-- [x] 09. Acompanhamento da aprovação em tempo real.
+- [x] 3.  Login, logout e sessão atual.
+- [x] 4.  Rate limiter persistente para autenticação, registro e tracking.
+- [x] 5.  Job idempotente de limpeza de buckets expirados.
+- [x] 6.  Registro público de operador.
+- [x] 7.  Cadastro direto de usuário pelo administrador.
+- [x] 8.  Aprovação e rejeição de solicitações.
+- [x] 9.  Acompanhamento da aprovação em tempo real.
 - [x] 10. Cadastro de contato.
 - [x] 11. RBAC e ownership de contatos.
 - [x] 12. Lista paginada de contatos.
@@ -29,11 +29,12 @@ posteriores não são iniciados enquanto o item corrente estiver pendente ou blo
 
 ## P1 — Diferenciais viáveis
 
-- [ ] Notificações persistentes e estado lido/não lido.
-- [ ] Auditoria administrativa.
-- [ ] Dashboard com métricas essenciais.
-- [ ] Atualização do dashboard em tempo real.
-- [ ] Dashboard por papel: visão global somente leitura para ADMIN e visão dos próprios contatos para OPERATOR, com filtros de período e operador.
+- [x] Notificações persistentes e estado lido/não lido.
+- [x] Auditoria administrativa.
+- [x] Dashboard com métricas essenciais.
+- [x] Atualização do dashboard em tempo real.
+- [x] Dashboard por papel: visão global somente leitura para ADMIN e visão dos próprios contatos para OPERATOR, com filtros de período e operador.
+- [x] Política de senha reforçada no cadastro de operadores e solicitações de acesso.
 - [x] OpenAPI/Swagger.
 - [ ] CI no GitHub Actions.
 
