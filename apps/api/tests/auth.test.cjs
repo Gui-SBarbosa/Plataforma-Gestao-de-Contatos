@@ -51,6 +51,7 @@ describe("authentication endpoints", () => {
   afterAll(async () => {
     await prisma.rateLimitBucket.deleteMany();
     await prisma.session.deleteMany();
+    await prisma.auditLog.deleteMany({ where: { entityType: "AUTH" } });
     await prisma.user.deleteMany({
       where: { name: { in: ["Active Test", "Disabled Test", "Pending Test", "Rejected Test"] } },
     });
@@ -139,6 +140,8 @@ describe("authentication endpoints", () => {
     const currentUserResponse = await agent.get("/api/auth/me");
 
     expect(currentUserResponse.status).toBe(401);
+    const user = await prisma.user.findFirstOrThrow({ where: { email: activeUserEmail }, select: { id: true } });
+    await expect(prisma.auditLog.findFirst({ where: { action: "AUTH_LOGOUT", actorId: user.id, entityId: user.id, entityType: "AUTH" } })).resolves.toBeTruthy();
   });
 
   it("keeps the identity limit after a new application instance starts", async () => {
