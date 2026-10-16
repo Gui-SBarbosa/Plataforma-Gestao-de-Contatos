@@ -82,8 +82,8 @@ export const RegistrationTrackingPage = () => {
             <div><h2>Solicitar acesso</h2><p>Preencha seus dados para criar uma solicitação de operador.</p></div>
             <label>Nome completo<input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} minLength={2} maxLength={120} required /></label>
             <label>E-mail<input value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} type="email" maxLength={320} required /></label>
-            <label>Senha<input value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} type="password" minLength={12} maxLength={128} required /></label>
-            <label>Confirmar senha<input value={form.passwordConfirmation} onChange={(event) => setForm({ ...form, passwordConfirmation: event.target.value })} type="password" minLength={12} maxLength={128} required /></label>
+            <label>Senha<input value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} type="password" minLength={8} maxLength={128} pattern="(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,128}" title="Use no mínimo 8 caracteres, com uma letra maiúscula, um número e um símbolo." autoComplete="new-password" required /></label>
+            <label>Confirmar senha<input value={form.passwordConfirmation} onChange={(event) => setForm({ ...form, passwordConfirmation: event.target.value })} type="password" minLength={8} maxLength={128} autoComplete="new-password" required /></label>
             {formError && <p className="form-error" role="alert">{formError}</p>}
             <button className="button button-primary" disabled={isSubmitting} type="submit">{isSubmitting ? "Enviando…" : "Enviar solicitação"}</button>
           </form>

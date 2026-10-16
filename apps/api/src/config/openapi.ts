@@ -431,7 +431,7 @@ export const openApiDocument = {
         properties: {
           email: { format: "email", type: "string" },
           name: { maxLength: 120, minLength: 2, type: "string" },
-          password: { format: "password", maxLength: 128, minLength: 12, type: "string" },
+          password: { format: "password", maxLength: 128, minLength: 8, pattern: "^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).+$", type: "string" },
         },
         required: ["name", "email", "password"],
         type: "object",
@@ -639,7 +639,7 @@ export const openApiDocument = {
         properties: {
           email: { format: "email", type: "string" },
           name: { type: "string" },
-          password: { format: "password", minLength: 12, type: "string" },
+          password: { format: "password", minLength: 8, pattern: "^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).+$", type: "string" },
         },
         required: ["name", "email", "password"],
         type: "object",
