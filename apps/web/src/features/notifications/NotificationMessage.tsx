@@ -11,7 +11,7 @@ const getContactName = (notification: NotificationItem, creatorName: string) => 
 export const NotificationMessage = ({ notification }: { notification: NotificationItem }) => {
   const creatorName = notification.payload?.creatorName;
   if (notification.type === "NEW_CONTACT" && typeof creatorName === "string") {
-    return <p><strong>Operador {creatorName}</strong> cadastrou <strong>{getContactName(notification, creatorName)}</strong>.</p>;
+    return <p>Operador <strong>{creatorName}</strong> cadastrou <strong>{getContactName(notification, creatorName)}</strong>.</p>;
   }
   return <p>{notification.message}</p>;
 };
