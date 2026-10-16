@@ -25,6 +25,7 @@ NODE_ENV=production
 DATABASE_URL=<fornecida pelo ambiente>
 SEED_ADMIN_EMAIL=<e-mail do administrador de demonstração>
 SEED_ADMIN_PASSWORD=<fornecida apenas no ambiente de demo>
+SEED_OPERATOR_PASSWORD=<senha dos dois operadores de demonstração>
 SESSION_SECRET=<segredo forte>
 CSRF_SECRET=<segredo forte>
 RATE_LIMIT_SECRET=<segredo forte e independente>
@@ -41,7 +42,7 @@ Start: npm run start
 Rate limit cleanup: npm run rate-limit:cleanup
 ```
 
-`railway.toml` registra build, pre-deploy, start e healthcheck. Os comandos `:runtime` usam diretamente as variáveis fornecidas pelo Railway e não dependem de um arquivo `.env`. O pre-deploy usa migration e seed idempotentes; uma falha interrompe a publicação.
+`railway.toml` registra build, pre-deploy, start e healthcheck. Os comandos `:runtime` usam diretamente as variáveis fornecidas pelo Railway e não dependem de um arquivo `.env`. O pre-deploy usa migration e uma seed segura: ela só cria a massa de demonstração quando não há registros persistidos. Uma falha interrompe a publicação.
 
 ## Health checks
 
@@ -52,7 +53,8 @@ Rate limit cleanup: npm run rate-limit:cleanup
 
 - Produção usa `prisma migrate deploy`.
 - Não usar `prisma db push` como processo oficial de deploy.
-- Seed de demonstração deve ser idempotente.
+- A seed automática cria um administrador, dois operadores e 24 contatos em banco vazio. Cada operador recebe 12 contatos para demonstrar a paginação.
+- `npm run db:seed:reset` é o comando manual destrutivo para apagar os dados operacionais e recriar a massa; ele não faz parte do deploy.
 - Credenciais de demo não devem reutilizar secrets reais.
 
 ## Smoke test

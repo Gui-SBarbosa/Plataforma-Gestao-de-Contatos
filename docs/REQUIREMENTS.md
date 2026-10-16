@@ -103,7 +103,7 @@ O GestCon centraliza a entrada controlada de operadores, o cadastro de contatos 
 - AC-07 — Administrador desconectado encontra a notificação persistida quando retorna.
 - AC-08 — Lista de contatos retorna `data` e metadados `page`, `pageSize`, `total` e `totalPages`.
 - AC-09 — Operador não obtém contatos de outro operador por listagem ou acesso direto.
-- AC-10 — Seed disponibiliza somente um administrador ativo, com e-mail e senha fornecidos pelo ambiente; operadores e contatos são criados manualmente pela aplicação durante a demonstração.
+- AC-10 — Em banco vazio, a seed disponibiliza um administrador ativo, dois operadores ativos e 24 contatos distribuídos igualmente entre os operadores. Cada operador recebe 12 contatos, permitindo demonstrar a paginação padrão de 10 itens. As senhas de demonstração vêm do ambiente; a seed automática não altera banco que já contenha registros.
 - AC-11 — Lint, typecheck, testes e build terminam com sucesso.
 - AC-12 — Aplicação publicada executa login, aprovação, cadastro, notificação e paginação.
 - AC-13 — Limite de login permanece efetivo após reiniciar o processo da aplicação.
