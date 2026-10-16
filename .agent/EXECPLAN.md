@@ -191,6 +191,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 
 - 16/10/2026 — Por solicitação do usuário, a seed de deploy passará a criar um administrador, dois operadores e 24 contatos somente em banco vazio. Cada operador terá 12 contatos, suficiente para demonstrar a paginação padrão. O reset da massa ficará restrito ao comando manual explícito `db:seed:reset`, que limpa os dados operacionais antes de recriá-los.
 
+- 16/10/2026 — O Railway falhou no build porque `npm ci` tentou remover `apps/web/node_modules/.vite` enquanto o diretório estava bloqueado no cache persistente. O build do Railway passou a usar `npm install --prefer-offline --no-audit --no-fund`; a CI do GitHub permanece com `npm ci`.
+
 ## Pendências e próximos passos
 
 - 16/10/2026 — A primeira execução remota da CI falhou antes das migrations porque dotenv-cli aceita -f, e não -e. Os scripts Prisma foram corrigidos; geração do client, lint, typecheck, 52 testes de integração e build passaram localmente.
