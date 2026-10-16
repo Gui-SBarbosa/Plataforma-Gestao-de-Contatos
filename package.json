@@ -1,0 +1,41 @@
+{
+  "name": "gestcon",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:api": "npm run dev --workspace=@gestcon/api",
+    "dev:web": "npm run dev --workspace=@gestcon/web",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:generate": "npm run db:generate --workspace=@gestcon/api",
+    "db:migrate": "npm run db:migrate --workspace=@gestcon/api",
+    "db:deploy": "npm run db:deploy --workspace=@gestcon/api",
+    "db:seed": "npm run db:seed --workspace=@gestcon/api",
+    "db:deploy:runtime": "npm run db:deploy:runtime --workspace=@gestcon/api",
+    "db:seed:runtime": "npm run db:seed:runtime --workspace=@gestcon/api",
+    "rate-limit:cleanup": "npm run rate-limit:cleanup --workspace=@gestcon/api",
+    "build": "npm run build --workspaces --if-present",
+    "start": "npm run start --workspace=@gestcon/api",
+    "lint": "eslint .",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "typecheck:db": "npm run typecheck:db --workspace=@gestcon/api",
+    "test": "npm run test --workspaces --if-present",
+    "test:integration": "npm run test:integration --workspace=@gestcon/api",
+    "test:coverage": "npm run test:coverage --workspace=@gestcon/api"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.2"
+  }
+}

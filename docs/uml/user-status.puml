@@ -1,0 +1,9 @@
+@startuml
+[*] --> PENDING : solicitação
+PENDING --> ACTIVE : aprovação
+PENDING --> REJECTED : rejeição
+ACTIVE --> DISABLED : desativação
+DISABLED --> ACTIVE : reativação
+REJECTED --> [*]
+@enduml
+

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-label="Diagrama de implantação">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#64748b"/></marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="4" stdDeviation="7" flood-color="#0f172a" flood-opacity="0.10"/></filter>
+  </defs>
+  <rect width="100%" height="100%" fill="#f8fafc"/>
+  <rect x="0" y="0" width="100%" height="92" fill="#172554"/>
+  <text x="48" y="44" font-family="Inter,Arial,sans-serif" font-size="25" font-weight="700" fill="#fff">Diagrama de implantação</text>
+  <text x="48" y="70" font-family="Inter,Arial,sans-serif" font-size="14" fill="#bfdbfe">Topologia inicial de produção no Railway</text>
+  
+  <g filter="url(#shadow)"><rect x="65" y="250" width="230" height="150" rx="12" fill="#fff" stroke="#60a5fa" stroke-width="1.5"/></g><text x="83" y="279" text-anchor="start" font-family="Inter,Arial,sans-serif" font-size="16" font-weight="700" fill="#1e3a8a">Navegador</text><text x="83" y="304" text-anchor="start" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="400" fill="#334155">React SPA</text><text x="83" y="326" text-anchor="start" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="400" fill="#334155">Cookie HttpOnly</text><text x="83" y="348" text-anchor="start" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="400" fill="#334155">HTTPS / WSS</text>
+  <rect x="390" y="145" width="735" height="430" rx="20" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+  <text x="420" y="185" text-anchor="start" font-family="Inter,Arial,sans-serif" font-size="19" font-weight="700" fill="#1e3a8a">Ambiente Railway</text>
+  <g filter="url(#shadow)"><rect x="455" y="245" width="300" height="190" rx="12" fill="#fff" stroke="#60a5fa" stroke-width="1.5"/></g><text x="473" y="274" text-anchor="start" font-family="Inter,Arial,sans-serif" font-size="16" font-weight="700" fill="#1e3a8a">GestCon App — 1 réplica</text><text x="473" y="299" text-anchor="start" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="400" fill="#334155">Node.js + Express</text><text x="473" y="321" text-anchor="start" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="400" fill="#334155">Socket.IO</text><text x="473" y="343" text-anchor="start" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="400" fill="#334155">React build estático</text><text x="473" y="365" text-anchor="start" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="400" fill="#334155">Health checks</text>
+  <g filter="url(#shadow)"><rect x="860" y="270" width="205" height="145" rx="12" fill="#fff7ed" stroke="#fb923c" stroke-width="1.5"/></g><text x="878" y="299" text-anchor="start" font-family="Inter,Arial,sans-serif" font-size="16" font-weight="700" fill="#1e3a8a">PostgreSQL</text><text x="878" y="324" text-anchor="start" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="400" fill="#334155">Usuários e sessões</text><text x="878" y="346" text-anchor="start" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="400" fill="#334155">Contatos</text><text x="878" y="368" text-anchor="start" font-family="Inter,Arial,sans-serif" font-size="13" font-weight="400" fill="#334155">Notificações e auditoria</text>
+  <line x1="295" y1="320" x2="455" y2="320" stroke="#64748b" stroke-width="2"  marker-end="url(#arrow)"/><text x="375" y="312" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="12" font-weight="400" fill="#475569">HTTPS / WSS</text><line x1="755" y1="340" x2="860" y2="340" stroke="#64748b" stroke-width="2"  marker-end="url(#arrow)"/><text x="807.5" y="332" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="12" font-weight="400" fill="#475569">TLS / SQL</text>
+  <text x="455" y="500" text-anchor="start" font-family="Inter,Arial,sans-serif" font-size="14" font-weight="400" fill="#475569">Escala futura: múltiplas réplicas + Redis adapter</text>
+
+  <text x="1152" y="694" text-anchor="end" font-family="Inter,Arial,sans-serif" font-size="12" fill="#64748b">GestCon · UML</text>
+</svg>

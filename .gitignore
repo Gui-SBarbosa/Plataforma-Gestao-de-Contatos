@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Builds and coverage
+dist/
+build/
+coverage/
+.swc-cache/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editors and operating systems
+.idea/
+.vscode/
+.codex/
+.DS_Store
+Thumbs.db
+
+# Local delivery packages
+*.zip
+
