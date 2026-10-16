@@ -195,6 +195,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 
 - 16/10/2026 — Após corrigir o cache do Railway, o build falhou porque o Prisma Client não era gerado antes do TypeScript. O comando de build passou a executar `npm run db:generate` antes de `npm run build`.
 
+- 16/10/2026 — Como o Railway iniciou a API sem evidenciar a execução do pre deploy, o comando de start passou a repetir migration e seed segura. A seed considera somente registros de negócio para decidir se deve pular; sessões e buckets técnicos não impedem a população inicial.
+
 ## Pendências e próximos passos
 
 - 16/10/2026 — A primeira execução remota da CI falhou antes das migrations porque dotenv-cli aceita -f, e não -e. Os scripts Prisma foram corrigidos; geração do client, lint, typecheck, 52 testes de integração e build passaram localmente.
