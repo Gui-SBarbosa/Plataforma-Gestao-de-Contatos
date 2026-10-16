@@ -1,5 +1,5 @@
 [build]
-buildCommand = "npm install --prefer-offline --no-audit --no-fund && npm run db:generate && npm run build"
+buildCommand = "npm install --include=dev --prefer-offline --no-audit --no-fund && npm run build"
 
 [deploy]
 preDeployCommand = "npm run db:deploy:runtime && npm run db:seed:runtime"
