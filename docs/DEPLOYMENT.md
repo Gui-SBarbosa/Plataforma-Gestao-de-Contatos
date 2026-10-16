@@ -36,7 +36,7 @@ PORT=<fornecida pelo ambiente>
 ## Comandos do serviço
 
 ```text
-Build: npm install --prefer-offline --no-audit --no-fund && npm run build
+Build: npm install --prefer-offline --no-audit --no-fund && npm run db:generate && npm run build
 Pre-deploy: npm run db:deploy:runtime && npm run db:seed:runtime
 Start: npm run start
 Rate limit cleanup: npm run rate-limit:cleanup
