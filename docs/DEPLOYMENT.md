@@ -38,11 +38,11 @@ PORT=<fornecida pelo ambiente>
 ```text
 Build: npm install --prefer-offline --no-audit --no-fund && npm run db:generate && npm run build
 Pre-deploy: npm run db:deploy:runtime && npm run db:seed:runtime
-Start: npm run start
+Start: npm run db:deploy:runtime && npm run db:seed:runtime && npm run start
 Rate limit cleanup: npm run rate-limit:cleanup
 ```
 
-`railway.toml` registra build, pre-deploy, start e healthcheck. Os comandos `:runtime` usam diretamente as variáveis fornecidas pelo Railway e não dependem de um arquivo `.env`. O pre-deploy usa migration e uma seed segura: ela só cria a massa de demonstração quando não há registros persistidos. Uma falha interrompe a publicação.
+`railway.toml` registra build, pre-deploy, start e healthcheck. Os comandos `:runtime` usam diretamente as variáveis fornecidas pelo Railway e não dependem de um arquivo `.env`. O pre-deploy e o start aplicam migrations e a seed segura; a seed só cria a massa de demonstração quando não há registros de negócio. Essa repetição mantém o serviço recuperável caso a plataforma não execute o pre-deploy em uma publicação.
 
 ## Health checks
 

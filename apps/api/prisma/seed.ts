@@ -74,8 +74,6 @@ const hasPersistedData = async () => {
     prisma.contact.count(),
     prisma.notification.count(),
     prisma.auditLog.count(),
-    prisma.session.count(),
-    prisma.rateLimitBucket.count(),
   ]);
 
   return counts.some((count) => count > 0);
