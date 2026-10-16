@@ -189,6 +189,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 
 ## Pendências e próximos passos
 
+- 16/10/2026 — A primeira execução remota da CI falhou antes das migrations porque dotenv-cli aceita -f, e não -e. Os scripts Prisma foram corrigidos; geração do client, lint, typecheck, 52 testes de integração e build passaram localmente.
+
 - Notificações persistentes, auditoria administrativa e dashboard em tempo real concluídos.
 - Deploy Railway em andamento: validar build de produção, variáveis, migrations, seed, health check e smoke test.
 - Publicação remota ainda depende de acesso ao projeto Railway e da configuração dos segredos no ambiente.
