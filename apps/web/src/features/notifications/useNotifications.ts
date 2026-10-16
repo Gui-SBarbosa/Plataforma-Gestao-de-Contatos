@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { io } from "socket.io-client";
-
 import { listNotifications, markAllNotificationsRead, markNotificationRead } from "./notifications.api";
 import type { NotificationItem } from "./notifications.types";
+import { createRealtimeSocket } from "../../services/realtime";
 
 type NotificationState = { items: NotificationItem[]; isLoading: boolean; unread: number };
 
@@ -28,19 +27,22 @@ export const useNotifications = (enabled: boolean, pageSize = 5) => {
       return;
     }
 
-    const socket = io({ autoConnect: false, transports: ["websocket"] });
+    const socket = createRealtimeSocket();
     socket.on("contact:created", () => { void refresh(); });
     socket.on("registration:requested", () => {
       void refresh();
       window.dispatchEvent(new Event("registration:requested"));
     });
+    socket.on("connect", () => { void refresh(); });
     const handleNotificationsChanged = () => { void refresh(); };
     window.addEventListener("notifications:changed", handleNotificationsChanged);
     socket.connect();
     void refresh();
+    const recoveryTimer = window.setInterval(() => { void refresh(); }, 15000);
 
     return () => {
       window.removeEventListener("notifications:changed", handleNotificationsChanged);
+      window.clearInterval(recoveryTimer);
       socket.disconnect();
     };
   }, [enabled, refresh]);
