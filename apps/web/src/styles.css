@@ -70,7 +70,7 @@ h1 { max-width: 650px; margin: 10px 0 16px; color: #172554; font-size: clamp(34p
 .notification-row-icon { display: grid; place-items: center; flex: 0 0 32px; width: 32px; height: 32px; border-radius: 9px; color: #2563eb; background: #dbeafe; }
 .notification-row-icon .topbar-icon { width: 16px; height: 16px; }
 .notification-empty { padding: 26px 18px; color: #64748b; font-size: 13px; text-align: center; }
-.tracking-card a.button { text-align: center; }
+.tracking-card a.button { display: flex; align-items: center; justify-content: center; text-align: center; }
 .notification-menu-link { display: block; padding: 13px 18px; color: #1d4ed8; border-top: 1px solid #e2e8f0; font-size: 13px; font-weight: 700; text-align: center; text-decoration: none; }
 .notification-menu-link:hover { background: #eff6ff; }
 .nav-badge-notifications { color: #9a3412; background: #fed7aa; }
