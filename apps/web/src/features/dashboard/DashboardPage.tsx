@@ -10,7 +10,6 @@ import type { Contact, ContactSource } from "../contacts/contacts.types";
 
 import { DashboardFilters } from "./DashboardFilters";
 import { getDashboard, type DashboardData } from "./dashboard.api";
-import { createRealtimeSocket } from "../../services/realtime";
 
 type DashboardPageProps = { onLogout: () => void; user: AuthUser };
 const sourceLabels: Record<ContactSource, string> = { OTHER: "Outro", PHONE: "Telefone", REFERRAL: "Indicacao", SOCIAL_MEDIA: "Redes sociais", WEBSITE: "Site" };
@@ -44,13 +43,18 @@ export const DashboardPage = ({ user, onLogout }: DashboardPageProps) => {
       }
     };
     void load();
-    const socket = createRealtimeSocket();
-    socket.on("contact:created", () => { void load(); });
-    if (user.role === "ADMIN") socket.on("registration:requested", () => { void load(); });
-    socket.on("connect", () => { void load(); });
-    socket.connect();
-    const recoveryTimer = window.setInterval(() => { void load(); }, 15000);
-    return () => { active = false; window.clearInterval(recoveryTimer); socket.disconnect(); };
+    const refreshDashboard = () => { void load(); };
+    window.addEventListener("realtime:contact-created", refreshDashboard);
+    if (user.role === "ADMIN") window.addEventListener("realtime:registration-requested", refreshDashboard);
+    window.addEventListener("realtime:connected", refreshDashboard);
+    window.addEventListener("realtime:recovery", refreshDashboard);
+    return () => {
+      active = false;
+      window.removeEventListener("realtime:contact-created", refreshDashboard);
+      if (user.role === "ADMIN") window.removeEventListener("realtime:registration-requested", refreshDashboard);
+      window.removeEventListener("realtime:connected", refreshDashboard);
+      window.removeEventListener("realtime:recovery", refreshDashboard);
+    };
   }, [operatorId, user.role]);
 
   const signOut = async () => { try { await logout(); } finally { onLogout(); } };

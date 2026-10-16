@@ -198,11 +198,13 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 16/10/2026 — Como o Railway iniciou a API sem evidenciar a execução do pre deploy, o comando de start passou a repetir migration e seed segura. A seed considera somente registros de negócio para decidir se deve pular; sessões e buckets técnicos não impedem a população inicial.
 - 16/10/2026 — Após smoke test manual no Railway indicar notificações visíveis somente após recarregar a página, o cliente web passou a iniciar Socket.IO com polling e upgrade para WebSocket, sincronizar ao conectar/reconectar e executar uma leitura periódica de recuperação. A persistência no PostgreSQL continua sendo a fonte de verdade.
 - 16/10/2026 — O rebuild remoto executou apenas o build automático `npm run build`, sem gerar o Prisma Client. O script raiz de build passou a gerar o client antes dos workspaces, tornando a compilação independente da aplicação de `railway.toml`; o comando declarado no arquivo também instala explicitamente dependências de desenvolvimento necessárias à compilação.
+- 16/10/2026 — O cliente passou a distribuir os eventos da conexão administrativa já usada nas notificações. Sidebar, solicitações e dashboard agora sincronizam pelo mesmo evento interno e também ao reconectar, eliminando sockets concorrentes e telas sem assinatura de atualização.
 
 ## Pendências e próximos passos
 
 - 16/10/2026 — A primeira execução remota da CI falhou antes das migrations porque dotenv-cli aceita -f, e não -e. Os scripts Prisma foram corrigidos; geração do client, lint, typecheck, 52 testes de integração e build passaram localmente.
 - 16/10/2026 — A correção de resiliência do realtime foi validada com typecheck web, ESLint web, build Vite e `git diff --check`. O wrapper `npm` continua falhando neste sandbox ao resolver `C:\Users\guiso`; os binários/workspace locais equivalentes foram usados.
+- 16/10/2026 — A sincronização compartilhada de sidebar, solicitações e dashboard foi validada com typecheck web, ESLint web, build Vite e `git diff --check`.
 
 - Notificações persistentes, auditoria administrativa e dashboard em tempo real concluídos.
 - Deploy Railway em andamento: validar build de produção, variáveis, migrations, seed, health check e smoke test.

@@ -23,11 +23,22 @@ export const AdminRequestsPage = ({ user, onLogout }: { user: AuthUser; onLogout
     try { const response = await listPendingRequests(nextPage); setRequests(response.data); setPage(response.meta.page); setTotalPages(response.meta.totalPages || 1); } catch { setError("Não foi possível carregar as solicitações."); } finally { setIsLoading(false); }
   };
 
-  useEffect(() => { void loadRequests(1); }, []);
+  useEffect(() => {
+    const refreshRequests = () => { void loadRequests(1); };
+    refreshRequests();
+    window.addEventListener("realtime:registration-requested", refreshRequests);
+    window.addEventListener("realtime:connected", refreshRequests);
+    window.addEventListener("realtime:recovery", refreshRequests);
+    return () => {
+      window.removeEventListener("realtime:registration-requested", refreshRequests);
+      window.removeEventListener("realtime:connected", refreshRequests);
+      window.removeEventListener("realtime:recovery", refreshRequests);
+    };
+  }, []);
 
   const decide = async (request: PendingRequest, decision: "approve" | "reject") => {
     setProcessingId(request.id); setFeedback(null); setError(null);
-    try { await (decision === "approve" ? approveRequest(request.id) : rejectRequest(request.id)); window.dispatchEvent(new Event("registration:requested")); setFeedback(decision === "approve" ? "Solicitação aprovada." : "Solicitação rejeitada."); await loadRequests(page); } catch { setError("Não foi possível concluir a decisão. Atualize a lista e tente novamente."); } finally { setProcessingId(null); }
+    try { await (decision === "approve" ? approveRequest(request.id) : rejectRequest(request.id)); window.dispatchEvent(new Event("requests:changed")); setFeedback(decision === "approve" ? "Solicitação aprovada." : "Solicitação rejeitada."); await loadRequests(page); } catch { setError("Não foi possível concluir a decisão. Atualize a lista e tente novamente."); } finally { setProcessingId(null); }
   };
 
   const signOut = async () => { try { await logout(); } finally { onLogout(); } };

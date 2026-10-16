@@ -5,6 +5,7 @@ import { listPendingRequests } from "../../features/admin-requests/admin-request
 import { listContacts } from "../../features/contacts/contacts.api";
 import { NotificationBell } from "../../features/notifications/NotificationBell";
 import { useNotifications } from "../../features/notifications/useNotifications";
+import { useRealtimeEvents } from "../../services/useRealtimeEvents";
 import { Brand } from "./Brand";
 
 export type AppSection = "audit" | "contacts" | "notifications" | "operators" | "overview" | "profile" | "requests" | "settings";
@@ -30,14 +31,26 @@ export const AppShell = ({ activeSection, children, contactCount: initialContact
   const [pendingRequestCount, setPendingRequestCount] = useState(0);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const notifications = useNotifications(isAdmin);
+  useRealtimeEvents(true);
 
   useEffect(() => {
     let active = true;
-    setSidebarContactCount(initialContactCount);
-    void listContacts(1).then((page) => {
-      if (active) setSidebarContactCount(page.meta.total);
-    }).catch(() => undefined);
-    return () => { active = false; };
+    const refreshContactCount = () => {
+      setSidebarContactCount(initialContactCount);
+      void listContacts(1).then((page) => {
+        if (active) setSidebarContactCount(page.meta.total);
+      }).catch(() => undefined);
+    };
+    refreshContactCount();
+    window.addEventListener("realtime:contact-created", refreshContactCount);
+    window.addEventListener("realtime:connected", refreshContactCount);
+    window.addEventListener("realtime:recovery", refreshContactCount);
+    return () => {
+      active = false;
+      window.removeEventListener("realtime:contact-created", refreshContactCount);
+      window.removeEventListener("realtime:connected", refreshContactCount);
+      window.removeEventListener("realtime:recovery", refreshContactCount);
+    };
   }, [initialContactCount]);
 
   useEffect(() => {
@@ -48,12 +61,17 @@ export const AppShell = ({ activeSection, children, contactCount: initialContact
         if (active) setPendingRequestCount(page.meta.total);
       }).catch(() => undefined);
     };
-    const handleRegistrationRequested = () => refreshPendingRequests();
     refreshPendingRequests();
-    window.addEventListener("registration:requested", handleRegistrationRequested);
+    window.addEventListener("realtime:registration-requested", refreshPendingRequests);
+    window.addEventListener("requests:changed", refreshPendingRequests);
+    window.addEventListener("realtime:connected", refreshPendingRequests);
+    window.addEventListener("realtime:recovery", refreshPendingRequests);
     return () => {
       active = false;
-      window.removeEventListener("registration:requested", handleRegistrationRequested);
+      window.removeEventListener("realtime:registration-requested", refreshPendingRequests);
+      window.removeEventListener("requests:changed", refreshPendingRequests);
+      window.removeEventListener("realtime:connected", refreshPendingRequests);
+      window.removeEventListener("realtime:recovery", refreshPendingRequests);
     };
   }, [isAdmin]);
 

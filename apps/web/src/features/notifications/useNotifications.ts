@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
+
 import { listNotifications, markAllNotificationsRead, markNotificationRead } from "./notifications.api";
 import type { NotificationItem } from "./notifications.types";
-import { createRealtimeSocket } from "../../services/realtime";
 
 type NotificationState = { items: NotificationItem[]; isLoading: boolean; unread: number };
 
@@ -27,23 +27,21 @@ export const useNotifications = (enabled: boolean, pageSize = 5) => {
       return;
     }
 
-    const socket = createRealtimeSocket();
-    socket.on("contact:created", () => { void refresh(); });
-    socket.on("registration:requested", () => {
-      void refresh();
-      window.dispatchEvent(new Event("registration:requested"));
-    });
-    socket.on("connect", () => { void refresh(); });
     const handleNotificationsChanged = () => { void refresh(); };
+    const handleRealtimeUpdate = () => { void refresh(); };
     window.addEventListener("notifications:changed", handleNotificationsChanged);
-    socket.connect();
+    window.addEventListener("realtime:contact-created", handleRealtimeUpdate);
+    window.addEventListener("realtime:registration-requested", handleRealtimeUpdate);
+    window.addEventListener("realtime:connected", handleRealtimeUpdate);
+    window.addEventListener("realtime:recovery", handleRealtimeUpdate);
     void refresh();
-    const recoveryTimer = window.setInterval(() => { void refresh(); }, 15000);
 
     return () => {
       window.removeEventListener("notifications:changed", handleNotificationsChanged);
-      window.clearInterval(recoveryTimer);
-      socket.disconnect();
+      window.removeEventListener("realtime:contact-created", handleRealtimeUpdate);
+      window.removeEventListener("realtime:registration-requested", handleRealtimeUpdate);
+      window.removeEventListener("realtime:connected", handleRealtimeUpdate);
+      window.removeEventListener("realtime:recovery", handleRealtimeUpdate);
     };
   }, [enabled, refresh]);
 
