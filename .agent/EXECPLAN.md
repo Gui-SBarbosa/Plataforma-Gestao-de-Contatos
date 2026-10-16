@@ -199,6 +199,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 16/10/2026 — Após smoke test manual no Railway indicar notificações visíveis somente após recarregar a página, o cliente web passou a iniciar Socket.IO com polling e upgrade para WebSocket, sincronizar ao conectar/reconectar e executar uma leitura periódica de recuperação. A persistência no PostgreSQL continua sendo a fonte de verdade.
 - 16/10/2026 — O rebuild remoto executou apenas o build automático `npm run build`, sem gerar o Prisma Client. O script raiz de build passou a gerar o client antes dos workspaces, tornando a compilação independente da aplicação de `railway.toml`; o comando declarado no arquivo também instala explicitamente dependências de desenvolvimento necessárias à compilação.
 - 16/10/2026 — O cliente passou a distribuir os eventos da conexão administrativa já usada nas notificações. Sidebar, solicitações e dashboard agora sincronizam pelo mesmo evento interno e também ao reconectar, eliminando sockets concorrentes e telas sem assinatura de atualização.
+- 16/10/2026 — O acompanhamento público de solicitações passou a usar o fallback de transporte do restante do cliente e consulta periodicamente o estado persistido enquanto acompanha uma solicitação. Aprovação e rejeição deixam de depender exclusivamente de um handshake WebSocket.
 
 ## Pendências e próximos passos
 
