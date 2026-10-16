@@ -13,6 +13,8 @@ O GitHub Actions executa lint, typecheck, migrations em PostgreSQL efêmero, tes
 
 O Railway permanece responsável pelo deploy automático após o push na `main`, usando a configuração versionada no repositório. O deploy executa migrations e seed idempotente com as variáveis configuradas no ambiente Railway.
 
+O build do Railway usa `npm install --prefer-offline --no-audit --no-fund` para preservar o cache de dependências. A CI do GitHub continua usando `npm ci`; essa diferença evita que o daemon de build do Railway tente remover o diretório `.vite` bloqueado no cache persistente.
+
 ## Consequências
 
 - A validação não exige segredos de produção no GitHub Actions.

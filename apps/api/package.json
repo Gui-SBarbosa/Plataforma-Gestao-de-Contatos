@@ -9,6 +9,7 @@
     "db:migrate": "dotenv -f ../../.env -- prisma migrate dev --name init",
     "db:deploy": "dotenv -f ../../.env -- prisma migrate deploy",
     "db:seed": "dotenv -f ../../.env -- prisma db seed",
+    "db:seed:reset": "dotenv -f ../../.env -- tsx prisma/seed.ts --reset",
     "db:deploy:runtime": "prisma migrate deploy",
     "db:seed:runtime": "prisma db seed",
     "build": "tsc -p tsconfig.json",

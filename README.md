@@ -50,7 +50,9 @@ npm run db:seed
 
 O PostgreSQL local Ã© fornecido pelo `compose.yaml`. O Docker Desktop precisa estar iniciado antes de `npm run db:up`. Os comandos Prisma carregam o `.env` da raiz do repositÃ³rio.
 
-Antes de executar o seed, preencha `SEED_ADMIN_EMAIL` e `SEED_ADMIN_PASSWORD` no `.env` local. Esses valores não devem ser commitados.
+Antes de executar o seed, preencha `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` e `SEED_OPERATOR_PASSWORD` no `.env` local. Esses valores não devem ser commitados.
+
+`npm run db:seed` cria a massa de demonstração apenas quando não há registros no banco. Para apagar os dados operacionais e recriar a massa manualmente, execute `npm run db:seed:reset`. Esse comando é destrutivo e não é usado pelo deploy.
 
 Para iniciar a API, também defina `SESSION_SECRET`, `CSRF_SECRET` e `RATE_LIMIT_SECRET` com pelo menos 32 caracteres. Use valores locais diferentes dos usados em produção.
 
@@ -105,4 +107,4 @@ SEED_ADMIN_EMAIL=<email de demonstração>
 SEED_ADMIN_PASSWORD=<senha de demonstração>
 ```
 
-Não configure nem reutilize secrets locais em produção. `DATABASE_URL` vem do PostgreSQL Railway. `PORT` é fornecida pela plataforma e tem prioridade sobre `API_PORT`. O `railway.toml` executa migration e seed idempotente antes de iniciar a API. Nunca use `prisma db push` em produção.
+Não configure nem reutilize secrets locais em produção. `DATABASE_URL` vem do PostgreSQL Railway. `PORT` é fornecida pela plataforma e tem prioridade sobre `API_PORT`. O `railway.toml` instala dependências preservando o cache do Railway, executa migration e seed segura antes de iniciar a API. Nunca use `prisma db push` em produção.
