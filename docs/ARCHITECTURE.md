@@ -21,8 +21,9 @@ Consulte os diagramas formais em [UML.md](UML.md).
 
 | Módulo        | Responsabilidade                                                 |
 | ------------- | ---------------------------------------------------------------- |
-| auth          | Registro, login, logout, sessão e tracking token                 |
-| users         | Gestão e transição de status de usuários                         |
+| auth          | Login, logout, sessão e CSRF                                     |
+| registration  | Solicitação pública, tracking token e acompanhamento             |
+| admin-users   | Gestão e transição de status de operadores                       |
 | contacts      | Cadastro, ownership e paginação                                  |
 | notifications | Persistência, leitura e entrega de notificações                  |
 | dashboard     | Agregações administrativas                                       |
@@ -47,13 +48,15 @@ apps/api/src/
 ├── middlewares/
 ├── realtime/
 ├── shared/
-└── modules/
+    └── modules/
     ├── auth/
-    ├── users/
+    ├── registration/
+    ├── admin-users/
     ├── contacts/
     ├── notifications/
     ├── dashboard/
-    └── audit/
+    ├── audit/
+    └── rate-limit/
 
 apps/web/src/
 ├── components/

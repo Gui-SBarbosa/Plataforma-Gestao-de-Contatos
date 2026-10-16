@@ -105,6 +105,7 @@ CSRF_SECRET=<segredo aleatório com 32 ou mais caracteres>
 RATE_LIMIT_SECRET=<segredo independente com 32 ou mais caracteres>
 SEED_ADMIN_EMAIL=<email de demonstração>
 SEED_ADMIN_PASSWORD=<senha de demonstração>
+SEED_OPERATOR_PASSWORD=<senha dos operadores de demonstração>
 ```
 
 Não configure nem reutilize secrets locais em produção. `DATABASE_URL` vem do PostgreSQL Railway. `PORT` é fornecida pela plataforma e tem prioridade sobre `API_PORT`. O `railway.toml` instala dependências, gera o Prisma Client, preserva o cache do Railway e executa migration e seed segura antes de iniciar a API. Nunca use `prisma db push` em produção.
