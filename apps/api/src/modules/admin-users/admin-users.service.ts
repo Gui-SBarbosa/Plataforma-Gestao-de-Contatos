@@ -93,21 +93,25 @@ export const updateOperator = async (userId: string, input: UpdateOperatorInput,
 };
 
 export const setOperatorStatus = async (userId: string, status: "ACTIVE" | "DISABLED", actorId: string, input?: ActivateOperatorInput) => {
-  let result;
   try {
-    result = await prisma.user.updateMany({ data: status === "DISABLED" ? { email: null, status } : { email: input!.email, status }, where: { id: userId, role: UserRole.OPERATOR, status: { in: [UserStatus.ACTIVE, UserStatus.DISABLED] } } });
+    return await prisma.$transaction(async (transaction) => {
+      const result = await transaction.user.updateMany({
+        data: status === "DISABLED" ? { email: null, status } : { email: input!.email, status },
+        where: { id: userId, role: UserRole.OPERATOR, status: { in: [UserStatus.ACTIVE, UserStatus.DISABLED] } },
+      });
+      if (result.count === 0) {
+        const user = await transaction.user.findFirst({ where: { id: userId, role: UserRole.OPERATOR }, select: { id: true } });
+        if (!user) throw new OperatorNotFoundError();
+        throw new OperatorConflictError();
+      }
+      const user = await transaction.user.findUniqueOrThrow({ where: { id: userId }, select: { ...adminUserSelect, createdAt: true, updatedAt: true } });
+      await transaction.auditLog.create({ data: { action: status === "ACTIVE" ? "USER_REACTIVATED" : "USER_DISABLED", actorId, entityId: user.id, entityType: "USER" } });
+      return user;
+    });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") throw new OperatorConflictError();
     throw error;
   }
-  if (result.count === 0) {
-    const user = await prisma.user.findFirst({ where: { id: userId, role: UserRole.OPERATOR }, select: { id: true } });
-    if (!user) throw new OperatorNotFoundError();
-    throw new OperatorConflictError();
-  }
-  const user = await prisma.user.findUniqueOrThrow({ where: { id: userId }, select: { ...adminUserSelect, createdAt: true, updatedAt: true } });
-  await prisma.auditLog.create({ data: { action: status === "ACTIVE" ? "USER_REACTIVATED" : "USER_DISABLED", actorId, entityId: user.id, entityType: "USER" } });
-  return user;
 };
 
 const decidePendingUser = async (
@@ -119,24 +123,20 @@ const decidePendingUser = async (
     status === UserStatus.ACTIVE
       ? { approvedAt: new Date(), approvedById: administratorId, status }
       : { email: null, status };
-  const result = await prisma.user.updateMany({
-    data: decisionData,
-    where: { id: userId, role: UserRole.OPERATOR, status: UserStatus.PENDING },
-  });
-
-  if (result.count === 0) {
-    const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
-
-    if (!user) {
-      throw new PendingUserNotFoundError();
+  return prisma.$transaction(async (transaction) => {
+    const result = await transaction.user.updateMany({
+      data: decisionData,
+      where: { id: userId, role: UserRole.OPERATOR, status: UserStatus.PENDING },
+    });
+    if (result.count === 0) {
+      const user = await transaction.user.findUnique({ where: { id: userId }, select: { id: true } });
+      if (!user) throw new PendingUserNotFoundError();
+      throw new UserDecisionConflictError();
     }
-
-    throw new UserDecisionConflictError();
-  }
-
-  const user = await prisma.user.findUniqueOrThrow({ where: { id: userId }, select: decisionUserSelect });
-  await prisma.auditLog.create({ data: { action: status === UserStatus.ACTIVE ? "USER_APPROVED" : "USER_REJECTED", actorId: administratorId, entityId: user.id, entityType: "USER" } });
-  return user;
+    const user = await transaction.user.findUniqueOrThrow({ where: { id: userId }, select: decisionUserSelect });
+    await transaction.auditLog.create({ data: { action: status === UserStatus.ACTIVE ? "USER_APPROVED" : "USER_REJECTED", actorId: administratorId, entityId: user.id, entityType: "USER" } });
+    return user;
+  });
 };
 
 export const approvePendingUser = (userId: string, administratorId: string) =>

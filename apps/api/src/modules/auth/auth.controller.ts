@@ -54,7 +54,7 @@ export const login: RequestHandler = async (request, response, next) => {
     const user = await authenticateUser(input.data);
 
     if (!user) {
-      void recordAuditEvent({ action: "AUTH_LOGIN_FAILED", entityType: "AUTH" });
+      await recordAuditEvent({ action: "AUTH_LOGIN_FAILED", entityType: "AUTH" });
       response.status(401).json({
         error: { code: "INVALID_CREDENTIALS", message: "Invalid email or password.", requestId: request.id },
       });
@@ -73,7 +73,7 @@ export const login: RequestHandler = async (request, response, next) => {
     request.session.userId = user.id;
     request.session.csrfToken = createCsrfToken(request.sessionID);
     await saveSession(request);
-    void recordAuditEvent({ action: "AUTH_LOGIN_SUCCEEDED", actorId: user.id, entityId: user.id, entityType: "AUTH" });
+    await recordAuditEvent({ action: "AUTH_LOGIN_SUCCEEDED", actorId: user.id, entityId: user.id, entityType: "AUTH" });
 
     response.status(200).json({ data: { user, csrfToken: request.session.csrfToken } });
   } catch (error) {
@@ -81,16 +81,16 @@ export const login: RequestHandler = async (request, response, next) => {
   }
 };
 
-export const logout: RequestHandler = (request, response, next) => {
-  request.session.destroy((error) => {
-    if (error) {
-      next(error);
-      return;
-    }
-
+export const logout: RequestHandler = async (request, response, next) => {
+  const actorId = request.authUser!.id;
+  try {
+    await new Promise<void>((resolve, reject) => request.session.destroy((error) => (error ? reject(error) : resolve())));
+    await recordAuditEvent({ action: "AUTH_LOGOUT", actorId, entityId: actorId, entityType: "AUTH" });
     response.clearCookie("gestcon.sid");
     response.status(204).send();
-  });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const getCurrentUser: RequestHandler = (request, response) => {

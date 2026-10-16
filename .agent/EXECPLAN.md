@@ -201,6 +201,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 16/10/2026 — O cliente passou a distribuir os eventos da conexão administrativa já usada nas notificações. Sidebar, solicitações e dashboard agora sincronizam pelo mesmo evento interno e também ao reconectar, eliminando sockets concorrentes e telas sem assinatura de atualização.
 - 16/10/2026 — O acompanhamento público de solicitações passou a usar o fallback de transporte do restante do cliente e consulta periodicamente o estado persistido enquanto acompanha uma solicitação. Aprovação e rejeição deixam de depender exclusivamente de um handshake WebSocket.
 
+- 16/10/2026 — Auditorias de decisões e ativação/desativação foram reunidas à mesma transação da mutação, e login/logout passaram a registrar eventos aguardados. A revisão foi validada com `npm run typecheck`, `npm run lint` e os testes `auth.test.cjs` e `admin-users.test.cjs` (16 casos aprovados).
+
 ## Pendências e próximos passos
 
 - 16/10/2026 — A primeira execução remota da CI falhou antes das migrations porque dotenv-cli aceita -f, e não -e. Os scripts Prisma foram corrigidos; geração do client, lint, typecheck, 52 testes de integração e build passaram localmente.

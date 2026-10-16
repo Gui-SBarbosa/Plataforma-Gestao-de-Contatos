@@ -11,6 +11,7 @@ import type { AuditLog, AuditPage as AuditPageData } from "./audit.types";
 const actionLabels: Record<string, string> = {
   AUTH_LOGIN_FAILED: "Tentativa de login inválida",
   AUTH_LOGIN_SUCCEEDED: "Login realizado",
+  AUTH_LOGOUT: "Logout realizado",
   CONTACT_CREATED: "Contato criado",
   REGISTRATION_REQUESTED: "Solicitação criada",
   USER_APPROVED: "Solicitação aprovada",
@@ -33,7 +34,9 @@ const descriptionFor = (log: AuditLog) => {
   if (log.action === "USER_UPDATED") return `${actor} atualizou os dados de um operador.`;
   if (log.action === "USER_DISABLED") return `${actor} desativou um operador.`;
   if (log.action === "USER_REACTIVATED") return `${actor} reativou um operador.`;
-  return log.action === "AUTH_LOGIN_FAILED" ? "Uma tentativa de login não foi autorizada." : `${actor} iniciou uma sessão.`;
+  if (log.action === "AUTH_LOGIN_FAILED") return "Uma tentativa de login não foi autorizada.";
+  if (log.action === "AUTH_LOGOUT") return `${actor} encerrou a sessão.`;
+  return `${actor} iniciou uma sessão.`;
 };
 
 export const AuditPage = ({ user, onLogout }: { user: AuthUser; onLogout: () => void }) => {
