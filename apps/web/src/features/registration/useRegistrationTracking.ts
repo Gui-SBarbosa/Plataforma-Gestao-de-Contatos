@@ -24,6 +24,8 @@ export const useRegistrationTracking = (trackingToken: string | null) => {
 
     const abortController = new AbortController();
     const socket = createRealtimeSocket();
+    let disposed = false;
+    let recoveryTimer: number | undefined;
 
     const load = async () => {
       setState({ error: null, isConnected: false, isLoading: true, registration: null });
@@ -72,14 +74,29 @@ export const useRegistrationTracking = (trackingToken: string | null) => {
       }
     };
 
+    const recoverWhileDisconnected = () => {
+      if (disposed || recoveryTimer !== undefined) return;
+      void refreshPersistedStatus();
+      recoveryTimer = window.setInterval(() => { void refreshPersistedStatus(); }, 15000);
+    };
+
+    const stopRecovery = () => {
+      if (recoveryTimer === undefined) return;
+      window.clearInterval(recoveryTimer);
+      recoveryTimer = undefined;
+    };
+
     socket.on("registration:approved", updateRegistration);
     socket.on("registration:rejected", updateRegistration);
+    socket.on("connect", stopRecovery);
+    socket.on("connect_error", recoverWhileDisconnected);
+    socket.on("disconnect", recoverWhileDisconnected);
     void load();
-    const recoveryTimer = window.setInterval(() => { void refreshPersistedStatus(); }, 15000);
 
     return () => {
+      disposed = true;
       abortController.abort();
-      window.clearInterval(recoveryTimer);
+      stopRecovery();
       socket.emit("registration:unwatch");
       socket.disconnect();
     };
