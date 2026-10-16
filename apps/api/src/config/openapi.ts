@@ -362,6 +362,26 @@ export const openApiDocument = {
         tags: ["Dashboard"],
       },
     },
+    "/api/admin/audit-logs": {
+      get: {
+        parameters: [
+          { in: "query", name: "action", schema: { type: "string" } },
+          { in: "query", name: "from", schema: { format: "date-time", type: "string" } },
+          { in: "query", name: "to", schema: { format: "date-time", type: "string" } },
+          { in: "query", name: "page", schema: { default: 1, minimum: 1, type: "integer" } },
+          { in: "query", name: "pageSize", schema: { default: 20, maximum: 50, minimum: 1, type: "integer" } },
+        ],
+        responses: {
+          "200": { content: { "application/json": { schema: { $ref: "#/components/schemas/AuditLogListResponse" } } }, description: "Administrative audit events." },
+          "400": { ...errorResponse, description: "Invalid audit filters." },
+          "401": { ...errorResponse, description: "Unauthenticated or inactive user." },
+          "403": { ...errorResponse, description: "Administrator role required." },
+        },
+        security: [{ sessionCookie: [] }],
+        summary: "List administrative audit events",
+        tags: ["Administration"],
+      },
+    },
     "/api/health": {
       get: {
         responses: {
@@ -414,6 +434,26 @@ export const openApiDocument = {
           password: { format: "password", maxLength: 128, minLength: 12, type: "string" },
         },
         required: ["name", "email", "password"],
+        type: "object",
+      },
+      AuditLog: {
+        properties: {
+          action: { type: "string" },
+          actorId: { format: "uuid", nullable: true, type: "string" },
+          createdAt: { format: "date-time", type: "string" },
+          entityId: { format: "uuid", nullable: true, type: "string" },
+          entityType: { type: "string" },
+          id: { format: "uuid", type: "string" },
+        },
+        required: ["id", "action", "entityType", "createdAt"],
+        type: "object",
+      },
+      AuditLogListResponse: {
+        properties: {
+          data: { items: { $ref: "#/components/schemas/AuditLog" }, type: "array" },
+          meta: { properties: { page: { type: "integer" }, pageSize: { type: "integer" }, total: { type: "integer" }, totalPages: { type: "integer" } }, type: "object" },
+        },
+        required: ["data", "meta"],
         type: "object",
       },
       OperatorUpdateInput: {

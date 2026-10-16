@@ -27,7 +27,7 @@ export const createUser: RequestHandler = async (request, response, next) => {
   }
 
   try {
-    const user = await createActiveOperator(input.data);
+    const user = await createActiveOperator(input.data, request.authUser!.id);
 
     response.status(201).json({ data: { user } });
   } catch (error) {
@@ -73,7 +73,7 @@ export const listAllOperators: RequestHandler = async (request, response, next) 
 export const update: RequestHandler = async (request, response, next) => {
   const params = userIdSchema.safeParse(request.params); const input = updateOperatorSchema.safeParse(request.body);
   if (!params.success || !input.success) { response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Unable to process the request.", requestId: request.id } }); return; }
-  try { response.status(200).json({ data: { user: await updateOperator(params.data.id, input.data) } }); } catch (error) {
+  try { response.status(200).json({ data: { user: await updateOperator(params.data.id, input.data, request.authUser!.id) } }); } catch (error) {
     if (error instanceof OperatorNotFoundError) { response.status(404).json({ error: { code: "USER_NOT_FOUND", message: "Unable to process the request.", requestId: request.id } }); return; }
     if (error instanceof OperatorConflictError) { response.status(409).json({ error: { code: "USER_CONFLICT", message: "Unable to process the request.", requestId: request.id } }); return; }
     next(error);
@@ -90,7 +90,7 @@ export const activate: RequestHandler = async (request, response, next) => {
 const changeStatus = async (request: Parameters<RequestHandler>[0], response: Parameters<RequestHandler>[1], next: Parameters<RequestHandler>[2], status: "ACTIVE" | "DISABLED", input?: { email: string }) => {
   const params = userIdSchema.safeParse(request.params);
   if (!params.success) { response.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Unable to process the request.", requestId: request.id } }); return; }
-  try { response.status(200).json({ data: { user: await setOperatorStatus(params.data.id, status, input) } }); } catch (error) {
+  try { response.status(200).json({ data: { user: await setOperatorStatus(params.data.id, status, request.authUser!.id, input) } }); } catch (error) {
     if (error instanceof OperatorNotFoundError) { response.status(404).json({ error: { code: "USER_NOT_FOUND", message: "Unable to process the request.", requestId: request.id } }); return; }
     if (error instanceof OperatorConflictError) { response.status(409).json({ error: { code: "INVALID_USER_TRANSITION", message: "Unable to process the request.", requestId: request.id } }); return; }
     next(error);

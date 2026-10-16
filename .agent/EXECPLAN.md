@@ -127,6 +127,7 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 15/10/2026 — por solicitação do usuário, a publicação Railway foi adiada. A ordem de diferenciais será dashboard, notificações/auditoria e CI; dashboard é a única etapa em andamento.
 - 15/10/2026 — dashboard concluído: `GET /api/dashboard` agrega contatos com ownership no backend, filtros de data, intervalo e operador administrativo, além de interface em `#overview`. Atualização por evento permanece deliberadamente fora desta etapa e dependerá de notificações/auditoria.
 - 15/10/2026 — iniciada a etapa de notificações e auditoria, após concluir o dashboard. A persistência e a auditoria serão tratadas antes da atualização de métricas por evento.
+- 16/10/2026 — auditoria administrativa iniciada: administradores consultarão eventos paginados e filtráveis, sem dados sensíveis. A interface mostrará somente contexto seguro, responsável, data e entidade afetada; criações de contato, solicitações, operações administrativas e autenticação passam a produzir eventos compatíveis.
 
 ## Validações executadas
 

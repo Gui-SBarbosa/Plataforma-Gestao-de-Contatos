@@ -4,6 +4,7 @@ import type { RequestHandler } from "express";
 
 import { env } from "../../config/env.js";
 import { clearRateLimit } from "../rate-limit/rate-limit.service.js";
+import { recordAuditEvent } from "../audit/audit.service.js";
 
 import { loginSchema } from "./auth.schema.js";
 import { authenticateUser } from "./auth.service.js";
@@ -53,6 +54,7 @@ export const login: RequestHandler = async (request, response, next) => {
     const user = await authenticateUser(input.data);
 
     if (!user) {
+      void recordAuditEvent({ action: "AUTH_LOGIN_FAILED", entityType: "AUTH" });
       response.status(401).json({
         error: { code: "INVALID_CREDENTIALS", message: "Invalid email or password.", requestId: request.id },
       });
@@ -71,6 +73,7 @@ export const login: RequestHandler = async (request, response, next) => {
     request.session.userId = user.id;
     request.session.csrfToken = createCsrfToken(request.sessionID);
     await saveSession(request);
+    void recordAuditEvent({ action: "AUTH_LOGIN_SUCCEEDED", actorId: user.id, entityId: user.id, entityType: "AUTH" });
 
     response.status(200).json({ data: { user, csrfToken: request.session.csrfToken } });
   } catch (error) {

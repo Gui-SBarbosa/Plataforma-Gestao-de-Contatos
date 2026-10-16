@@ -7,7 +7,7 @@ import { NotificationBell } from "../../features/notifications/NotificationBell"
 import { useNotifications } from "../../features/notifications/useNotifications";
 import { Brand } from "./Brand";
 
-export type AppSection = "contacts" | "notifications" | "operators" | "overview" | "profile" | "requests" | "settings";
+export type AppSection = "audit" | "contacts" | "notifications" | "operators" | "overview" | "profile" | "requests" | "settings";
 
 const TopbarIcon = ({ name }: { name: "chevron" | "shield" }) => {
   if (name === "shield") return <svg className="topbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.6 2.9 8.1 7 10 4.1-1.9 7-5.4 7-10V6l-7-3Z" /><path d="m9.5 12 1.7 1.7 3.5-3.5" /></svg>;
@@ -67,6 +67,7 @@ export const AppShell = ({ activeSection, children, contactCount: initialContact
           <a className={`nav-link ${activeSection === "requests" ? "active" : ""}`} href="#requests">Solicitações {pendingRequestCount > 0 && <span className="nav-badge nav-badge-notifications">{pendingRequestCount > 99 ? "99+" : pendingRequestCount}</span>}</a>
           <a className={`nav-link ${activeSection === "operators" ? "active" : ""}`} href="#operators">Operadores</a>
           <a className={`nav-link ${activeSection === "notifications" ? "active" : ""}`} href="#notifications">Notificações {notifications.unread > 0 && <span className="nav-badge nav-badge-notifications">{notifications.unread > 99 ? "99+" : notifications.unread}</span>}</a>
+          <a className={`nav-link ${activeSection === "audit" ? "active" : ""}`} href="#audit">Auditoria</a>
         </>}
         <a className={`nav-link ${activeSection === "settings" ? "active" : ""}`} href="#settings">Configurações</a>
       </nav>
