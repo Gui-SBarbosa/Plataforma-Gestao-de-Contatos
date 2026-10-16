@@ -18,7 +18,7 @@ const emails = {
   pendingTwo: "approval-pending-two@example.com",
   pendingThree: "approval-pending-three@example.com",
 };
-const password = "approval-test-password";
+const password = "ApprovalTest1!";
 
 describe("operator request decisions", () => {
   let app;

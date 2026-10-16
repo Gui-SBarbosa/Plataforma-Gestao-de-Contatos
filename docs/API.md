@@ -59,7 +59,7 @@ Paginação:
 {
   "name": "Operador Demo",
   "email": "operador@example.com",
-  "password": "senha-forte"
+  "password": "SenhaForte1!"
 }
 ```
 

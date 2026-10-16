@@ -20,7 +20,7 @@ const registrationEmails = [
   "registration-five@example.com",
   "registration-six@example.com",
 ];
-const password = "registration-test-password";
+const password = "Registration1!";
 
 describe("public operator registration", () => {
   let app;

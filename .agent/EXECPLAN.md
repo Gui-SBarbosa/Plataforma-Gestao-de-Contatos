@@ -45,10 +45,10 @@ Construir e publicar um monólito modular que permita cadastro e aprovação de 
 | completed   | Lista paginada           | Listagem de contatos com paginação backend                         |
 | completed   | Notificação em tempo real | Sala administrativa e evento pós-persistência de contato          |
 | completed   | Frontend de contatos | Interface modular, escopo por papel e contratos HTTP existentes   |
-| in_progress | Notificações e auditoria | Persistência, leitura e auditoria administrativa                   |
+| completed   | Notificações e auditoria | Persistência, leitura e auditoria administrativa                   |
 | completed   | Dashboard                | Métricas por papel e filtros HTTP por intervalo                    |
 | completed   | Qualidade                | Jest/Supertest, lint, typecheck, build e revisão de segurança     |
-| pending     | Deploy                   | Railway, migrations, seed de demo e smoke test                    |
+| in_progress | Deploy                   | Railway, migrations, seed de demo e smoke test                    |
 | completed   | Entrega (P0.16)          | README executável e documentação de ambiente revisada             |
 
 | completed   | Conditional user email uniqueness | Active/pending emails required and unique; disabled/rejected emails nullable and reusable |
@@ -183,11 +183,13 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 15/10/2026 — gráfico de linha corrigido para manter traço visível mesmo com apenas um ponto de série; typecheck, ESLint e build Vite passaram novamente.
 - 15/10/2026 — série diária do dashboard passou a normalizar sete dias, preencher ausências com zero e exibir escalas dinâmicas nos eixos X e Y; validação frontend passou novamente.
 - 15/10/2026 — marcadores do gráfico passaram de círculos SVG deformados pelo redimensionamento para pontos HTML circulares, alinhados à linha e com foco visual no hover; lint, typecheck, build Vite e `git diff --check` aprovados.
+- 16/10/2026 — etapa de Deploy iniciada. Lint, typecheck e build passaram; os comandos `db:deploy:runtime` e `db:seed:runtime` foram criados para execução no Railway sem dependência de `.env` local.
+- 16/10/2026 — CI/CD iniciado por solicitação do usuário: GitHub Actions validará pull requests e pushes para `main` com PostgreSQL efêmero; o Railway seguirá publicando automaticamente a branch principal.
+- 16/10/2026 — workflow de CI validado localmente: lint, typecheck, typecheck do seed, 52 testes de integração e build passaram. A suíte agora executa sequencialmente para isolar o rate limiter persistente entre cenários.
 
 ## Pendências e próximos passos
 
-- Próximo diferencial: notificações persistentes e auditoria administrativa; depois, CI.
-- Dashboard concluído: métricas por papel e filtros HTTP estão disponíveis; atualização por evento será integrada após notificações/auditoria.
-- Deploy Railway permanece pendente: conectar o repositório a um projeto Railway, criar PostgreSQL, configurar as variáveis de produção e liberar a publicação.
-- Frontend modular de contatos concluído; a integração de notificações persistentes, auditoria e dashboard permanece pendente conforme backlog.
-- Correção de autorização por papel concluída. Próximo trabalho funcional: dashboard por papel com métricas e filtros, ainda pendente no backlog.
+- Notificações persistentes, auditoria administrativa e dashboard em tempo real concluídos.
+- Deploy Railway em andamento: validar build de produção, variáveis, migrations, seed, health check e smoke test.
+- Publicação remota ainda depende de acesso ao projeto Railway e da configuração dos segredos no ambiente.
+- Configurar proteção da branch `main` no GitHub exigindo o status `CI / verify` antes do merge.

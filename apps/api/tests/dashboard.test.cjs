@@ -14,7 +14,7 @@ process.env.SESSION_SECRET = "test-session-secret-with-at-least-thirty-two-chara
 const adminEmail = "dashboard-admin-test@example.com";
 const operatorEmail = "dashboard-operator-test@example.com";
 const otherOperatorEmail = "dashboard-other-operator-test@example.com";
-const password = "dashboard-test-password";
+const password = "Dashboard1!";
 
 describe("dashboard metrics", () => {
   let admin;
@@ -46,6 +46,7 @@ describe("dashboard metrics", () => {
   });
 
   beforeEach(async () => {
+    await prisma.rateLimitBucket.deleteMany();
     await prisma.contact.deleteMany({ where: { createdById: { in: [admin.id, operator.id, otherOperator.id] } } });
     await prisma.session.deleteMany();
     await prisma.contact.createMany({

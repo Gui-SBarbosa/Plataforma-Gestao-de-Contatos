@@ -14,7 +14,7 @@ process.env.SESSION_SECRET = "test-session-secret-with-at-least-thirty-two-chara
 const adminEmail = "admin-user-test@example.com";
 const createdOperatorEmail = "created-operator-test@example.com";
 const operatorEmail = "operator-user-test@example.com";
-const password = "admin-user-test-password";
+const password = "AdminUser1!";
 
 describe("admin user creation", () => {
   let app;

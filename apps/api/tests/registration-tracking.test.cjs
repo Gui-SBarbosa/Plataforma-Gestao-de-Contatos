@@ -15,7 +15,7 @@ process.env.SESSION_SECRET = "test-session-secret-with-at-least-thirty-two-chara
 
 const adminEmail = "tracking-admin@example.com";
 const pendingEmail = "tracking-pending@example.com";
-const password = "tracking-test-password";
+const password = "TrackingTest1!";
 const trackingToken = "tracking-token-with-at-least-forty-three-characters";
 
 describe("registration tracking", () => {

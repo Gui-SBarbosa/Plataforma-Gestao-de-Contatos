@@ -2,6 +2,8 @@ import { hash } from "@node-rs/argon2";
 import { PrismaClient, UserRole, UserStatus } from "@prisma/client";
 import { z } from "zod";
 
+import { passwordSchema } from "../src/shared/password-policy.js";
+
 const prisma = new PrismaClient();
 
 const requiredSeedValue = (name: string) => {
@@ -25,9 +27,20 @@ const requiredAdminEmail = () => {
   return parsedEmail.data;
 };
 
+const requiredAdminPassword = () => {
+  const password = requiredSeedValue("SEED_ADMIN_PASSWORD");
+  const parsedPassword = passwordSchema.safeParse(password);
+
+  if (!parsedPassword.success) {
+    throw new Error("SEED_ADMIN_PASSWORD does not meet the password policy.");
+  }
+
+  return parsedPassword.data;
+};
+
 const main = async () => {
   const adminEmail = requiredAdminEmail();
-  const adminPasswordHash = await hash(requiredSeedValue("SEED_ADMIN_PASSWORD"), { algorithm: 2 });
+  const adminPasswordHash = await hash(requiredAdminPassword(), { algorithm: 2 });
 
   const existingAdmin = await prisma.user.findFirst({ where: { email: adminEmail } });
 

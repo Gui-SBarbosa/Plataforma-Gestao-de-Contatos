@@ -14,7 +14,7 @@ process.env.SESSION_SECRET = "test-session-secret-with-at-least-thirty-two-chara
 const activeUserEmail = "auth-active-test@example.com";
 const disabledUserEmail = "auth-disabled-test@example.com";
 const pendingUserEmail = "auth-pending-test@example.com";
-const password = "test-password-for-authentication";
+const password = "AuthTest1!";
 const rejectedUserEmail = "auth-rejected-test@example.com";
 
 describe("authentication endpoints", () => {

@@ -14,7 +14,7 @@ process.env.SESSION_SECRET = "test-session-secret-with-at-least-thirty-two-chara
 const operatorEmail = "contact-operator-test@example.com";
 const otherOperatorEmail = "other-contact-operator-test@example.com";
 const adminEmail = "contact-admin-test@example.com";
-const password = "contact-operator-test-password";
+const password = "ContactTest1!";
 
 describe("contact creation", () => {
   let app;

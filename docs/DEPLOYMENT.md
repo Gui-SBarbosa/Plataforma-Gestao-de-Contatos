@@ -12,7 +12,7 @@
 ```text
 push na main
 → CI: lint + typecheck + testes + build
-→ deploy
+→ deploy automático pelo Railway
 → migration de produção
 → health check
 → smoke test
@@ -36,12 +36,12 @@ PORT=<fornecida pelo ambiente>
 
 ```text
 Build: npm ci && npm run build
-Pre-deploy: npm run db:deploy && npm run db:seed
+Pre-deploy: npm run db:deploy:runtime && npm run db:seed:runtime
 Start: npm run start
 Rate limit cleanup: npm run rate-limit:cleanup
 ```
 
-`railway.toml` registra build, pre-deploy, start e healthcheck. O pre-deploy usa migration e seed idempotentes; uma falha interrompe a publicação.
+`railway.toml` registra build, pre-deploy, start e healthcheck. Os comandos `:runtime` usam diretamente as variáveis fornecidas pelo Railway e não dependem de um arquivo `.env`. O pre-deploy usa migration e seed idempotentes; uma falha interrompe a publicação.
 
 ## Health checks
 
@@ -68,6 +68,13 @@ Rate limit cleanup: npm run rate-limit:cleanup
 - [ ] Logout invalida a sessão.
 - [ ] Rate limit retorna `429` e `Retry-After`.
 - [ ] Reinício não zera o contador persistido.
+
+## CI/CD
+
+- O workflow `.github/workflows/ci.yml` executa em pull requests e pushes para `main`.
+- A pipeline cria um PostgreSQL efêmero, aplica as migrations e executa lint, typecheck, testes e build.
+- No GitHub, proteger a branch `main` exigindo o status `CI / verify` antes do merge.
+- O serviço Railway conectado ao repositório publica automaticamente os commits recebidos na `main`.
 
 ## Manutenção do rate limiter
 

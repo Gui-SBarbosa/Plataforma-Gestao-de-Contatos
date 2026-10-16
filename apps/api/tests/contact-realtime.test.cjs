@@ -14,7 +14,7 @@ process.env.SESSION_SECRET = "test-session-secret-with-at-least-thirty-two-chara
 
 const adminEmail = "contact-realtime-admin@example.com";
 const operatorEmail = "contact-realtime-operator@example.com";
-const password = "contact-realtime-password";
+const password = "Realtime1!";
 
 describe("contact realtime notification", () => {
   let app;
@@ -54,6 +54,7 @@ describe("contact realtime notification", () => {
   });
 
   beforeEach(async () => {
+    await prisma.rateLimitBucket.deleteMany();
     await prisma.contact.deleteMany({ where: { createdById: { in: users.map((user) => user.id) } } });
     await prisma.session.deleteMany();
   });
