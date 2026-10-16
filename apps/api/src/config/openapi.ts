@@ -293,6 +293,40 @@ export const openApiDocument = {
         tags: ["Contacts"],
       },
     },
+    "/api/notifications": {
+      get: {
+        parameters: [
+          { in: "query", name: "page", schema: { default: 1, minimum: 1, type: "integer" } },
+          { in: "query", name: "pageSize", schema: { default: 10, maximum: 50, minimum: 1, type: "integer" } },
+        ],
+        responses: {
+          "200": {
+            content: { "application/json": { schema: { $ref: "#/components/schemas/NotificationListResponse" } } },
+            description: "Notifications for the authenticated recipient.",
+          },
+          "400": { ...errorResponse, description: "Invalid pagination input." },
+          "401": { ...errorResponse, description: "Unauthenticated or inactive user." },
+        },
+        security: [{ sessionCookie: [] }],
+        summary: "List personal notifications",
+        tags: ["Notifications"],
+      },
+    },
+    "/api/notifications/{id}/read": {
+      patch: {
+        parameters: [{ $ref: "#/components/parameters/NotificationId" }, { $ref: "#/components/parameters/CsrfToken" }],
+        responses: {
+          "204": { description: "Notification marked as read." },
+          "400": { ...errorResponse, description: "Invalid notification identifier." },
+          "401": { ...errorResponse, description: "Unauthenticated or inactive user." },
+          "403": { ...errorResponse, description: "Invalid CSRF token." },
+          "404": { ...errorResponse, description: "Notification not found for the current recipient." },
+        },
+        security: [{ sessionCookie: [] }],
+        summary: "Mark a notification as read",
+        tags: ["Notifications"],
+      },
+    },
     "/api/dashboard": {
       get: {
         parameters: [
@@ -332,6 +366,13 @@ export const openApiDocument = {
     parameters: {
       ContactId: {
         description: "Contact UUID.",
+        in: "path",
+        name: "id",
+        required: true,
+        schema: { format: "uuid", type: "string" },
+      },
+      NotificationId: {
+        description: "Notification UUID.",
         in: "path",
         name: "id",
         required: true,
@@ -420,6 +461,32 @@ export const openApiDocument = {
       ContactResponse: {
         properties: { data: { properties: { contact: { $ref: "#/components/schemas/Contact" } }, required: ["contact"], type: "object" } },
         required: ["data"],
+        type: "object",
+      },
+      Notification: {
+        properties: {
+          createdAt: { format: "date-time", type: "string" },
+          id: { format: "uuid", type: "string" },
+          message: { type: "string" },
+          payload: { nullable: true, type: "object" },
+          readAt: { format: "date-time", nullable: true, type: "string" },
+          title: { type: "string" },
+          type: { enum: ["NEW_CONTACT", "REGISTRATION_REQUEST", "REGISTRATION_APPROVED", "REGISTRATION_REJECTED"], type: "string" },
+        },
+        required: ["id", "type", "title", "message", "readAt", "createdAt"],
+        type: "object",
+      },
+      NotificationListResponse: {
+        properties: {
+          data: { items: { $ref: "#/components/schemas/Notification" }, type: "array" },
+          meta: {
+            allOf: [
+              { $ref: "#/components/schemas/PaginationMeta" },
+              { properties: { unread: { type: "integer" } }, required: ["unread"], type: "object" },
+            ],
+          },
+        },
+        required: ["data", "meta"],
         type: "object",
       },
       DashboardResponse: {

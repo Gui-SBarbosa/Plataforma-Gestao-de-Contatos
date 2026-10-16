@@ -14,6 +14,7 @@ import { authRouter } from "./modules/auth/auth.routes.js";
 import { adminUsersRouter } from "./modules/admin-users/admin-users.routes.js";
 import { contactsRouter } from "./modules/contacts/contacts.routes.js";
 import { dashboardRouter } from "./modules/dashboard/dashboard.routes.js";
+import { notificationsRouter } from "./modules/notifications/notifications.routes.js";
 
 export const createApp = () => {
   const app = express();
@@ -54,6 +55,7 @@ export const createApp = () => {
   app.use("/api/admin/users", adminUsersRouter);
   app.use("/api/contacts", contactsRouter);
   app.use("/api/dashboard", dashboardRouter);
+  app.use("/api/notifications", notificationsRouter);
   registerOpenApiDocs(app, env.NODE_ENV);
   app.use("/api", notFoundHandler);
 

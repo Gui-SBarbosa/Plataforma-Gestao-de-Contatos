@@ -148,7 +148,6 @@ inexistente ou não visível retorna `404`; a resposta não expõe o identificad
 |---|---|---|
 | GET | `/notifications?page=1&pageSize=10` | Autenticado |
 | PATCH | `/notifications/:id/read` | Destinatário |
-| PATCH | `/notifications/read-all` | Autenticado |
 
 ## Dashboard e auditoria
 

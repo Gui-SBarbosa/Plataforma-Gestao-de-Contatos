@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { NotificationType, UserRole, UserStatus } from "@prisma/client";
 
 import { prisma } from "../../config/prisma.js";
 
@@ -16,10 +16,39 @@ const contactSelect = {
   createdBy: { select: { name: true } },
 } as const;
 
-export const createContact = (input: CreateContactInput, createdById: string) =>
-  prisma.contact.create({
-    data: { ...input, createdById },
-    select: contactSelect,
+export const createContact = (input: CreateContactInput, createdById: string, creatorName: string) =>
+  prisma.$transaction(async (transaction) => {
+    const contact = await transaction.contact.create({
+      data: { ...input, createdById },
+      select: contactSelect,
+    });
+    const administrators = await transaction.user.findMany({
+      select: { id: true },
+      where: { role: UserRole.ADMIN, status: UserStatus.ACTIVE },
+    });
+
+    await Promise.all([
+      transaction.notification.createMany({
+        data: administrators.map((administrator) => ({
+          message: `${creatorName} cadastrou ${contact.name}.`,
+          payload: { contactId: contact.id, creatorName, createdAt: contact.createdAt.toISOString() },
+          recipientId: administrator.id,
+          title: "Novo contato cadastrado",
+          type: NotificationType.NEW_CONTACT,
+        })),
+      }),
+      transaction.auditLog.create({
+        data: {
+          action: "CONTACT_CREATED",
+          actorId: createdById,
+          entityId: contact.id,
+          entityType: "CONTACT",
+          metadata: { source: contact.source },
+        },
+      }),
+    ]);
+
+    return contact;
   });
 
 export const findVisibleContact = (contactId: string, user: { id: string; role: UserRole }) =>
