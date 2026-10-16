@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 
 import { listNotificationsSchema, notificationIdSchema } from "./notifications.schema.js";
-import { listNotifications, markNotificationRead } from "./notifications.service.js";
+import { listNotifications, markAllNotificationsRead, markNotificationRead } from "./notifications.service.js";
 
 export const list: RequestHandler = async (request, response, next) => {
   const input = listNotificationsSchema.safeParse(request.query);
@@ -36,6 +36,15 @@ export const markRead: RequestHandler = async (request, response, next) => {
       response.status(404).json({ error: { code: "NOTIFICATION_NOT_FOUND", message: "Unable to process the request.", requestId: request.id } });
       return;
     }
+    response.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const markAllRead: RequestHandler = async (request, response, next) => {
+  try {
+    await markAllNotificationsRead(request.authUser!.id);
     response.status(204).end();
   } catch (error) {
     next(error);

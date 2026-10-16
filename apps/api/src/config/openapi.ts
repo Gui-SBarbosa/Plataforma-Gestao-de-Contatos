@@ -327,6 +327,19 @@ export const openApiDocument = {
         tags: ["Notifications"],
       },
     },
+    "/api/notifications/read-all": {
+      patch: {
+        parameters: [{ $ref: "#/components/parameters/CsrfToken" }],
+        responses: {
+          "204": { description: "All notifications marked as read." },
+          "401": { ...errorResponse, description: "Unauthenticated or inactive user." },
+          "403": { ...errorResponse, description: "Invalid CSRF token." },
+        },
+        security: [{ sessionCookie: [] }],
+        summary: "Mark all personal notifications as read",
+        tags: ["Notifications"],
+      },
+    },
     "/api/dashboard": {
       get: {
         parameters: [

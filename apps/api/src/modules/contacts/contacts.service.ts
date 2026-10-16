@@ -30,8 +30,8 @@ export const createContact = (input: CreateContactInput, createdById: string, cr
     await Promise.all([
       transaction.notification.createMany({
         data: administrators.map((administrator) => ({
-          message: `${creatorName} cadastrou ${contact.name}.`,
-          payload: { contactId: contact.id, creatorName, createdAt: contact.createdAt.toISOString() },
+          message: `Operador ${creatorName} cadastrou ${contact.name}.`,
+          payload: { contactId: contact.id, contactName: contact.name, creatorName, createdAt: contact.createdAt.toISOString() },
           recipientId: administrator.id,
           title: "Novo contato cadastrado",
           type: NotificationType.NEW_CONTACT,

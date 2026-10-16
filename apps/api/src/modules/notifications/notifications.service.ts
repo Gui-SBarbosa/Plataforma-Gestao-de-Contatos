@@ -37,3 +37,10 @@ export const markNotificationRead = async (notificationId: string, recipientId: 
 
   return result.count > 0;
 };
+
+export const markAllNotificationsRead = async (recipientId: string) => {
+  await prisma.notification.updateMany({
+    data: { readAt: new Date() },
+    where: { readAt: null, recipientId },
+  });
+};
