@@ -56,6 +56,10 @@ describe("operator request decisions", () => {
     await prisma.$disconnect();
   });
 
+  beforeEach(async () => {
+    await prisma.rateLimitBucket.deleteMany();
+  });
+
   const login = async (email) => {
     const agent = request.agent(app);
     const csrf = await agent.get("/api/auth/csrf");

@@ -187,6 +187,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 - 16/10/2026 — CI/CD iniciado por solicitação do usuário: GitHub Actions validará pull requests e pushes para `main` com PostgreSQL efêmero; o Railway seguirá publicando automaticamente a branch principal.
 - 16/10/2026 — workflow de CI validado localmente: lint, typecheck, typecheck do seed, 52 testes de integração e build passaram. A suíte agora executa sequencialmente para isolar o rate limiter persistente entre cenários.
 
+- 16/10/2026 — A CI revelou que os testes de aprovação compartilhavam o bucket persistente de login. A suíte agora limpa esse estado antes de cada cenário; os 52 testes de integração passaram localmente.
+
 ## Pendências e próximos passos
 
 - 16/10/2026 — A primeira execução remota da CI falhou antes das migrations porque dotenv-cli aceita -f, e não -e. Os scripts Prisma foram corrigidos; geração do client, lint, typecheck, 52 testes de integração e build passaram localmente.
