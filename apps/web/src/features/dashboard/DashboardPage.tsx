@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 
 import { AppShell } from "../../components/layout/AppShell";
 import { EmptyState } from "../../components/ui/EmptyState";
@@ -44,7 +45,11 @@ export const DashboardPage = ({ user, onLogout }: DashboardPageProps) => {
       }
     };
     void load();
-    return () => { active = false; };
+    const socket = io({ autoConnect: false, transports: ["websocket"] });
+    socket.on("contact:created", () => { void load(); });
+    if (user.role === "ADMIN") socket.on("registration:requested", () => { void load(); });
+    socket.connect();
+    return () => { active = false; socket.disconnect(); };
   }, [operatorId, user.role]);
 
   const signOut = async () => { try { await logout(); } finally { onLogout(); } };
@@ -62,7 +67,7 @@ const DashboardContent = ({ contacts, data, pending, user }: { contacts: Contact
   return <>
     <section className="dashboard-metrics"><MetricCard icon="contacts" tone="blue" value={data.summary.contacts} label="Total de contatos" detail="no periodo" /><MetricCard icon="today" tone="green" value={todayTotal} label="Contatos cadastrados hoje" detail={data.interval === "day" ? "intervalo diario" : "intervalo selecionado"} /><MetricCard icon="operators" tone="navy" value={data.availableOperators.length || (user.role === "OPERATOR" ? 1 : 0)} label="Operadores ativos" detail="com acesso ativo" /><MetricCard icon="sources" tone="amber" value={sourceTotal ? data.bySource.filter((item) => item.total > 0).length : 0} label="Origens utilizadas" detail="fontes com registros" /></section>
     <section className="dashboard-grid dashboard-grid-charts"><article className="card dashboard-card"><DashboardCardHead title="Contatos cadastrados" subtitle="Ultimos sete dias" /><LineChart data={data.series} interval={data.interval} /></article><article className="card dashboard-card"><DashboardCardHead title="Contatos por origem" subtitle="Distribuicao total" /><SourceChart data={data.bySource} /></article></section>
-    <section className="dashboard-grid dashboard-grid-lower"><article className="card dashboard-card"><DashboardCardHead title={user.role === "ADMIN" ? "Contatos recentes" : "Meus contatos recentes"} subtitle="Ultimos cadastros visiveis" actionLabel="Ver todos" actionHref="#contacts" /><RecentContacts contacts={contacts} showOperator={user.role === "ADMIN"} /></article>{user.role === "ADMIN" && <article className="card dashboard-card"><DashboardCardHead title="Solicitacoes pendentes" subtitle="Aguardando analise" actionLabel="Ver todas" actionHref="#requests" /><PendingList pending={pending} /></article>}</section>
+    <section className="dashboard-grid dashboard-grid-lower"><article className="card dashboard-card"><DashboardCardHead title={user.role === "ADMIN" ? "Contatos recentes" : "Meus contatos recentes"} subtitle="Ultimos cadastros visiveis" actionLabel="Ver todos" actionHref="#contacts" /><RecentContacts contacts={contacts} showOperator={user.role === "ADMIN"} /></article>{user.role === "ADMIN" && <article className="card dashboard-card"><DashboardCardHead title="Solicitações pendentes" subtitle="Aguardando análise" actionLabel="Ver todas" actionHref="#requests" /><PendingList pending={pending} /></article>}</section>
   </>;
 };
 
@@ -100,11 +105,13 @@ const fillDailySeries = (data: DashboardData["series"]) => {
 
 const LineChart = ({ data, interval }: { data: DashboardData["series"]; interval: string }) => {
   const values = interval === "day" ? fillDailySeries(data) : data.length ? data : [{ period: "", total: 0 }];
-  const max = Math.max(...values.map((item) => item.total), 1);
+  const rawMax = Math.max(...values.map((item) => item.total), 0);
+  const max = rawMax === 0 ? 1 : Math.ceil(rawMax / 2) * 2;
+  const middle = max / 2;
   const y = (total: number) => 92 - (total / max) * 72;
   const x = (index: number) => values.length === 1 ? 50 : index * (100 / (values.length - 1));
   const points = values.map((item, index) => `${x(index)},${y(item.total)}`).join(" ");
-  return <div className="dashboard-line-chart"><div className="dashboard-chart-body"><div className="dashboard-y-axis"><span>{max}</span><span>{Math.round(max / 2)}</span><span>0</span></div><div className="dashboard-chart-plot"><svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="Contatos por periodo"><line x1="0" y1="20" x2="100" y2="20" /><line x1="0" y1="56" x2="100" y2="56" /><line x1="0" y1="92" x2="100" y2="92" /><polyline points={points} /></svg>{values.map((item, index) => <span className="dashboard-chart-point" key={`${item.period}-${index}`} style={{ left: `${x(index)}%`, top: `${y(item.total)}%` }} title={`${formatPeriod(item.period, interval)}: ${item.total} contatos`} aria-label={`${formatPeriod(item.period, interval)}: ${item.total} contatos`} />)}</div></div><div className="dashboard-chart-labels">{values.map((item, index) => <span key={`${item.period}-${index}`}>{formatPeriod(item.period, interval)}</span>)}</div>{!data.length && interval !== "day" && <small className="dashboard-chart-empty">Sem dados no periodo selecionado</small>}</div>;
+  return <div className="dashboard-line-chart"><div className="dashboard-chart-body"><div className="dashboard-y-axis"><span>{max}</span><span>{middle}</span><span>0</span></div><div className="dashboard-chart-plot"><svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="Contatos por periodo"><defs><linearGradient id="dashboard-line-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#2563eb" stopOpacity=".18" /><stop offset="100%" stopColor="#2563eb" stopOpacity="0" /></linearGradient></defs><line x1="0" y1="20" x2="100" y2="20" /><line x1="0" y1="56" x2="100" y2="56" /><line x1="0" y1="92" x2="100" y2="92" /><polygon className="dashboard-chart-area" points={`0,92 ${points} 100,92`} /><polyline points={points} /></svg>{values.map((item, index) => { const period = formatPeriod(item.period, interval); const tooltip = `${period}: ${item.total} contatos cadastrados`; const edgeClass = index === 0 ? " is-first" : index === values.length - 1 ? " is-last" : ""; return <span className={`dashboard-chart-point${edgeClass}`} key={`${item.period}-${index}`} style={{ left: `${x(index)}%`, top: `${y(item.total)}%` }} title={tooltip} aria-label={tooltip} data-tooltip={tooltip} />; })}</div></div><div className="dashboard-chart-labels">{values.map((item, index) => <span key={`${item.period}-${index}`} style={{ left: `${x(index)}%` }}>{formatPeriod(item.period, interval)}</span>)}</div><div className="dashboard-chart-status"><i /> Atualização em tempo real</div>{!data.length && interval !== "day" && <small className="dashboard-chart-empty">Sem dados no período selecionado</small>}</div>;
 };
 
 const SourceChart = ({ data }: { data: DashboardData["bySource"] }) => {

@@ -16,12 +16,13 @@ export const create: RequestHandler = async (request, response, next) => {
   try {
     const contact = await createContact(input.data, request.authUser!.id, request.authUser!.name);
     const publishContactCreated = request.app.locals.publishContactCreated as
-      | ((event: { contactId: string; createdAt: Date; creatorName: string }) => void)
+      | ((event: { contactId: string; createdAt: Date; creatorId: string; creatorName: string }) => void)
       | undefined;
 
     publishContactCreated?.({
       contactId: contact.id,
       createdAt: contact.createdAt,
+      creatorId: request.authUser!.id,
       creatorName: request.authUser!.name,
     });
 

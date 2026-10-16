@@ -19,6 +19,7 @@ type RegistrationDecision = {
 type ContactCreated = {
   contactId: string;
   createdAt: Date;
+  creatorId: string;
   creatorName: string;
 };
 
@@ -32,6 +33,7 @@ type RegistrationWatchAcknowledgement = (response: { code?: string; data?: { dec
 
 const registrationRoom = (registrationId: string) => `registration:${registrationId}`;
 const adminRoom = "admins";
+const userRoom = (userId: string) => `user:${userId}`;
 
 export const createRegistrationRealtime = (httpServer: HttpServer, sessionMiddleware?: RequestHandler) => {
   const io = new Server(httpServer, {
@@ -60,6 +62,7 @@ export const createRegistrationRealtime = (httpServer: HttpServer, sessionMiddle
 
       void getActiveUser(userId)
         .then((user) => {
+          if (user) socket.join(userRoom(user.id));
           if (user?.role === UserRole.ADMIN) {
             socket.join(adminRoom);
           }
@@ -130,8 +133,9 @@ export const createRegistrationRealtime = (httpServer: HttpServer, sessionMiddle
 
       io.to(registrationRoom(registrationId)).emit(event, { decidedAt, status });
     },
-    publishContactCreated: ({ contactId, createdAt, creatorName }: ContactCreated) => {
+    publishContactCreated: ({ contactId, createdAt, creatorId, creatorName }: ContactCreated) => {
       io.to(adminRoom).emit("contact:created", { contactId, createdAt, creatorName });
+      io.to(userRoom(creatorId)).emit("contact:created", { contactId, createdAt, creatorName });
     },
     publishRegistrationRequested: ({ createdAt, registrationId, requesterName }: RegistrationRequested) => {
       io.to(adminRoom).emit("registration:requested", { createdAt, registrationId, requesterName });
