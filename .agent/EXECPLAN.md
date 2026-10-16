@@ -193,6 +193,8 @@ Usar os identificadores `AC-*` definidos em `docs/REQUIREMENTS.md`. Nenhuma etap
 
 - 16/10/2026 — O Railway falhou no build porque `npm ci` tentou remover `apps/web/node_modules/.vite` enquanto o diretório estava bloqueado no cache persistente. O build do Railway passou a usar `npm install --prefer-offline --no-audit --no-fund`; a CI do GitHub permanece com `npm ci`.
 
+- 16/10/2026 — Após corrigir o cache do Railway, o build falhou porque o Prisma Client não era gerado antes do TypeScript. O comando de build passou a executar `npm run db:generate` antes de `npm run build`.
+
 ## Pendências e próximos passos
 
 - 16/10/2026 — A primeira execução remota da CI falhou antes das migrations porque dotenv-cli aceita -f, e não -e. Os scripts Prisma foram corrigidos; geração do client, lint, typecheck, 52 testes de integração e build passaram localmente.
