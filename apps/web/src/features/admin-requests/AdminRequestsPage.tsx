@@ -27,7 +27,7 @@ export const AdminRequestsPage = ({ user, onLogout }: { user: AuthUser; onLogout
 
   const decide = async (request: PendingRequest, decision: "approve" | "reject") => {
     setProcessingId(request.id); setFeedback(null); setError(null);
-    try { await (decision === "approve" ? approveRequest(request.id) : rejectRequest(request.id)); setFeedback(decision === "approve" ? "Solicitação aprovada." : "Solicitação rejeitada."); await loadRequests(page); } catch { setError("Não foi possível concluir a decisão. Atualize a lista e tente novamente."); } finally { setProcessingId(null); }
+    try { await (decision === "approve" ? approveRequest(request.id) : rejectRequest(request.id)); window.dispatchEvent(new Event("registration:requested")); setFeedback(decision === "approve" ? "Solicitação aprovada." : "Solicitação rejeitada."); await loadRequests(page); } catch { setError("Não foi possível concluir a decisão. Atualize a lista e tente novamente."); } finally { setProcessingId(null); }
   };
 
   const signOut = async () => { try { await logout(); } finally { onLogout(); } };

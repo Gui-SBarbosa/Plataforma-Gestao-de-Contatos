@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 
 import type { AuthUser } from "../../features/auth/auth.types";
+import { listPendingRequests } from "../../features/admin-requests/admin-requests.api";
 import { listContacts } from "../../features/contacts/contacts.api";
 import { NotificationBell } from "../../features/notifications/NotificationBell";
 import { useNotifications } from "../../features/notifications/useNotifications";
@@ -26,6 +27,7 @@ type AppShellProps = {
 export const AppShell = ({ activeSection, children, contactCount: initialContactCount, onLogout, user }: AppShellProps) => {
   const isAdmin = user.role === "ADMIN";
   const [sidebarContactCount, setSidebarContactCount] = useState<number | undefined>(initialContactCount);
+  const [pendingRequestCount, setPendingRequestCount] = useState(0);
   const notifications = useNotifications(isAdmin);
 
   useEffect(() => {
@@ -37,6 +39,23 @@ export const AppShell = ({ activeSection, children, contactCount: initialContact
     return () => { active = false; };
   }, [initialContactCount]);
 
+  useEffect(() => {
+    if (!isAdmin) return;
+    let active = true;
+    const refreshPendingRequests = () => {
+      void listPendingRequests(1).then((page) => {
+        if (active) setPendingRequestCount(page.meta.total);
+      }).catch(() => undefined);
+    };
+    const handleRegistrationRequested = () => refreshPendingRequests();
+    refreshPendingRequests();
+    window.addEventListener("registration:requested", handleRegistrationRequested);
+    return () => {
+      active = false;
+      window.removeEventListener("registration:requested", handleRegistrationRequested);
+    };
+  }, [isAdmin]);
+
   return <div className="app-shell">
     <aside className="sidebar">
       <Brand />
@@ -44,7 +63,7 @@ export const AppShell = ({ activeSection, children, contactCount: initialContact
         <a className={`nav-link ${activeSection === "overview" ? "active" : ""}`} href="#overview">Dashboard</a>
         <a className={`nav-link ${activeSection === "contacts" ? "active" : ""}`} href="#contacts">Contatos {sidebarContactCount !== undefined && <span className="nav-badge">{sidebarContactCount}</span>}</a>
         {isAdmin && <>
-          <a className={`nav-link ${activeSection === "requests" ? "active" : ""}`} href="#requests">Solicitações</a>
+          <a className={`nav-link ${activeSection === "requests" ? "active" : ""}`} href="#requests">Solicitações {pendingRequestCount > 0 && <span className="nav-badge nav-badge-notifications">{pendingRequestCount > 99 ? "99+" : pendingRequestCount}</span>}</a>
           <a className={`nav-link ${activeSection === "operators" ? "active" : ""}`} href="#operators">Operadores</a>
           <a className={`nav-link ${activeSection === "notifications" ? "active" : ""}`} href="#notifications">Notificações {notifications.unread > 0 && <span className="nav-badge nav-badge-notifications">{notifications.unread > 99 ? "99+" : notifications.unread}</span>}</a>
         </>}
